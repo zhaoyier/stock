@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
+var crawler = require("./crawler/code");
 
 var app = express();
 
@@ -55,6 +56,10 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
+
+setInterval(function () {
+    crawler.UpdataStockData()
+}, 1000*60*5);
 
 
 module.exports = app;
