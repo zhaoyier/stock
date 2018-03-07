@@ -1,0 +1,13 @@
+{
+    "mongo": {
+        "dbname":"honeycomb",
+        "url":"mongodb://47.96.22.148:27027"
+    },
+    "redis":{
+        "host": "47.96.22.148",
+        "port": 6399
+    },
+    "table": {
+        "ambo": {"name": "ambo", "desc": ""}
+    }
+}

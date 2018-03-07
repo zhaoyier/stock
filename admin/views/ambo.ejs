@@ -1,0 +1,105 @@
+<%- contentFor('header') %>
+<h1 class="page-title"><%= _locals.title %></h1>
+
+<!-- page specific plugin styles -->
+<link rel="stylesheet" href="css/jquery-ui.min.css" />
+<link rel="stylesheet" href="css/bootstrap-datepicker3.min.css" />
+<link rel="stylesheet" href="css/ui.jqgrid.min.css" />
+
+<%- contentFor('body') %>
+<div class="breadcrumbs ace-save-state" id="breadcrumbs">
+    <ul class="breadcrumb">
+        <li>
+            <i class="ace-icon fa fa-home home-icon"></i>
+            <a href="#">Home</a>
+        </li>
+
+        <li>
+            <a href="#">Tables</a>
+        </li>
+        <li class="active">jqGrid plugin</li>
+    </ul><!-- /.breadcrumb -->
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>
+            jqGrid
+            <small>
+                <i class="ace-icon fa fa-angle-double-right"></i>
+                Dynamic tables and grids using jqGrid plugin
+            </small>
+        </h1>
+    </div><!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            <div class="alert alert-info">
+                <button class="close" data-dismiss="alert">
+                    <i class="ace-icon fa fa-times"></i>
+                </button>
+
+                <i class="ace-icon fa fa-hand-o-right"></i>
+                Please note that demo server is not configured to save the changes, therefore you may see an error message.
+            </div>
+
+            <table id="grid-table"></table>
+
+            <div id="grid-pager"></div>
+
+            <!-- PAGE CONTENT ENDS -->
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+</div><!-- /.page-content -->
+<!-- page specific plugin scripts -->
+<script src="js/bootstrap-datepicker.min.js"></script>
+<script src="js/jquery.jqGrid.min.js"></script>
+<script src="js/grid.locale-en.js"></script>
+<script src="js/moment.min.js"></script>
+<script src="js/mygrid.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var option = {
+            url :    '/ambo/page',
+            editurl: '/ambo/edit',
+            caption :'账号系统',
+            navbar : { 	//navbar options
+                edit: true,
+                add: true,
+                del: true,
+                search: false,
+                refresh: true,
+                view: true
+            },
+            colModel : [
+                {editable: true, hidden: true},
+                {label: '编号', name:'_id',width: 80, editable: true},
+                {label: '名称', name:'name',width: 80, editable: true},
+                {label: '上市', name:'launch',width: 80, editable: true},
+                {label: '状态', name:'status',width: 80, editable: true},
+                {label: '创建日期', name:'create',width: 80, editable: false, formatter: dateFormat},
+                {label: '更新日期', name:'update',width: 80, editable: false, formatter: dateFormat},
+            ]
+        }
+
+        function dateFormat(cell) {
+            return moment.utc(cell).utcOffset(8).format("YYYY-MM-DD HH:mm")
+        }
+
+        function QueryAccountPage() {
+            var params = {};
+            if(option['_start']){
+                jQuery("#grid-table").setGridParam({postData: params}).trigger("reloadGrid");
+            }
+            else{
+                option['_start'] = true;
+                option.postData = params;
+                mygrid.create('#grid-table',"#grid-pager",option);
+            }
+        }
+
+        QueryAccountPage()
+    })
+
+</script>
