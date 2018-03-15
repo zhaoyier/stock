@@ -1,0 +1,9 @@
+{
+    "groupId": 1,
+    "serviceId": 3,
+    "monitorAddress": "localhost:11002",
+
+    "gameID": 100,
+    "sessionThinNumber": 20,
+    "sessionOvertime": 1200
+}

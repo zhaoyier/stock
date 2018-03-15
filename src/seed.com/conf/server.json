@@ -1,0 +1,21 @@
+{
+    "redis": {
+        "Network": "tcp",
+        "Address": "47.96.22.148:6399",
+        "MaxIdle": 100,
+        "MaxActive": 600
+    },
+    "mongodb":{
+        "Username": "",
+        "Password": "",
+        "Address": "47.96.22.148:27027",
+        "database":"stock",
+        "maxPoolSize": 4096
+    },
+    "mysql": {
+        "DriverName": "mysql",
+        "DataSourceName": "root:qxkin7bLcOIS&$gz@tcp(106.14.214.51:3306)/stock?charset=utf8",
+        "MaxOpenConns": 2000,
+        "MaxIdleConns": 1000
+    }
+}

@@ -1,0 +1,116 @@
+syntax="proto3";
+
+package stock;
+
+message BasicData {
+    //代码
+    string code = 1;
+    //类型
+    string exchange = 2;
+    //日期, eg:20180314
+    string date = 3;
+    //今开
+    int32 opening = 4;
+    //收盘
+    int32 closing = 5;
+    //成交量
+    int32 volume = 6;
+    //最高
+    int32 highest = 7;
+    //最低
+    int32 lowest = 8;
+    //内盘
+    int32 inside = 9;
+    //外盘
+    int32 outside = 10;
+    //换手率
+    int32 turnover = 11;
+    //成交额
+    int32 trading = 12;
+    //振幅
+    int32 amplitude = 13;
+    //委比 单位:%
+    int32 entrust = 14;
+    //量比
+    int32 amountRatio = 15;
+    //流通市值
+    int32 circulated = 16;
+    //总市值
+    int32 total = 17;
+    //市盈率MRQ
+    int32 peRatio = 18;
+    //市净率
+    int32 pbRatio = 19;
+    //每股收益
+    int32 income = 20;
+    //每股净资产
+    int32 per = 21;
+    //总股本
+    int32 equity = 22;
+    //流通股本
+    int32 flow = 23;
+}
+// 金额和单位
+message AmountUnit {
+    //数量
+    float amount = 1;
+    //单位
+    string unit = 2;
+}
+
+message Funds {
+    //错误码
+    int32 errorNo = 1;
+    //错误描述
+    string errorMsg = 2;
+    //资金信息
+    FundsData fundsData = 3;
+}
+
+//资金数据
+message FundsData {
+    //流入
+    int32 mainInflow = 1;
+    //流入
+    int32 retailInflow = 2;
+    //流出
+    int32 mainOutflow = 3;
+    //流出
+    int32 retailOutflow = 4;
+    //主力信息
+    repeated MainInfo mainInfo = 5;
+}
+
+//信息
+message MainInfo {
+    //日期
+    string date = 1;
+    //金额
+    int32 amount = 2;
+}
+
+//数据库储存
+message DBFunds {
+    //代码
+    string id = 1;
+    //资金信息
+    repeated DBFundsData funds = 2;
+    //创建时间
+    int64 create = 3;
+    //更新日期
+    int64 update = 4;
+}
+
+//数据库存储数据
+message DBFundsData {
+    //流入
+    int32 mi = 1;
+    //流入
+    int32 ri = 2;
+    //流出
+    int32 mo = 3;
+    //流出
+    int32 ro = 4;
+    //日期
+    string date = 5;
+}
