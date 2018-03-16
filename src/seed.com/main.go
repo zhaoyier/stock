@@ -9,5 +9,7 @@ func main() {
 	defer func() {
 		mongo.Shutdown()
 	}()
-	logic.Start()
+	//logic.Start()
+	//fmt.Println("===>>>", utils.HTTPGet("http://hq.sinajs.cn/list=sh600139", "GBK"))
+	logic.QueryCodeData()
 }

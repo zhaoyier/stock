@@ -2,6 +2,16 @@ syntax="proto3";
 
 package stock;
 
+message CodeData {
+    //代号
+    string id = 1;
+    //交易所
+    string exchange = 2;
+    //名称
+    string name = 3;
+    //创建日期
+    int64 createTime = 4;
+}
 message BasicData {
     //代码
     string code = 1;

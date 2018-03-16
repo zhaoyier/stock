@@ -2,7 +2,6 @@ package dao
 
 import (
 	"bytes"
-	"fmt"
 	"time"
 
 	"gopkg.in/mgo.v2/bson"
@@ -81,7 +80,6 @@ func SaveBasic(code, exc string, data *stock.BasicData) error {
 		data.GetLowest(), data.GetInside(), data.GetOutside(), data.GetTurnover(), data.GetTrading(), data.GetAmplitude(),
 		data.GetEntrust(), data.GetAmountRatio(), data.GetCirculated(), data.GetTotal(), data.GetPeRatio(), data.GetPbRatio(),
 		data.GetIncome(), data.GetPer(), data.GetEquity(), data.GetFlow(), time.Now().Unix()}
-	fmt.Println("====>>>0001:", sql.String(), args)
 	if _, err := db.Insert(sql.String(), args...); err != nil {
 		log.Errorf("[SaveBasic] 记录数据失败: %s", err.Error())
 		return err
@@ -91,11 +89,8 @@ func SaveBasic(code, exc string, data *stock.BasicData) error {
 
 //SaveFundsData 记录资金数据
 func SaveFundsData(code string, data *stock.FundsData) error {
-	db := mysql.NewDBHandler()
-	var sql bytes.Buffer
-	sql.WriteString(insertFundsSQL)
-	t := time.Now().Unix()
-	args := []interface{}{code, data.GetMainInflow(), data.GetRetailInflow(), data.GetMainOutflow(), data.GetRetailOutflow(), t}
+	db, sql := _init(insertBasicSQL)
+	args := []interface{}{code, data.GetMainInflow(), data.GetRetailInflow(), data.GetMainOutflow(), data.GetRetailOutflow(), time.Now().Unix()}
 	if _, err := db.Insert(sql.String(), args...); err != nil {
 		log.Errorf("[SaveFundsData] 记录数据失败: %s", err.Error())
 		return err

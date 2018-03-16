@@ -24,7 +24,6 @@ func HTTPGet(url, encode string) []byte {
 		fmt.Println("[HTTPGet] 读取响应消息失败: ", err.Error())
 		return nil
 	}
-	fmt.Println("======>>>201:", body)
 	switch encode {
 	case "gbk", "GBK":
 		data, err := ioutil.ReadAll(transform.NewReader(bytes.NewReader(body), chinese.GBK.NewDecoder()))

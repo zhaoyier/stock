@@ -23,6 +23,11 @@ func FormatInt64(val int64) string {
 	return strconv.FormatInt(val, 10)
 }
 
+//FormatInt int转字符串
+func FormatInt(val int) string {
+	return strconv.FormatInt(int64(val), 10)
+}
+
 //ParseFloat32 字符串转32浮点数
 func ParseFloat32(str string) float32 {
 	val, err := strconv.ParseFloat(str, 32)

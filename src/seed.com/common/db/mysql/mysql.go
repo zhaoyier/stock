@@ -31,7 +31,7 @@ func NewDBHandler() *DBHandler {
 	return &DBHandler{DB: db}
 }
 
-//insert
+//Insert 插入数据
 func (this *DBHandler) Insert(sql string, args ...interface{}) (int64, error) {
 	stmt, err := this.DB.Prepare(sql)
 	if err != nil {
