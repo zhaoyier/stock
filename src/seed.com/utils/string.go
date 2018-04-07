@@ -54,3 +54,25 @@ func ParseFloat2Int32(str string) int32 {
 	}
 	return int32(val * 100)
 }
+
+//FormatStockCode 股票代码转换
+func FormatStockCode(val int) string {
+	base := strconv.FormatInt(int64(val), 10)
+	if len(base) < 6 {
+		switch 6 - len(base) {
+		case 1:
+			return "0" + base
+		case 2:
+			return "00" + base
+		case 3:
+			return "000" + base
+		case 4:
+			return "0000" + base
+		case 5:
+			return "00000" + base
+		default:
+			return base
+		}
+	}
+	return base
+}

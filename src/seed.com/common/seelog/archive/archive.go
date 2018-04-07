@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	"edroity.com/libs/seelog/archive/gzip"
+	"seed.com/common/seelog/archive/gzip"
 )
 
 // Reader is the interface for reading files from an archive.

@@ -37,11 +37,12 @@ import (
 	"time"
 
 	"bytes"
-	"edroity.com/libs/seelog/archive"
-	"edroity.com/libs/seelog/archive/gzip"
-	"edroity.com/libs/seelog/archive/tar"
-	"edroity.com/libs/seelog/archive/zip"
 	"regexp"
+
+	"seed.com/common/seelog/archive"
+	"seed.com/common/seelog/archive/gzip"
+	"seed.com/common/seelog/archive/tar"
+	"seed.com/common/seelog/archive/zip"
 )
 
 // Common constants

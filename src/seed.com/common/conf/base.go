@@ -1,7 +1,7 @@
 package conf
 
 import (
-	"edroity.com/server/common/json"
+	"seed.com/common/json"
 )
 
 const (

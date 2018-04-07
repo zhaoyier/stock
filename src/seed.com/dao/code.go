@@ -1,7 +1,8 @@
 package dao
 
 import (
-	"seed.com/common/log"
+	"sync"
+
 	"seed.com/proto/stock"
 )
 
@@ -12,14 +13,13 @@ const (
 )
 
 //SaveCodeData 记录代码数据
-func SaveCodeData(dataList []*stock.CodeData) error {
+func SaveCodeData(data *stock.CodeData, wg *sync.WaitGroup) error {
+	wg.Add(1)
 	db, sql := _init(insertCodeSQL)
-	for _, data := range dataList {
-		args := []interface{}{data.GetId(), data.GetName(), data.GetExchange(), data.GetCreateTime()}
-		if _, err := db.Insert(sql.String(), args...); err != nil {
-			log.Errorf("[SaveFundsData] 记录数据失败: %s", err.Error())
-		}
+	args := []interface{}{data.GetId(), data.GetName(), data.GetExchange(), data.GetCreateTime()}
+	if _, err := db.Insert(sql.String(), args...); err != nil {
+		//log.Errorf("[SaveFundsData] 记录数据失败: %s", err.Error())
 	}
-
+	wg.Done()
 	return nil
 }

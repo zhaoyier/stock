@@ -1,15 +1,17 @@
 package main
 
 import (
-	"seed.com/common/db/mongo"
+	"runtime"
+
 	"seed.com/logic"
 )
 
 func main() {
 	defer func() {
-		mongo.Shutdown()
+		//mongo.Shutdown()
 	}()
-	//logic.Start()
-	//fmt.Println("===>>>", utils.HTTPGet("http://hq.sinajs.cn/list=sh600139", "GBK"))
-	logic.QueryCodeData()
+	runtime.GOMAXPROCS(runtime.NumCPU())
+	// code := logic.NewCode()
+	// code.StartCollectCode()
+	logic.EastMoneyData()
 }

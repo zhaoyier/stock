@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"errors"
 
-	"edroity.com/server/common/conf"
-	"edroity.com/server/common/log"
+	"seed.com/common/conf"
+	"seed.com/common/log"
 	_ "github.com/go-sql-driver/mysql"
 )
 

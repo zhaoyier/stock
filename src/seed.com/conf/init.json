@@ -1,9 +1,14 @@
 {
-    "groupId": 1,
-    "serviceId": 3,
-    "monitorAddress": "localhost:11002",
-
-    "gameID": 100,
-    "sessionThinNumber": 20,
-    "sessionOvertime": 1200
+    "code": "http://hq.sinajs.cn/",
+    "blockBasic": [{
+        "exchange": "sh",
+        "block": "hua",
+        "min": 600000,
+        "max": 600400
+    }, {
+        "exchange": "sz",
+        "block": "sza",
+        "min": 600000,
+        "max": 600400
+    }]
 }
