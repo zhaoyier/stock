@@ -3,6 +3,7 @@ package utils
 import (
 	"strconv"
 	"strings"
+	"time"
 )
 
 //Trim 删除字符中指定
@@ -75,4 +76,20 @@ func FormatStockCode(val int) string {
 		}
 	}
 	return base
+}
+
+//ParseDate 日期转时间戳
+func ParseDate(date string) int64 {
+	tm, _ := time.Parse("2006-01-02", strings.Split(date, "T")[0])
+	//fmt.Println("==>>date:", date)
+	return tm.Unix()
+}
+
+//CheckExchange 判断交易所
+func CheckExchange(code string) string {
+	c, _ := strconv.ParseInt(code, 10, 64)
+	if c < 600000 {
+		return "sz"
+	}
+	return "sh"
 }

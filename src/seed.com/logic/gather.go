@@ -156,42 +156,60 @@ func _analyseCodeData(body []byte) *stock.CodeData {
 	return code
 }
 
-//EastMoneyData 东方财富抓取基本数据
-func EastMoneyData() {
-	link := "http://dcfm.eastmoney.com/em_mutisvcexpandinterface/api/js/get?type=XGSG_LB&token=70f12f2f4f091e459a279469fe49eca5&st=cbxjrgbs,securitycode&sr=-1&p=100&ps=50"
-	//查询数据
-	body := utils.HTTPGet(link, "utf8")
-	//判断页数
-	fmt.Println("====>>>0001:", string(body))
-	//字符串转结构数据
-	_parseEaseMoneyResponse(body)
-}
-
 //_parseEaseMoneyResponse 解析返回数据
-func _parseEaseMoneyResponse(data []byte) {
+func _parseEaseMoneyResponse(data []byte) []*pbStock.EastMoneyData {
 	var _codeList []map[string]interface{}
+	_codeDataList := make([]*pbStock.EastMoneyData, 0, 0)
 	if err := json.Unmarshal(data, &_codeList); err == nil {
 		for _, _code := range _codeList {
-			_mapToStruct(_code)
+			if code := _mapToStruct(_code); code != nil {
+				_codeDataList = append(_codeDataList, code)
+			}
 		}
 	} else {
 		fmt.Println("==>>t1 err:", err)
 	}
+
+	return _codeDataList
 }
 
 //_mapToStruct 映射数据
-func _mapToStruct(data map[string]interface{}) {
-	var _code pbStock.EastmoneyCode
-	if body, err := json.Marshal(data); err != nil {
+func _mapToStruct(data map[string]interface{}) *pbStock.EastMoneyData {
+	//fmt.Println("====>>>200:", data)
+	_code := &pbStock.EastMoneyData{}
+	body, err := json.Marshal(data)
+	if err != nil {
 		fmt.Println("====>>>201:", err)
-		return
-	} else if strings.Contains(string(body), "未上市") { //判断是否未上市
-		return
-	} else { //解析代码基本信息
-		if err := json.Unmarshal(body, &_code); err != nil {
-			fmt.Println("====>>>202:", err)
-			return
-		}
-		fmt.Println("====>>>203:", _code)
+		return nil
 	}
+	//fmt.Println("====>>>202:", string(body))
+	if strings.Contains(string(body), "待上市") { //判断是否未上市
+		return nil
+	}
+	if strings.Contains(string(body), "未开板") { //判断是否未上市
+		return nil
+	}
+
+	if strings.Contains(string(body), "\"INDUSTRYPE\":\"-\"") {
+		body = []byte(strings.Replace(string(body), "\"INDUSTRYPE\":\"-\"", "\"INDUSTRYPE\":-1", 1))
+	}
+
+	if strings.Contains(string(body), "\"Close\":\"-\"") {
+		body = []byte(strings.Replace(string(body), "\"Close\":\"-\"", "\"Close\":-1", 1))
+	}
+
+	if strings.Contains(string(body), "\"mzyqgs\":\"-\"") {
+		body = []byte(strings.Replace(string(body), "\"mzyqgs\":\"-\"", "\"mzyqgs\":-1", 1))
+	}
+
+	if strings.Contains(string(body), "\"kb\":\"-\"") {
+		return nil
+	}
+
+	//解析代码基本信息
+	if err := json.Unmarshal(body, _code); err != nil {
+		fmt.Println("====>>>208:", err, string(body))
+		return nil
+	}
+	return _code
 }

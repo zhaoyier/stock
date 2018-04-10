@@ -2,14 +2,18 @@ syntax="proto3";
 
 package stock;
 
-message EastmoneyCode {
+message EastMoneyPage {
+    
+}
+
+message EastMoneyData {
     string financecode = 1;
     string companycode = 2;
     string securityshortname = 3;
     string securitycode = 4;
     string subcode = 5;
-    float fxzl = 6;
-    float wsfxsl = 7;
+    int64 fxzl = 6;
+    int64 wsfxsl = 7;
     float applyont = 8;
     float issuepriceMoney = 9;
     float issueprice = 10;
@@ -18,20 +22,20 @@ message EastmoneyCode {
     string listingdate = 16;
     float peissuea = 17;
     float lwr = 18;
-    float cbxjrgbs = 19;
+    //float cbxjrgbs = 19;
     string sc = 20;
     float mzyqgs = 21;
-    float sgzs = 22;
+    //float sgzs = 22;
     float applyontMoney = 23;
-    float averagelow = 24;
+    //float averagelow = 24;
     string kb = 25;
     float zzf = 26;
     float sl = 27;
     float mzyqhl = 28;
-    float totaliiqrplaceoff = 29;
+    //float totaliiqrplaceoff = 29;
     string INDUSTRY = 30;
     float Close = 35;
-    float ChangePercent = 40;
+    //float ChangePercent = 40;
     string ZgsmsOrYxs = 41;
     string Url = 42;
     float INDUSTRYPE = 43;
@@ -56,29 +60,29 @@ message CodeData {
     //网上发行总数
     int64 wsfxsl = 5;
     //发行价格
-    int32 issue = 6;
+    float issue = 6;
     //申购日期
-    int32 purchase = 7;
+    int64 purchase = 7;
     //发行市盈率
-    int32 peissuea = 8;
+    float peissuea = 8;
     //行业信息
     string industry = 9;
     //主营业务
     string mainbusin = 13;
     //总涨幅
-    int32 zzf = 15;
+    float zzf = 15;
     //申购代码
     string security = 16;
     //上市日期
     int64 listing = 17;
     //行业市盈率
-    int32 industrype = 20;
+    float industrype = 20;
     //首日收盘价
-    int32 closing = 21;
+    float closing = 21;
     //每中一签获利
-    int32 mzyqhl = 22;
+    float mzyqhl = 22;
     //连续一字板数量
-    int32 sl = 25;
+    float sl = 25;
     //创建日期
     int64 createTime = 30;
     //更新日期

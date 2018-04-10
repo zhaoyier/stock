@@ -7,11 +7,15 @@ import (
 )
 
 func main() {
-	defer func() {
-		//mongo.Shutdown()
-	}()
+	// defer func() {
+	// 	//mongo.Shutdown()
+	// }()
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	// code := logic.NewCode()
 	// code.StartCollectCode()
-	logic.EastMoneyData()
+	//logic.EastMoneyData()
+	// east := logic.NewEast()
+	// east.Start()
+
+	logic.Todo()
 }
