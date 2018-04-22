@@ -46,7 +46,7 @@ func (bd *BaiduData) GetBaiduBasicData() error {
 	return nil
 }
 
-//GetBaiduFundData 查询百度资金信息
+//GetBaiduFundData 查询百度资金信息git
 func (bd *BaiduData) GetBaiduFundData() error {
 	return nil
 }
