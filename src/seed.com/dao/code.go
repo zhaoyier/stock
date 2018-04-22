@@ -12,6 +12,7 @@ const (
 	codeFields  = "id, exchange, name, fxzl, wsfxsl, issue, purchase, peissuea, industry, " +
 		"mainbusin, zzf, security, listing, industrype, closing, mzyqhl, sl, createTime, updateTime"
 	insertCodeSQL = "INSERT INTO " + codeTblName + " (" + codeFields + ") VALUES(?, ?, ?, ?, ?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?, FROM_UNIXTIME(?), FROM_UNIXTIME(?))"
+	selectCount   = "select count(*) from code"
 )
 
 //SaveCodeData 记录代码数据
@@ -28,4 +29,14 @@ func SaveCodeData(data *stock.CodeData, wg *sync.WaitGroup) error {
 	}
 	wg.Done()
 	return nil
+}
+
+//GetCodeTotal 查询股票代码总数
+func GetCodeTotal() {
+	db, sql := _init(selectCount)
+	res, err := db.Query(sql.String())
+	if err != nil {
+		fmt.Println("[GetCodeTotal] ")
+	}
+	fmt.Println("====>>002:", res)
 }

@@ -2,6 +2,7 @@ package logic
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -26,12 +27,13 @@ func _getWebPageDocument(url string) (*goquery.Document, error) {
 }
 
 // 抓取基本信息
-func _crawlBasicMessage(code, exc string) {
+// exc 交易所
+func _crawlBasicMessage(code, exc string) error {
 	url := "https://gupiao.baidu.com/stock/" + exc + code + ".html"
 	doc, err := goquery.NewDocument(url)
 	if err != nil {
 		log.Errorf("[_getWebPageDocument] 爬取网页失败: %v", err)
-		return
+		return err
 	}
 
 	message := &stock.BasicData{}
@@ -92,33 +94,35 @@ func _crawlBasicMessage(code, exc string) {
 
 	if err := dao.SaveBasic("600139", "sz", message); err != nil {
 		log.Errorf("[_getHTTPJSON] 记录数据失败:%s", err.Error())
-		return
+		return nil
 	}
 
-	return
+	return nil
 }
 
-func _getHTTPJSON(code, exchange string) {
+func _getHTTPJSON(code, exchange string) error {
 	url := "https://gupiao.baidu.com/api/stocks/stockfunds?from=pc&os_ver=1&cuid=xxx&vv=100&format=json&stock_code="
 	url += exchange + code + "&timestamp=" + utils.FormatInt64(time.Now().Unix()*1000)
-
 	if response, err := http.Get(url); err != nil {
 		log.Errorf("[_getHTTPJSON] 查询JSON数据失败: %s", err.Error())
-		return
+		return err
 	} else if body, err := ioutil.ReadAll(response.Body); err != nil {
 		log.Errorf("[_getHTTPJSON] 读取JSON数据失败: %s", err.Error())
-		return
+		return err
 	} else {
 		funds := &stock.Funds{}
 		json.Unmarshal(body, &funds)
 		if funds.GetErrorNo() != 0 {
 			log.Errorf("[_getHTTPJSON] 返回数据错误: %s", funds.GetErrorMsg())
-			return
+			_, err := fmt.Printf("Code: %s|Exchange: %s 解析失败!", code, exchange)
+			return err
 		}
 		if err := dao.SaveFundsData(code, funds.GetFundsData()); err != nil {
 			log.Errorf("[_getHTTPJSON] 记录数据失败:%s", err.Error())
+			return err
 		}
 	}
+	return nil
 }
 
 //AmountUnitSplit 价格和单位拆分
@@ -158,14 +162,10 @@ func _traverseCode() {
 	wg := sync.WaitGroup{}
 	wg.Add(3)
 	go func() {
-		_crawlBasicMessage("002145", "sz")
-		_getHTTPJSON("002145", "sz")
-		wg.Done()
-	}()
-	go func() {
-		wg.Done()
-	}()
-	go func() {
+		e1, e2 := _crawlBasicMessage("002145", "sz"), _getHTTPJSON("002145", "sz")
+		if e1 != nil || e2 != nil {
+			fmt.Printf("Code: %s|Exchange: %s 查询失败: Err: %s|%s", "", "", e1, e2)
+		}
 		wg.Done()
 	}()
 	wg.Wait()

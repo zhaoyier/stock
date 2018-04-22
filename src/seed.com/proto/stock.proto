@@ -200,3 +200,24 @@ message DBFundsData {
     //日期
     string date = 5;
 }
+
+
+//股票代码
+message StockCode {
+    //代码
+    string code = 1;
+    //交易所
+    string exchange = 2;
+}
+
+//股票代码翻页
+message StockCodePage {
+    //当前页码
+    int32 page = 1;
+    //页面大小
+    int32 size = 2;
+    //总数
+    int32 total = 5;
+    //页面信息
+    repeated StockCode codeList = 10;
+}
