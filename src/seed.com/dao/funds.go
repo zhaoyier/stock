@@ -2,6 +2,7 @@ package dao
 
 import (
 	"bytes"
+	"fmt"
 	"time"
 
 	"seed.com/common/db/mysql"
@@ -86,7 +87,8 @@ func SaveBasic(code, exc string, data *stock.BasicData) error {
 
 //SaveFundsData 记录资金数据
 func SaveFundsData(code string, data *stock.FundsData) error {
-	db, sql := _init(insertBasicSQL)
+	db, sql := _init(insertFundsSQL)
+	fmt.Println("===>>>>data:", data, data.GetRetailInflow())
 	args := []interface{}{code, data.GetMainInflow(), data.GetRetailInflow(), data.GetMainOutflow(), data.GetRetailOutflow(), time.Now().Unix()}
 	if _, err := db.Insert(sql.String(), args...); err != nil {
 		log.Errorf("[SaveFundsData] 记录数据失败: %s", err.Error())

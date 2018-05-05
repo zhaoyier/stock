@@ -43,6 +43,7 @@ func _crawlBasicMessage(code, exc string) error {
 	//解析基本信息
 	doc.Find(".bets-content .line1 dl").Each(func(i int, s *goquery.Selection) {
 		value := s.Find("dd").Text()
+		//fmt.Println("===>>>code 001:", code, value)
 		switch i {
 		case 0:
 			message.Opening = utils.ParseFloat2Int32(value)
@@ -54,6 +55,7 @@ func _crawlBasicMessage(code, exc string) error {
 			message.Inside = _getFormatAmount(value)
 		case 5:
 			message.Trading = _getFormatAmount(value)
+			fmt.Println("=====>>>trading:", value, message.Trading)
 		case 6:
 			message.Entrust = _getFormatAmount(value)
 		case 7:
@@ -68,6 +70,7 @@ func _crawlBasicMessage(code, exc string) error {
 	})
 	doc.Find(".bets-content .line2 dl").Each(func(i int, s *goquery.Selection) {
 		value := s.Find("dd").Text()
+		//fmt.Println("===>>>code 002:", code, value)
 		switch i {
 		case 0:
 			message.Closing = utils.ParseFloat2Int32(value)
@@ -91,8 +94,8 @@ func _crawlBasicMessage(code, exc string) error {
 			message.Flow = _getFormatAmount(value)
 		}
 	})
-
-	if err := dao.SaveBasic("600139", "sz", message); err != nil {
+	fmt.Println("===>>>message:", message)
+	if err := dao.SaveBasic(code, exc, message); err != nil {
 		log.Errorf("[_getHTTPJSON] 记录数据失败:%s", err.Error())
 		return nil
 	}
@@ -110,6 +113,7 @@ func _getHTTPJSON(code, exchange string) error {
 		log.Errorf("[_getHTTPJSON] 读取JSON数据失败: %s", err.Error())
 		return err
 	} else {
+		fmt.Println("====>>>body:", string(body))
 		funds := &stock.Funds{}
 		json.Unmarshal(body, &funds)
 		if funds.GetErrorNo() != 0 {
@@ -126,8 +130,9 @@ func _getHTTPJSON(code, exchange string) error {
 }
 
 //AmountUnitSplit 价格和单位拆分
-func _getFormatAmount(str string) int32 {
+func _getFormatAmount(str string) int64 {
 	bs := []byte(str)
+	//fmt.Println("====>>>amount:", str, bs)
 	valueList := make([]byte, 0, 0)
 	for _, v := range bs {
 		switch v {
@@ -138,21 +143,24 @@ func _getFormatAmount(str string) int32 {
 		default:
 		}
 	}
-	amount := utils.ParseFloat2Int32(str[0:len(valueList)])
+	amount := utils.ParseI64(str[0:len(valueList)])
+	fmt.Println("====>>>amount:", amount, string(valueList))
 	unit := str[len(valueList):]
 	if unit == "亿" {
-		return amount * 10000
+		return amount * 100000000
 	} else if unit == "万" {
-		return amount
-	} else if unit == "万手" {
-		return amount
-	} else if unit == "亿手" {
 		return amount * 10000
+	} else if unit == "万手" {
+		return amount * 10000
+	} else if unit == "亿手" {
+		return amount * 100000000
+	} else if unit == "手" {
+		return amount
 	} else if unit == "%" {
 		return amount
 	}
-
-	log.Warnf("[_getFormatAmount] 单位异常: %s", unit, unit == "%")
+	fmt.Println("====>>001:", string(valueList), unit)
+	log.Warnf("[_getFormatAmount] 单位异常: %s", unit, "|--|", unit == "%")
 	return amount
 }
 

@@ -31,7 +31,7 @@ func FormatInt(val int) string {
 
 //ParseFloat32 字符串转32浮点数
 func ParseFloat32(str string) float32 {
-	val, err := strconv.ParseFloat(str, 32)
+	val, err := strconv.ParseFloat(str, 64)
 	if err != nil {
 
 	}
@@ -40,7 +40,7 @@ func ParseFloat32(str string) float32 {
 
 //ParseFloat64 字符串转64位浮点数
 func ParseFloat64(str string) float64 {
-	val, err := strconv.ParseFloat(str, 32)
+	val, err := strconv.ParseFloat(str, 64)
 	if err != nil {
 
 	}
@@ -49,11 +49,20 @@ func ParseFloat64(str string) float64 {
 
 //ParseFloat2Int32 字符串转整数
 func ParseFloat2Int32(str string) int32 {
-	val, err := strconv.ParseFloat(str, 32)
+	val, err := strconv.ParseFloat(str, 64)
 	if err != nil {
 
 	}
 	return int32(val * 100)
+}
+
+// ParseI64 将字符串转int64
+func ParseI64(str string) int64 {
+	val, err := strconv.ParseFloat(str, 64)
+	if err != nil {
+
+	}
+	return int64(val * 100)
 }
 
 //FormatStockCode 股票代码转换

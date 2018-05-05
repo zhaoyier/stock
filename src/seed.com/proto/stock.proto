@@ -100,29 +100,29 @@ message BasicData {
     //收盘
     int32 closing = 5;
     //成交量
-    int32 volume = 6;
+    int64 volume = 6;
     //最高
     int32 highest = 7;
     //最低
     int32 lowest = 8;
     //内盘
-    int32 inside = 9;
+    int64 inside = 9;
     //外盘
-    int32 outside = 10;
+    int64 outside = 10;
     //换手率
-    int32 turnover = 11;
+    int64 turnover = 11;
     //成交额
-    int32 trading = 12;
+    int64 trading = 12;
     //振幅
-    int32 amplitude = 13;
+    int64 amplitude = 13;
     //委比 单位:%
-    int32 entrust = 14;
+    int64 entrust = 14;
     //量比
     int32 amountRatio = 15;
     //流通市值
-    int32 circulated = 16;
+    int64 circulated = 16;
     //总市值
-    int32 total = 17;
+    int64 total = 17;
     //市盈率MRQ
     int32 peRatio = 18;
     //市净率
@@ -132,9 +132,9 @@ message BasicData {
     //每股净资产
     int32 per = 21;
     //总股本
-    int32 equity = 22;
+    int64 equity = 22;
     //流通股本
-    int32 flow = 23;
+    int64 flow = 23;
 }
 // 金额和单位
 message AmountUnit {
@@ -156,13 +156,13 @@ message Funds {
 //资金数据
 message FundsData {
     //流入
-    int32 mainInflow = 1;
+    float mainInflow = 1;
     //流入
-    int32 retailInflow = 2;
+    float retailInflow = 2;
     //流出
-    int32 mainOutflow = 3;
+    float mainOutflow = 3;
     //流出
-    int32 retailOutflow = 4;
+    float retailOutflow = 4;
     //主力信息
     repeated MainInfo mainInfo = 5;
 }
@@ -220,4 +220,18 @@ message StockCodePage {
     int32 total = 5;
     //页面信息
     repeated StockCode codeList = 10;
+}
+
+//翻页查询股票数据列表
+message GetCodeByOffsetDataList {
+  repeated CodeByOffsetData list = 1;
+}
+//翻页查询股票数据 
+message CodeByOffsetData {
+  //代码ID
+  string id=1;
+  //名称
+  string name=2;
+  //交易所
+  string exchange=3;
 }
