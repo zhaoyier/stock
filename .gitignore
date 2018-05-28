@@ -1,3 +1,4 @@
 /node_modules/
-/.idea/*
+.idea/*
 pkg/**
+src/seed.com/.idea/

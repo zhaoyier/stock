@@ -1,0 +1,19 @@
+syntax="proto3";
+
+package seller;
+
+message Basic {
+    string name = 1;
+}
+
+message GetNameReq {
+
+}
+
+message GetNameResp {
+
+}
+
+service Seller {
+    rpc GetSellerName(GetNameReq) returns(GetNameResp);
+}

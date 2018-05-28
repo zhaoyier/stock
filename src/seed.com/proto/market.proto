@@ -1,8 +1,0 @@
-syntax="proto3";
-
-import "seller.proto";
-package market;
-
-message GetEmployee {
-    seller.Basic  employee = 1;
-}
