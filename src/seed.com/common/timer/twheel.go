@@ -1,3 +1,6 @@
+/**
+ * 依据时间轮构造定时器
+ */
 package timer
 
 import (
@@ -5,6 +8,7 @@ import (
 	"time"
 	"fmt"
 	"sync"
+	"seed.com/common/utils"
 )
 
 type Task func(args ...interface{}) error
@@ -29,7 +33,8 @@ func NewTimer(options *Options) *TimeWheel {
 }
 
 // 新增定时器
-func (tw *TimeWheel) AddTimer() {
+func (tw *TimeWheel) AddTimer(date string) {
+
 	// 计算圈数和槽位
 
 }
