@@ -6,7 +6,6 @@ import (
 	"runtime"
 	"sync"
 
-	"strings"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -14,12 +13,13 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"seed.com/common/log"
+	cutils "seed.com/common/utils"
 	"seed.com/mushroom/dao"
 	"seed.com/mushroom/proto/stock"
 	"seed.com/utils"
 )
 
-const Origin = "baidu";
+const Origin = "baidu"
 
 //BaiduData 构造百度数据结构
 type BaiduData struct {
@@ -45,11 +45,12 @@ func NewBaiduData() *BaiduData {
 
 //Start 开始采集百度数据
 func (bd *BaiduData) Start() {
-	//TODO bd.GetStockCode()
-	bd.GetBaiduStockData(&stock.CodeByOffsetData{
-		Id:       "002339",
-		Exchange: "sz",
-	}, nil)
+	bd.GetStockCode()
+	//fmt.Println("===>>baidu start")
+	//bd.GetBaiduStockData(&stock.CodeByOffsetData{
+	//	Id:       "002145",
+	//	Exchange: "sz",
+	//}, nil)
 }
 
 //GetStockCode 查询股票代码数据
@@ -97,15 +98,15 @@ func _baiduBasicData(code, exc string) error {
 		log.Errorf("[_getWebPageDocument] 爬取网页失败: %v", err)
 		return err
 	}
-
+	fmt.Println("====>>>basic data:", doc);
 	message := &stock.BasicData{}
 	//计算日期
-	date := time.Now().Format("2006-01-02")
-	message.Date = strings.Join(strings.Split(date, "-"), "")
+	// date := time.Now().Format("2006-01-02")
+	message.Date = cutils.GetTodyDate()
 	//解析基本信息
 	doc.Find(".bets-content .line1 dl").Each(func(i int, s *goquery.Selection) {
 		value := s.Find("dd").Text()
-		//fmt.Println("===>>>code 001:", code, value)
+		fmt.Println("===>>>code 001:", code, value)
 		switch i {
 		case 0:
 			message.Opening = utils.ParseFloat2Int32(value)
@@ -117,7 +118,6 @@ func _baiduBasicData(code, exc string) error {
 			message.Inside = _getFormatAmount(value)
 		case 5:
 			message.Trading = _getFormatAmount(value)
-			fmt.Println("=====>>>trading:", value, message.Trading)
 		case 6:
 			message.Entrust = _getFormatAmount(value)
 		case 7:
@@ -176,6 +176,7 @@ func _baiduFunds(code, exc string) error {
 	} else {
 		fmt.Println("====>>>body:", string(body))
 		funds := &stock.Funds{}
+
 		json.Unmarshal(body, &funds)
 		if funds.GetErrorNo() != 0 {
 			log.Errorf("[_getHTTPJSON] 返回数据错误: %s", funds.GetErrorMsg())
@@ -218,8 +219,10 @@ func _getFormatAmount(str string) int64 {
 		return amount
 	} else if unit == "%" {
 		return amount
+	} else {
+		return 0
 	}
 	fmt.Println("====>>001:", string(valueList), unit)
-	log.Warnf("[_getFormatAmount] 单位异常: %s", unit, "|--|", unit == "%")
+	log.Warnf("[_getFormatAmount] 单位异常: %s|%d", unit, amount)
 	return amount
 }

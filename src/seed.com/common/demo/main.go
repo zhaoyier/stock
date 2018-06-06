@@ -16,6 +16,7 @@ func main()  {
 	var date string = "2018-5-1 x:x:1"
 
 	fmt.Println("==>>:", utils.GetDiffTime(date))
+	fmt.Println("==>>002:", utils.GetTodyDate())
 }
 
 func getDateList(date string) (delay []int) {

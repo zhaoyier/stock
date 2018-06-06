@@ -127,3 +127,8 @@ func atoi(s string) int {
 	num, _ := strconv.Atoi(s)
 	return num
 }
+
+func GetTodyDate() string {
+	tm := time.Now()
+	return tm.Format("20060102")
+}

@@ -163,8 +163,10 @@ message FundsData {
     float mainOutflow = 3;
     //流出
     float retailOutflow = 4;
+    // 日期
+    string date = 5;
     //主力信息
-    repeated MainInfo mainInfo = 5;
+    repeated MainInfo mainInfo = 6;
 }
 
 //信息
