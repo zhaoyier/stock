@@ -45,12 +45,12 @@ func NewBaiduData() *BaiduData {
 
 //Start 开始采集百度数据
 func (bd *BaiduData) Start() {
-	bd.GetStockCode()
+	//bd.GetStockCode()
 	//fmt.Println("===>>baidu start")
-	//bd.GetBaiduStockData(&stock.CodeByOffsetData{
-	//	Id:       "002145",
-	//	Exchange: "sz",
-	//}, nil)
+	bd.GetBaiduStockData(&stock.CodeByOffsetData{
+		Id:       "002145",
+		Exchange: "sz",
+	}, nil)
 }
 
 //GetStockCode 查询股票代码数据
