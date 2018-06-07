@@ -4,9 +4,11 @@ import (
 	"runtime"
 	// "seed.com/mushroom/timer"
 	"seed.com/mushroom/task"
+	"seed.com/common/log"
 )
 
 func main() {
+	defer log.Shutdown()
 	// cpu多核
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	// 定时器1，传入两个参数

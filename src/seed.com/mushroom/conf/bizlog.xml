@@ -4,10 +4,10 @@
             <console />
         </filter>
         <filter levels="trace,debug,info,warn,critical,error">
-            <rollingfile type="date" filename="/data/logs/logs/game_debug.log" datepattern="2006.01.02" maxrolls="10000000" />
+            <rollingfile type="date" filename="/data/logs/seed_debug.log" datepattern="2006.01.02" maxrolls="10000000" />
         </filter>
         <filter levels="error,critical">
-            <rollingfile type="date" filename="/data/logs/logs/game_error.log" datepattern="2006.01.02" maxrolls="10000000" />
+            <rollingfile type="date" filename="/data/logs/seed_error.log" datepattern="2006.01.02" maxrolls="10000000" />
         </filter>
     </outputs>
     <formats>
