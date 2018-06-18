@@ -1,4 +1,5 @@
 /node_modules/
 .idea/*
 ./pkg/**
+weeds/node_modules/
 src/seed.com/.idea/
