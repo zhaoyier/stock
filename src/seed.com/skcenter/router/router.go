@@ -14,6 +14,7 @@ func RegisterRouters()  {
 	{
 		accountGroup.POST("/login", handler.Login)
 	}
+	apiGroup := router.Group("")
 }
 
 func Start(address string) {
