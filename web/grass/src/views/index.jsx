@@ -5,11 +5,11 @@ class App extends React.Component{
     render(){  
         return (  
             <div>  
-                <p>Hello</p>
+                <p>Hello World</p>
             </div>  
         )  
     }  
 }
 ReactDOM.render(( 
     <App/> 
-), document.getElementById('root')); 
+), document.getElementById('container')); 
