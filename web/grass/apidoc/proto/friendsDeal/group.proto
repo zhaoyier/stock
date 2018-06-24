@@ -1,0 +1,124 @@
+syntax = "proto3";
+package friendsDeal;
+
+import "common/ezbuy.proto";
+
+service Group {
+  option (common.service).webapi = true;
+  rpc Product(GroupProduct) returns (GroupProductResp);
+  rpc ShareInfo(GroupShareInfo) returns (GroupShareInfoResp);
+  rpc Notify(GroupNotify) returns (GroupNotifyResp);
+}
+
+enum GroupNotifyStatus {
+  GroupNotifyStatusInvalid = 0;
+  GroupNotifyStatusJoin = 1;
+  GroupNotifyStatusSucc = 2;
+  GroupNotifyStatusFail = 3;
+  GroupNotifyStatusTimeout6H = 4;
+  GroupNotifyStatusTimeout1H = 5;
+}
+
+message GroupNotify {
+  int32 customerId = 1;
+  string groupOrderId = 2;
+  GroupNotifyStatus status = 4;
+  
+
+  string nickName = 10;
+  string friendsDealStatus = 11;
+  string friendsDealStatusMsg = 12;
+  string orderLink = 13;
+  string productName = 14;
+  string productLink = 15;
+  string listLink = 16;
+  string accountLink = 17;
+}
+
+message GroupNotifyResp {
+  bool isNotified = 1;
+  string statusMsg = 2;
+}
+
+message GroupProduct {
+  string refId = 1;
+  string eventId = 2;
+  int64 gpid = 3;
+}
+
+message GroupProductResp {
+  GroupProductItem item = 1;
+}
+
+message GroupProductItem {
+  int64 gpid = 1;
+  double price = 2;
+  double originalPrice = 3;
+  // 销售地价格
+  double groupPrice = 4;
+  // 来源地价格
+  double groupOriginPrice = 5;
+  double exchange = 6;
+  double virtualPrice = 7;
+  double discountRate = 8;
+  int32 minPersons = 9;
+  int32 curStock = 10;
+  GroupSinglePrice singlePrice = 11;
+  bool disableSingle = 12;
+  string productUrl = 13;
+}
+
+message GroupSinglePrice {
+  double ActualPrice = 1;
+  double ActualOriginPrice = 2;
+  double GroupPrice = 3;
+  double GroupOriginPrice = 4;
+  double TransportFee = 5;
+  double AgentFee = 6;
+}
+
+message GroupShareInfo {
+  string groupID = 1;
+  GroupShareType type = 2;
+  string settingId = 3;
+  int64 gpId = 4;
+}
+
+message GroupShareInfoResp {
+  GroupError err = 1;
+  GroupShareInfoE info = 2;
+}
+
+enum ErrorCode {
+  ErrorCodeOK = 0;
+  ErrorCodeNotFound = 1;
+  ErrorCodeUnknown = 2;
+  ErrorObjectId = 3;
+  ErrorArrayLenZero = 4;
+  ErrorNil = 5;
+  ErrorNilCustomerId = 6;
+  ErrorNilCatalog = 7;
+  ErrorNilClient = 8;
+  ErrorNilPhone = 9;
+  ErrorSyncSeller = 10;
+}
+
+enum GroupShareType {
+  other = 0;
+  product = 1; // 小团分享
+  shareGroup = 2; // 大团分享
+}
+
+// ErrCode.ErrorCode != ErrorCodeOk ==> err
+message GroupError {
+  ErrorCode errCode = 1;
+  string msg = 2;
+}
+
+message GroupShareInfoE {
+  string title = 1;
+  string type = 2;
+  string imageURL = 3;
+  string description =4;
+}
+

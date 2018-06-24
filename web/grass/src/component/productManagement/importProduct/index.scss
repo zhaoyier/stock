@@ -1,0 +1,55 @@
+body {
+  background-color: #F2F2F2;
+}
+
+@mixin bottom__line {
+  margin-left: -20px;
+  margin-right: -20px;
+  border-bottom: 1px solid #EEEEEE;
+}
+@mixin clearfix {
+  content: "."; 
+  visibility: hidden; 
+  display: block; 
+  height: 0; 
+  clear: both;
+}
+
+.clearfix:after { 
+  @include clearfix;
+}
+.import__form {
+  margin-top: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+  padding: 20px;
+  min-height: 700px;
+  background: #fff;
+  border-radius: 4px;
+}
+.map__path {
+  @include bottom__line;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 15px;
+  h3 {
+    font-size: 14px;
+  }
+}
+.tips {
+  @include bottom__line;
+  padding-top: 25px;
+  padding-left: 20px;
+  padding-bottom: 25px;
+}
+.form__item {
+  margin: 20px auto 0;
+  width: 700px;
+  .label {
+    width: 100px;
+    float: left;
+  }
+  .user__control {
+    float: left;
+  }
+}

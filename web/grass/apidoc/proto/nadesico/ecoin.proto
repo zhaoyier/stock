@@ -1,0 +1,28 @@
+syntax = "proto3";
+package nadesico;
+
+service Ecoin {
+    rpc Op (OpReq) returns (OpResp);
+    rpc Total (TotalReq) returns (TotalResp);
+}
+
+// --------------------
+message OpReq {
+    int64 uid = 1;
+    int32 delta = 2;
+    string operator = 3;
+    string note = 4;
+}
+
+message OpResp {
+    bool ret = 1;
+}
+
+// --------------------
+message TotalReq {
+    int64 uid = 1;
+}
+
+message TotalResp {
+    int32 total = 1;
+}

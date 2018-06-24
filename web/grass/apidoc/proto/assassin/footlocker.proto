@@ -1,0 +1,29 @@
+syntax = "proto3";
+package assassin;
+import "assassin/assassin.proto";
+import "common/ezbuy.proto";
+
+service FootLocker {
+    option (common.service).webapi = true;
+    rpc Get(FootLockerGet) returns (FootLockerGetResp);
+    rpc GetSingleProductUrl(GetSingleProductUrlReq) returns (GetSingleProductUrlResp);
+}
+
+
+message FootLockerGet {
+    string id = 1;
+    bool notRealtime = 2;
+}
+
+message FootLockerGetResp {
+    Product product = 1;
+}
+
+message GetSingleProductUrlReq {
+    string url = 1;
+    string scid = 2;
+}
+
+message GetSingleProductUrlResp {
+    repeated string urls = 1;
+}

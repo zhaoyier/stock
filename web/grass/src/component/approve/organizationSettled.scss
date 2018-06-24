@@ -1,0 +1,69 @@
+@import '../../scss/_base.scss';
+
+.organizationSettled{
+  width: 900px;
+  margin: 0 auto;
+  padding-top: 45px;
+  > h2{
+    width:100%;
+    height:40px;
+    line-height:40px;
+    font-size:18px;
+    color:white;
+    font-weight: normal;
+    background: #ff5a00;
+    border:1px solid #ccc;
+    padding-left:30px;
+    margin: 15px 0;
+  }
+  form{
+    .title{
+      color:#000;
+      font-size:16px;
+      padding-left:20px;
+      margin-bottom: 15px;
+    }
+    .picture{
+      .name{
+        height:45px;
+        line-height:45px;
+        text-align: center;
+        background: #2db7f5;
+        font-size:18px;
+        color:white;
+        border-bottom:1px solid #ccc;
+      }
+      .img{
+        position:relative;
+        height:203px;
+        .icon{
+          position:absolute;
+          left:0;
+          top:0;
+          z-index: 1;
+          width:100%;
+          height: 100%;
+          @include flexbox(row, center, center, null);
+        }
+        .uploadImage{
+          position:absolute;
+          left:0;
+          top:0;
+          width:100%;
+          height:100%;
+          z-index:2;
+        }
+      }
+      border:1px solid #ccc;
+      height:250px;
+      cursor: pointer;
+      margin-bottom:15px;
+    }
+  }
+  .origin__code {
+    .country__icon {
+      width: 30px;
+      vertical-align: middle;
+    }
+  }
+}

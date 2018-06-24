@@ -1,0 +1,97 @@
+syntax = "proto3";
+package assassin;
+
+message XTaobaoDetail {
+  XTaobaoDetailDelivery delivery = 1;
+  XTaobaoDetailFeature feature = 2;
+  XTaobaoDetailItem item = 3;
+  XTaobaoDetailPrice price = 4;
+  XTaobaoDetailDescProps props = 5;
+  XTaobaoDetailSkuBase skuBase = 6;
+  XTaobaoDetailSkuCore skuCore = 7;
+  XTaobaoDetailTrade trade = 8;
+}
+
+message XTaobaoDetailDelivery {
+  int32 areaId = 1;
+  string from = 2;
+  string postage = 3;
+  string to = 4;
+}
+
+message XTaobaoDetailFeature {
+  bool cainiaoNoramal = 1;
+  bool hasCoupon = 2;
+  bool hasSku = 3;
+  bool showSku = 4;
+  bool superActTime = 5;
+  bool hasNewCombo = 6;
+}
+
+message XTaobaoDetailItem {
+  repeated string images = 1;
+  int64 itemId = 2;
+  string taobaoDescUrl = 3;
+  string taobaoPcDescUrl = 4;
+  string title = 5;
+  string tmallDescUrl = 6;
+  string subtitle = 7;
+}
+
+message XTaobaoDetailPrice {
+  string originalPrice = 1;
+  string price = 2;
+}
+
+message XTaobaoDetailDescProps {
+  map<string, string> base = 1;
+}
+
+message XTaobaoDetailDescPropsItem {
+  string key = 1;
+  string value = 2;
+}
+
+message XTaobaoDetailSkuBase {
+  repeated XTaobaoDetailSkuBaseProp props = 1;
+  repeated XTaobaoDetailSkuBaseSku skus = 2;
+}
+
+message XTaobaoDetailSkuBaseProp {
+  string name = 1;
+  int32 pid = 2;
+  repeated XTaobaoDetailSkuBasePropValue values = 3;
+}
+
+message XTaobaoDetailSkuBasePropValue {
+  string name = 1;
+  int64 vid = 2;
+  string image = 3;
+}
+
+message XTaobaoDetailSkuBaseSku {
+  string propPath = 1;
+  int64 skuId = 2;
+}
+
+message XTaobaoDetailSkuCore {
+  map<string, XTaobaoDetailSkuCoreInfo> sku2info = 1;
+}
+
+message XTaobaoDetailSkuCoreInfo {
+  XTaobaoDetailSkuCoreInfoPrice price = 1;
+  int32 quantity = 2;
+}
+
+message XTaobaoDetailSkuCoreInfoPrice {
+  int32 priceMoney = 1;
+  string priceText = 2;
+  string priceTitle = 3;
+  int32 type = 4;
+}
+
+
+message XTaobaoDetailTrade {
+  bool buyEnable = 1;
+  bool cartEnable = 2;
+}

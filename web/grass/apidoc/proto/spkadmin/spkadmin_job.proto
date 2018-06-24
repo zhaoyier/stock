@@ -1,0 +1,201 @@
+syntax = "proto3";
+package spkadmin;
+import "common/ezbuy.proto";
+import "common/any.proto";
+import "common/time.proto";
+import "common/html.proto";
+
+// 运行任务
+service Job {
+  option (common.service).webapi = true;
+  rpc Index(JobIndex) returns (common.Html);
+  // 添加任务
+  rpc Add(JobAdd) returns (JobAddResp);
+  // 获取并标记正在执行
+  rpc Pull(JobPull) returns (JobPullResp);
+  // 标记状态, 进度
+  rpc Ack(JobAck) returns (JobAckResp);
+  // 列表页
+  rpc List(JobList) returns (JobListResp);
+  // 标记任务为成功
+  rpc Succ(JobSucc) returns (JobSuccResp);
+  // 标记任务失败
+  rpc Fail(JobFail) returns (JobFailResp);
+  // 停止任务
+  rpc Stop(JobStop) returns (JobStopResp);
+  // 将计划任务修改为立刻执行
+  rpc Execute(JobExecute) returns (JobExecuteResp);
+  // 打印log
+  rpc Log(JobLog) returns (JobLogResp);
+  // 查看Job的状态
+  rpc Get(JobGet) returns (JobGetResp);
+}
+
+// ---------------------------------------------------------------------------
+
+enum JobLogLevel {
+  JobLogLevelInfo = 0;
+  JobLogLevelError = 1;
+}
+
+enum JobStatus {
+  JobStatusInit = 0;
+  JobStatusExecuting = 1;
+  JobStatusDone = 2;
+  JobStatusFail = 3;
+  JobStatusPause = 5;
+}
+
+message JobAdd {
+  common.Any payload = 1;
+  common.Duration timeout = 2;
+  common.Time execute = 3;
+  string payloadJSON = 4;
+  // 相同执行时间相同类型的只会存在一个
+  bool dedup = 5;
+  // 上一个任务job的id
+  string executeAfter = 6;
+}
+
+message JobAddResp {
+  string id = 1;
+  JobStatus status = 2;
+}
+
+message JobPull {
+  // payload 的类型 -> 被当作是任务的类型
+  // 一般是取 common.MarshalAny() 的 type
+  string type = 1;
+  // 只有来源程序匹配才能执行
+  string sourceExec = 2;
+  // 客户端启动的随机sessionId, 重启时要不一样
+  string sessionId = 3;
+}
+
+message JobPullResp {
+  common.Any payload = 1;
+  string id = 2;
+}
+
+message JobAck {
+  string id = 1;
+  int32 current = 2;
+  int32 total = 3;
+  string sessionId = 4;
+}
+
+message JobAckResp {
+  bool continue = 1;
+  // 不能继续执行的原因
+  string msg = 2;
+}
+
+message JobUpdate {
+  string id = 1;
+  JobStatus status = 2;
+  int32 total = 3;
+  int32 current = 4;
+  string sessionId = 5;
+  string msg = 6;
+}
+
+message JobUpdateResp {
+  // 表示是否继续
+  bool continue = 1;
+  // 不能继续执行的原因
+  string msg = 2;
+}
+
+message JobList {
+  string type = 1;
+  string exec = 2;
+  int32 limit = 3;
+  int32 offset = 4;
+}
+
+message JobItem {
+  string id =1;
+  int32 total = 2;
+  int32 current =3;
+  JobStatus status = 4;
+  common.Any data = 5;
+  int64 createDate = 6;
+}
+
+message JobListResp {
+  repeated JobItem items = 1;
+  int32 total = 2;
+}
+
+// ---------------------------------------------------------------------------
+
+message JobFail {
+  string id = 1;
+  string sessionId = 2;
+  string msg = 3;
+}
+
+message JobFailResp {
+  
+}
+
+// ---------------------------------------------------------------------------
+
+message JobIndex {
+  string id = 3;
+  string sourceExec = 1;
+  string type = 2;
+}
+
+// ---------------------------------------------------------------------------
+
+message JobExecute {
+  string id = 1;
+}
+
+message JobExecuteResp {
+}
+
+// ---------------------------------------------------------------------------
+
+message JobLog {
+  string id = 1;
+  JobLogLevel level = 2;
+  string msg = 3;
+}
+
+message JobLogResp {
+}
+
+// ---------------------------------------------------------------------------
+
+message JobStop {
+  string id = 1;
+}
+
+message JobStopResp {
+  
+}
+
+// ---------------------------------------------------------------------------
+
+message JobSucc {
+  string id = 1;
+  string sessionId = 2;  
+}
+
+
+message JobSuccResp {
+  
+}
+
+// ---------------------------------------------------------------------------
+
+message JobGet {
+  repeated string jobIds = 1;
+}
+
+message JobGetResp {
+  repeated JobItem items = 2;
+}
+

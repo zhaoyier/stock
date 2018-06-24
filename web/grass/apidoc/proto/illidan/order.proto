@@ -1,0 +1,30 @@
+syntax = "proto3";
+package illidan;
+
+import "common/ezbuy.proto";
+
+service Order {
+    option (common.service).webapi = true;
+	option (common.service).public = true;
+
+    rpc GetTrackInfo(GetTrackInfoReq) returns (GetTrackInfoResp);
+}
+
+message GetTrackInfoReq {
+    repeated string orderSns = 1;
+}
+
+message GetTrackInfoResp {
+    repeated TrackInfo trackInfos = 1;
+}
+
+message TrackInfo {
+    string order_sn = 1;
+    repeated ShippingInfo shippingInfos = 2;
+}
+
+message ShippingInfo {
+    string shippingName = 1;
+    string shippingNo = 2;
+    int64 shippingTime = 3;
+}

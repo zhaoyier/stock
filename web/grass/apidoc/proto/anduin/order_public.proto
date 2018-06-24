@@ -1,0 +1,29 @@
+syntax = "proto3";
+package anduin;
+
+import "biz/warehouse.proto";
+import "biz/region.proto";
+
+message EzbuyOrderItem {
+	uint64 orderID = 1;
+	uint64 itemID = 2;
+	int32 customerID = 3;
+	int64 gpid = 4;
+	int64 skuId = 5;
+	int64 qty = 6;
+	int64 unitPrice = 7;
+	int32 shipmentTypeID = 8;
+	biz.Warehouse warehouse = 9;
+	biz.Region region = 10;                   // 目的地 region
+}
+
+message EzbuyOrderItemResult {
+	EzbuyOrderItemResultCode code = 1;
+	string message = 2;
+	bool shouldReassign = 3;
+}
+
+enum EzbuyOrderItemResultCode {
+	EzbuyOrderItemResultCodeOK = 0;
+	EzbuyOrderItemResultCodeShouldReassign = 1;
+}

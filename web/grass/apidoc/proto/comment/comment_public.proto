@@ -1,0 +1,189 @@
+syntax = "proto3";
+package comment;
+option swift_prefix = "GR";
+
+import "common/ezbuy.proto";
+import "common/common.proto";
+import "biz/region.proto";
+
+service Comment {
+    option (common.service).webapi = true;
+    // 用户给某商品添加一条评论
+    rpc AddComment(CommentAddComment) returns (CommentAddCommentResp);
+    // 获取某商品下可见的评论(分国家)
+    rpc GetProductComments(CommentGetProductComments) returns (CommentGetProductCommentsResp);
+    // 获取用户发布过的评论
+    rpc GetCustomerComments(CommentGetCustomerComments) returns (CommentGetCustomerCommentsResp);
+    // 用户给某评论点赞
+    rpc MarkHelpful(CommentMarkHelpful) returns (CommentMarkHelpfulResp);
+    // 检查指定订单是否被评价过
+    rpc VerifyOrderIsCommented(CommentVerifyOrderIsCommented) returns (CommentVerifyOrderIsCommentedResp);
+    // 获取指定订单的评价
+    rpc GetOrderComment(CommentGetOrderComment) returns (CommentGetOrderCommentResp);
+    // 获取某商品来源网站的评价
+    rpc GetProductPlatformComments(CommentGetProductPlatformComments) returns (CommentGetProductPlatformCommentsResp);
+}
+
+// ---------------------------------------------------------------------------
+
+enum XCommentSort {
+    XCommentSortDefault = 0;
+    XCommentSortStar = 1;
+    XCommentSortDate = 2;
+}
+
+// 通过错误码返回的错误都是永久的的错误(即重新发送请求也没用)
+enum XCommentErrorCode {
+    XCommentErrorCodeOk = 0;
+    // 重复操作(例如重复评论, 重复点赞)
+    XCommentErrorCodeReOperate = 1;
+    // 非法的Cookie
+    XCommentErrorCodeInvalidCookie = 2;
+    // 非法的订单(不存在,不属于该用户等)
+    XCommentErrorCodeInvalidOrder = 3;
+    // 非法的评分, (不在1~5内)
+    XCommentErrorCodeInvalidGrade = 4;
+    // 字符超出限制
+    XCommentErrorCodeTooManyCharacters = 5;
+    // 图片数量超出限制
+    XCommentErrorCodeTooManyPhotos = 6;
+    // 未知错误...
+    XCommentErrorCodeUnexpected = 7;
+    // 操作的对象不存在(例如点赞的评论不存在)
+    XCommentErrorCodeNotExist = 8;
+}
+
+message XCommentHelpful {
+    // 被点赞次数
+    int32 count  = 1;
+    // 该用户是否给该评论点过赞
+    bool marked = 2;
+}
+
+message XCommentItem {
+    string id = 11;
+    string customer = 1;
+    string customerCatalog = 2;
+    int32 grade = 3;
+    repeated string skuDesc = 4;
+    string desc = 5;
+    repeated string photos = 6;
+    int64 date = 7;
+    XCommentHelpful helpful = 8;
+    string productTitle = 9;
+    string productImg = 10;
+    int64 gpid = 12;
+}
+
+// 用户信息通过cookie拿
+message CommentAddComment {
+    int64 orderId = 1;
+    // 1 ~ 5
+    int32 grade = 3;
+    // 文字描述
+    string desc = 4;
+    // 图片
+    repeated string photos = 5;
+}
+
+message CommentAddCommentResp {
+    XCommentErrorCode code = 1;
+    string message = 2;
+    // 评论获得的金币数量
+    int32 ecoin = 3;
+}
+
+enum XTagIcon {
+    XTagIconNone = 0;
+    XTagIconPhoto = 1;
+}
+
+message XCommentTag {
+    int64 id = 1;
+    string text = 2;
+    XTagIcon icon = 3;
+}
+
+// ---------------------------------------------------------------------------
+
+message CommentGetProductComments {
+    int64 gpid = 1;
+    int32 offset = 2;
+    int32 limit = 3;
+    // 筛选有图片的评论
+    bool withPhoto = 4;
+    XCommentSort sort = 5;
+    // 当tag被设置时, 优先使用 tag 的搜索条件
+    int64 tagId = 7;
+}
+
+message CommentGetProductCommentsResp {
+    repeated XCommentItem comments = 1;
+    // 非精准值, 仅供参考
+    int32 count = 2;
+    // 非精准值, 仅供参考
+    int32 countWithPhoto = 3;
+    // 是否需要显示来源网站的评价
+    bool showPlatformComments = 4;
+    // 评价标签列表
+    repeated XCommentTag tags = 5;
+}
+
+// ---------------------------------------------------------------------------
+// 用户信息通过cookie拿
+message CommentGetCustomerComments {
+    int32 offset = 1;
+    int32 limit = 2;
+}
+
+message CommentGetCustomerCommentsResp {
+    repeated XCommentItem comments = 1;
+}
+
+
+// ---------------------------------------------------------------------------
+
+// 用户信息通过cookie拿
+message CommentMarkHelpful {
+    string commentId = 1;
+}
+
+message CommentMarkHelpfulResp {
+    XCommentErrorCode code = 1;
+    string message = 2;
+}
+
+// ---------------------------------------------------------------------------
+
+message CommentVerifyOrderIsCommented {
+    repeated int64 orderId = 1;
+}
+
+message CommentVerifyOrderIsCommentedResp {
+    map<int64, bool> commentedState = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message CommentGetOrderComment {
+    int64 orderId = 1;
+}
+
+message CommentGetOrderCommentResp {
+    XCommentErrorCode code = 1;
+    XCommentItem comment = 2;
+    string message = 3;
+}
+
+// ---------------------------------------------------------------------------
+
+message CommentGetProductPlatformComments {
+    int64 gpid = 1;
+    int32 offset = 2;
+    int32 limit = 3;
+}
+
+message CommentGetProductPlatformCommentsResp {
+    repeated XCommentItem comments = 1;
+    int32 count = 2;
+}

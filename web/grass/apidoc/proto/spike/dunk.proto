@@ -1,0 +1,16 @@
+syntax = "proto3";
+package spike;
+
+service Dunk {
+	rpc GrabOrder(DunkGrabOrder) returns (DunkGrabOrderResp);
+}
+
+// ---------------------------------------------------------------------------
+
+message DunkGrabOrder {
+	
+}
+
+message DunkGrabOrderResp {
+	
+}

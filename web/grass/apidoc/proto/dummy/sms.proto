@@ -1,0 +1,33 @@
+syntax = "proto3";
+package dummy;
+
+service Sms {
+	// 短信发送接口, 支持批量发送
+	rpc Send(SMS) returns (SMSResp);
+}
+
+// 短信
+message Message {
+	// 用户ID
+	int64 customerId = 1;
+	// 接收者
+	string sentTo = 2;
+	// 短信内容
+	string message = 3;
+	// 短信类型: VerificationCode, DeliveryNotification, etc.
+	string messageType = 4;
+	// 非紧急
+	bool isDelay = 5;
+	// 邻里自提点名称
+	string NeiItemStationName = 6;
+	// 地铁站自提点名称
+	string SubwayStationName  = 7;
+}
+
+message SMS {
+	repeated Message messages = 1;
+}
+
+message SMSResp {
+	bool success = 1;
+}

@@ -1,0 +1,64 @@
+syntax = "proto3";
+package expresscn;
+
+import "expresscn/common_public.proto";
+
+
+///////// 派送计费 ////////////////
+
+message CalcDeliveryFeeReq {
+	// 派送站点地址
+	int64 	delivery_station_id = 1;
+	string 	catalog_code = 2;
+	// 送货上门城市
+	string	ship_to_state = 3;
+	// 货物重量(克)
+	int64	weight = 4;
+}
+
+// 400：表示非法的派送地点
+message CalcDeliveryFeeResp {
+	Result result = 1;
+	int64	delivery_fee = 2;
+}
+
+message HomeDeliveryFeePolicy {
+	int64 	id = 1;
+	int64	weight_unit = 2;
+	int64	max_weight = 3;
+	int64	price_unit = 4;
+	int64	base_price = 5;
+	int64	unit_weight_price = 6;
+}
+
+message RegionHomeDeliveryFeePolicies {
+	int64	region_id = 1;
+	string	region_name = 2;
+	repeated HomeDeliveryFeePolicy policies = 3;
+}
+
+message CountryReq {
+	string catalog_code = 1;
+}
+
+message CountryHomeDeliveryFeePolicies {
+	repeated RegionHomeDeliveryFeePolicies policies = 1;
+}
+
+message HomeStateToRegionId {
+	map<string, int64> state_to_region_id = 1;
+}
+
+service DeliveryFeeService {
+	rpc RpcCalcDeliveryFee(CalcDeliveryFeeReq) returns (CalcDeliveryFeeResp);
+
+	rpc RpcGetHomeRegionDeliveryFeePolicies(CountryReq) returns (CountryHomeDeliveryFeePolicies);
+
+	rpc RpcGetHomeStateToRegionId(CountryReq) returns (HomeStateToRegionId);
+
+
+	////////////////////////////////////////下面是admin接口///////////////////////
+	rpc AdminGetCountryHomeDeliveryFeePolicies(CountryReq) returns (CountryHomeDeliveryFeePolicies);
+
+	rpc AdminUpdateCourtryHomeDeliveryFeePolicies(CountryHomeDeliveryFeePolicies) returns (Result);
+}

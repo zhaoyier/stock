@@ -1,0 +1,148 @@
+syntax = "proto3";
+package comment;
+
+import "common/ezbuy.proto";
+import "common/setter.proto";
+import "common/common.proto";
+import "comment/comment_public.proto";
+import "spk/spk_public.proto";
+import "biz/region.proto";
+
+service CommentAdmin {
+    option (common.service).webapi = true;
+    // admin 后台批量设置评论可见性
+    rpc SetVisible (CommentAdminSetVisible) returns (CommentAdminSetVisibleResp);
+    // admin 后台获取某商品的评论
+    rpc GetProductExtComments (CommentAdminGetProductExtComments) returns (CommentAdminGetProductExtCommentsResp);
+    // admin 后台搜索带评论的商品
+    rpc SearchCommentedProduct (CommentAdminSearchCommentedProduct) returns (CommentAdminSearchCommentedProductResp);
+    // 导入商品评价的接口
+    rpc Import(CommentImport) returns (CommentImportResp);
+    // 编辑评论
+    rpc Edit(CommentEdit) returns (CommentEditResp);
+}
+
+// ---------------------------------------------------------------------------
+
+message CommentAdminSetVisible {
+    repeated string commentId = 1;
+    common.SetBool visible = 2;
+}
+
+message CommentAdminSetVisibleResp {
+}
+
+// ---------------------------------------------------------------------------
+
+message CommentAdminGetProductExtComments {
+    int64 gpid = 1;
+    int32 offset = 2;
+    int32 limit = 3;
+    // 筛选有图片的评论
+    common.TriBool withPhoto = 4;
+    // 筛选某sku的评论
+    string sku = 5;
+    int32 gradeRangeFrom = 6;
+    int32 gradeRangeTo = 7;
+    string customer = 8;
+    string customerCatalog = 9;
+    // 筛选可见的评论
+    common.TriBool visible = 10;
+    int64 earliestSubmitDate = 11;
+    int64 latestSubmitDate = 12;
+    comment.XCommentSort sort = 13;
+}
+
+message XCommentAdminItemExt {
+    comment.XCommentItem comment = 1;
+    bool visible = 2;
+    bool isForeign = 3;
+}
+
+
+message CommentAdminGetProductExtCommentsResp {
+    repeated XCommentAdminItemExt comments = 1;
+    repeated string enabledSkus = 2;
+}
+
+// ---------------------------------------------------------------------------
+
+message CommentAdminSearchCommentedProduct {
+    string vendor = 1;
+    string title = 2;
+    string url = 3;
+    spk.XPlatform platform = 4;
+    int64 earliestCreateDate = 5;
+    int64 latestCreateDate = 6;
+    biz.Region region = 7;
+    common.TriBool inSale = 8;
+    common.TriBool hasForeignComment = 11;
+    int32 offset = 9;
+    int32 limit = 10;
+}
+
+message XCommentAdminSearchCommentedProductItem {
+    int64 gpid = 1;
+    string title = 2;
+    string img = 3;
+    string vendor = 4;
+    spk.XPlatform platform = 5;
+    biz.Region region = 6;
+    int64 createDate = 7;
+    int32 commentCount = 8;
+    int32 visibleCommentCount = 9;
+    bool inSale = 10;
+}
+
+message CommentAdminSearchCommentedProductResp {
+    repeated XCommentAdminSearchCommentedProductItem items = 1;
+    repeated spk.XPlatform enabledPlatforms = 2;
+    repeated biz.Region enabledRegions = 3;
+    // 所有评价过的商品的数量, 不受搜索条件的限制
+    int32 commentedProductCount = 4;
+    // 所有发表过评价的用户数量, 不受搜索条件的限制
+    int32 commentedCustomerCount = 5;
+}
+
+// ---------------------------------------------------------------------------
+
+message XCommentImportItem {
+    int64 gpid = 1;
+    string customer = 2;
+    string customerCatalog = 3;
+    int32 grade = 4;
+    repeated string skuDesc = 5;
+    string desc = 6;
+    repeated string photos = 7;
+    int64 date = 8;
+    int32 helpfulCount = 9;
+}
+
+message XCommentImportFailure {
+    int64 idx = 1;
+    string msg = 2;
+}
+
+message CommentImport {
+    repeated XCommentImportItem items = 1;
+}
+
+message CommentImportResp {
+    repeated XCommentImportFailure failures = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message CommentEdit {
+    string commentId = 1;
+    // 开启后即使是顾客发表的评论也可以修改
+    bool force = 2;
+    common.SetStr desc = 3;
+    common.SetStrs photos = 4;
+    common.SetI32 grade = 5;
+    common.SetI64 date = 6;
+}
+
+message CommentEditResp {
+
+}

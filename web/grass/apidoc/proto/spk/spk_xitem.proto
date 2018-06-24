@@ -1,0 +1,404 @@
+syntax = "proto3";
+package spk;
+
+import "spk/errors_public.proto";
+import "common/ezbuy.proto";
+import "biz/region.proto";
+import "biz/warehouse.proto";
+import "biz/client.proto";
+import "spk/spk_public.proto";
+import "common/setter.proto";
+import "common/common.proto";
+
+// spu
+// 场景:
+message XItem {
+  Error error = 1;
+
+  XItemBase base = 2;
+  repeated XSku skus = 3;
+  repeated XProp props = 4;
+  XItemExtend extend = 5;
+}
+
+message XItemBaseCatalogBan {
+  string id = 1;
+  XBanScope scope = 2;
+}
+
+message XItemBaseCatalogBanOper {
+  common.SetOper oper = 1;
+  string id = 2;
+  XBanScope scope = 3;
+}
+
+// 基础信息分开
+
+message XItemBaseCatalog {
+  XEzbuy ezbuy = 1;
+  XPrime prime = 2;
+  bool block = 3;
+  bool noIndex = 4;
+  repeated string indexBanRules = 5;
+  repeated string banRules = 6;
+  bool isProdBan = 7;
+  bool isIndexProdBan = 8;
+  common.TriBool noBlock = 9; // noBlock 为TriBoolTrue 的时候才是强制屏蔽，字段名称的语义不对
+  bool BanList = 10;
+  bool BanDetail = 11;
+  // 是否在国家的列表页展示
+  bool indexed = 12;
+  int64 saleDate = 13; // 最近一次从这个国家上架的时间
+  int64 oosDate = 14; // 下架的时间
+  int64 inStockDate = 15; // 上架时间
+  int64 purchaseDate = 16; // 最近销售时间
+  repeated XItemBaseCatalogBan bans = 17;
+  XBanScope banScope = 18;
+  bool forceOOS = 19;
+}
+
+message XItemBaseCatalogOper {
+  XEzbuyOper ezbuy = 1;
+  XPrimeOper prime = 2;
+  common.SetBool block = 3;
+  common.SetBool noIndex = 4;
+  common.SetStrs indexBanRules = 5;
+  common.SetStrs banRules = 6;
+  common.SetBool isProdBan = 7;
+  common.SetBool isIndexProdBan = 8;
+  common.SetTriBool noBlock = 9;
+  common.SetBool indexed = 10;
+  common.SetI64 saleDate = 11;
+  common.SetI64 oosDate = 12;
+  common.SetI64 inStockDate = 15; // 上架时间
+  common.SetI64 purchaseDate = 16; // 购买时间
+  repeated XItemBaseCatalogBanOper bans = 17;
+  XBanScope banScope = 18;
+  common.SetBool forceOOS = 19;
+}
+
+message XItemBase {
+  int64 gpid = 1;
+  biz.Region region = 2;
+  string vendor = 3;
+  bool inSale = 4;
+  int32 pcid = 5;
+  string brand = 6;
+  XPlatform platform = 8;
+  string refId = 9;
+  repeated int64 skus = 10;
+  repeated int64 removedSkus = 14;
+  XBasePkg pkg = 12;
+  repeated XItemBaseDcid dcidPath = 13;
+  XPlatformInfo platformInfo = 15;
+  string internalUrl = 18;
+  
+  map<string, XItemBaseCatalog> catalog = 7;
+  // 这里表示全部sku都参加活动
+  repeated XActivityItem acts = 19;
+  int64 createDate = 20;
+  int64 updateDate = 21;
+  XBaseScore score = 22;
+  // 属性值的id列表
+  repeated int32 pvids = 23;
+  bool isPremium = 24;
+  XItemSpec spec = 26;
+  bool isThirdPartySeller = 27;
+  int64 version = 28;
+  common.TriBool forcePremium = 29;
+  repeated string allBanRules = 30;
+  bool indexed = 31;
+  bool noEzbuy = 32;
+  repeated XPlatform from = 33;
+  common.I64Range inSaleTime = 34;
+  string vendorId = 35;
+}
+
+message XItemSpec {
+  // 贵重物品
+  bool isValuable = 1;
+  // 易碎品
+  bool isFragile = 2;
+  // 易分开发货
+  bool isSplittable = 3;
+}
+
+message XItemSpecOper {
+  // 贵重物品
+  common.SetBool isValuable = 1;
+  // 易碎品
+  common.SetBool isFragile = 2;
+  // 易分开发货
+  common.SetBool isSplittable = 3;
+}
+
+
+message XBaseScore {
+  int32 listing = 1;
+}
+
+message XBaseScoreOper {
+  common.SetI32 listing = 1;
+}
+
+message XPlatformInfo {
+  repeated int64 cid = 1;
+  repeated string scid = 2;
+}
+
+message XPlatformInfoOper {
+  common.SetI64s cid = 1;
+  common.SetStrs scid = 2;
+}
+
+message XBasePkg {
+  // 自动计算的值, 最终值取这里
+  int32 estWeight = 1;
+  int32 estPrimeWeight = 2;
+  // 人肉预估值, 取代类目值不够
+  int32 estSetWeight = 3;
+  // 最小的重量
+  int32 minWeight = 4;
+}
+
+message XBasePkgOper {
+  common.SetI32 estWeight = 1;
+  common.SetI32 estPrimeWeight = 2;
+  common.SetI32 estSetWeight = 3;
+  common.SetI32 minWeight = 4;
+}
+
+message XItemBaseOper {
+  biz.Region region = 2;
+  common.SetStr vendor = 3;
+  common.SetStr vendorId = 35;
+  common.SetStr shop = 24;
+  common.SetBool inSale = 4;
+  common.SetI32 pcid = 5;
+  common.SetStr brand = 6;
+  map<string, XItemBaseCatalogOper> catalog = 7;
+  XPlatform platform = 8;
+  common.SetStr refId = 9;
+  common.SetI64s skus = 11;
+  common.SetI64s removedSkus = 14;
+  XBasePkgOper pkg = 12;
+  repeated XItemBaseDcid dcidPath = 13;
+  XPlatformInfoOper platformInfo = 15;
+  string updateBy = 16;
+  string updateExec = 17;
+  common.SetStr internalUrl = 18;
+  repeated XActivityItemOper acts = 19;
+  XBaseScoreOper score = 20;
+  common.SetI32s pvids = 23;
+  common.SetBool isPremium = 25;
+  bool upsert = 100;
+  XItemSpecOper spec = 26;
+  common.SetBool isThirdPartySeller = 27;
+  common.SetI64 version = 28;
+  common.SetTriBool forcePremium = 29;
+  common.SetStrs allBanRules = 30;
+  common.SetBool noEzbuy = 31;
+  repeated XPlatform from = 32;
+  XTimeOper inSaleTimeRange = 33;
+  int64 makeNewVersion = 34;
+}
+
+message XEzbuyOper {
+  common.SetBool enable = 1;
+  XEzbuyShipment type = 2;
+  bool typeEmptyOnly = 3;
+}
+
+message XPrimeOper {
+  common.SetBool enable = 1;
+  XPrimeShipment type = 2;    
+  bool typeEmptyOnly = 3;
+}
+
+message XTimeOper {
+    common.SetI64 from = 1;
+    common.SetI64 to = 2;
+}
+
+message XDescPropItem {
+  string name = 1;
+  repeated string values = 2;
+}
+
+message XSku {
+  int64 gpid = 1;
+  int64 parentGpid = 13;
+  string refId = 2;
+
+  // 标题, 可能为空
+  map<string, string> title = 3;
+  
+  // sku 的名字
+  map<string, string> name = 5;
+
+  string url = 6;
+  repeated string imgs = 7;
+
+  XProductPrice price = 8;
+  biz.Region region = 10;
+  bool inSale = 11;
+  XPlatform platform = 12;
+  int64 version = 14;
+  repeated XSkuAttr attr = 15;
+  repeated XSkuShippingFee shippingFee = 16;
+  XSkuPkg pkg = 17;
+  int32 quantity = 18;
+  bool isRemoved = 19;
+  
+  XWeight weight = 21;
+  // 只有该sku参加的活动
+  repeated XActivityItem acts = 22;
+  int64 createDate = 23;
+  int64 updateDate = 24;
+  bool isThirdPartySeller = 25;
+  int64 originPurchasePrice = 26;
+}
+
+message XItemBaseDcid {
+  // 从 leave 到 root
+  repeated int32 dcid = 1;
+}
+
+message XSkuShippingFee {
+  biz.Warehouse warehouse = 1;
+  int64 price = 2;
+}
+
+message XSkuAttr {
+  string propId = 1;
+  string valueId = 2;
+  // 不同语言
+  map<string, string> propName = 3;
+  map<string, string> valueName = 4;
+
+  // 属性图片
+  string img = 5;
+}
+
+message XSkuOper {
+  bool upsert = 1;
+  common.SetMapStr title = 2;
+  common.SetMapStr name = 3;
+  common.SetStr url = 4;
+  common.SetStrs imgs = 5;
+  XPriceOper price = 6;
+  common.SetStr refId = 7;
+  biz.Region region = 8;
+  XPlatform platform = 9;
+  common.SetI64 parentGpid = 10;
+  common.SetBool inSale = 11;
+  common.SetI64 version = 12;
+  repeated XSkuAttr attr = 15;
+  repeated XSkuShippingFee shippingFee = 16;
+  XSkuPkgOper pkg = 17;
+  common.SetI32 quantity = 18;
+  common.SetBool isRemoved = 19;
+  XWeightOper weight = 21;
+  string updateBy = 22;
+  string updateExec = 23;
+  repeated XActivityItemOper acts = 24;
+  common.SetBool isThirdPartySeller = 25;
+  common.SetI64 originPurchasePrice = 26;
+}
+
+message XPriceOper {
+  common.SetI64 price = 1;
+  common.SetI64 listPrice = 2;
+  common.SetI64 originPrice = 3;
+  common.SetI64 originListPrice = 4;
+}
+
+message XWeight {
+  int32 estGross = 1;
+  int32 gross = 2;
+  int32 estVolume = 3;
+  int32 volume = 4;
+}
+
+message XWeightOper {
+  common.SetI32 estGross = 1;
+  common.SetI32 gross = 2;
+  common.SetI32 estVolume = 3;
+  common.SetI32 volume = 4;
+}
+
+// 包裹信息
+message XSkuPkg {
+  // 净重
+  int32 weight = 1;
+  
+  int32 height = 2;
+  int32 width = 3;
+  int32 length = 4;
+  int32 volWeight = 5;
+}
+
+message XSkuPkgOper {
+  common.SetI32 weight = 1;
+  common.SetI32 height = 2;
+  common.SetI32 width = 3;
+  common.SetI32 length = 4;
+  common.SetI32 volWeight = 5;
+}
+
+message XDescItem {
+  string type = 1;
+  string data = 2;
+}
+
+message XDescProp {
+  string name = 1;
+  repeated string value = 2;
+}
+
+message XItemExtend {
+  repeated XDescItem desc = 1;
+  repeated XDescProp prop = 2;
+  XItemExtendTable rule = 5;
+  string descText = 3;
+  string location = 4;
+}
+
+message XItemExtendTable {
+  repeated string header = 1; 
+  repeated XItemExtendTableRow rows = 2;
+}
+
+message XItemExtendTableRow {
+  repeated string cols = 1;
+}
+
+message XItemExtendOper {
+  repeated XDescItem desc = 1;
+  repeated XDescProp prop = 2;
+  XItemExtendTable rule = 5;
+  common.SetStr descText = 3;
+  common.SetStr location = 4;
+}
+
+message XActivityItem {
+  XActivity type = 1;
+  string id = 2;
+  int64 start = 3;
+  int64 end = 4;
+  repeated string catalog = 5;
+  repeated biz.Client clients = 6;
+}
+
+message XActivityItemOper {
+  // 用于找到活动
+  XActivity type = 1;
+  string id = 2;
+
+  // 进行的修改
+  common.SetI64 start = 3;
+  common.SetI64 end = 4;
+  common.SetOper oper = 5;
+  common.SetStrs catalog = 6;
+}
+

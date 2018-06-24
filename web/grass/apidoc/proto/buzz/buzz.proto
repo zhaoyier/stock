@@ -1,0 +1,50 @@
+syntax = "proto3";
+package buzz;
+
+service Notification {
+	rpc Send(NotificationSend) returns (NotificationSendResp);
+	rpc SendEmail(NotificationSendEmail) returns (NotificationSendEmailResp);
+	rpc BatchSend(BatchSendReq) returns (NotificationSendResp);
+}
+
+message Keyvalue {
+	string Key = 1;
+	string Value = 2;
+}
+
+message NotificationSendResp {
+	int32 Code = 1;
+	string Message = 2;
+}
+
+message NotificationSend {
+	string Key = 1;
+	string ServerType = 2;
+	string MessageType = 3;
+	int32  CustomerId = 4;
+	repeated Keyvalue Msg = 5;
+}
+//发送文本邮件ContentType = text/plain, html邮件ContentType = text/html
+message NotificationSendEmail {
+	string From = 1;
+	repeated string To = 2;
+	string Subject =3;
+	string Body =4;
+	string ContentType=5;
+}
+
+message NotificationSendEmailResp {
+	SendCode Code = 1;
+	string Msg = 2;
+}
+
+enum SendCode{
+	SuccessCode = 0;
+	InvalidFormatCode = 1;
+	ErrCode = 2;
+}
+
+message BatchSendReq {
+        repeated NotificationSend items = 1;
+}
+

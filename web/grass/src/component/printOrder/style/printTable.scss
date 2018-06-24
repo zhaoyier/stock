@@ -1,0 +1,25 @@
+.page {
+  display:flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  overflow: hidden;
+  margin: 0 auto;
+  width: 210mm;
+  height: 297mm;
+  border-radius: 5px;
+  background: white;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  page-break-after: always!important;
+}
+
+.subpagewrap {
+  width: 100mm;
+  height: 140mm;
+  overflow: hidden;
+}
+
+@media print {
+  button {
+    display: none!important;
+  }
+}

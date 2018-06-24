@@ -1,0 +1,99 @@
+syntax = "proto3";
+package spike;
+
+service EzSellerOrder {
+    rpc CheckQuantity(OrderCheckQuantityReq) returns (OrderCheckQuantityResp);
+    rpc Add(OrderAddReq) returns (OrderAddResp);
+    rpc UpdateNote(OrderUpdateNoteReq) returns (OrderUpdateNoteRsp); // 用户新增/修改订单备注
+    rpc Cancel(OrderCancelReq) returns (OrderCancelRsp); // 取消订单
+}
+
+enum BasketItemType {
+    BasketItemTypeUnknown = 0;
+    BasketItemTypeEzbuy = 1;
+    BasketItemTypePrime = 2;
+}
+
+enum ActivityType {
+    ActivityTypeUnknown = 0;
+    ActivityTypeFlashSale = 1;
+    ActivityTypeCashOff = 2;
+    ActivityTypeFriendsDeal = 3;
+}
+
+message Activity {
+    ActivityType type = 1;
+    string activityId = 2;
+}
+
+message CheckQuantityItem {
+    // 购物车相关字段
+    int32 basketItemId = 1;
+    BasketItemType basketItemType = 2;
+
+    // 商品相关字段
+    string productUrl = 3;
+    int64 skuId = 4;
+    int32 quantity = 5;
+    double price = 6;
+    Activity activity = 7;
+}
+
+message CheckQuantityResultItem {
+    bool succeeded = 1;
+    bool readyForArrangemnet = 2;
+}
+
+message OrderCheckQuantityReq {
+    repeated CheckQuantityItem items = 1;
+}
+
+message OrderCheckQuantityResp {
+    repeated CheckQuantityResultItem results = 1;
+}
+
+message OrderAddItem {
+    int32 orderItemId = 1;
+    int64 skuId = 2;
+    string skuName = 3;
+    int32 quantity = 4;
+    double price = 5;
+    string remark = 6;
+}
+
+message OrderAddReq {
+    int32 ezOrderId = 1;
+    string ezOrderNum = 2;
+    string productUrl = 3;
+    string warehouseCode = 4;
+    repeated OrderAddItem items = 5;
+    Activity activity = 6;
+    int64 createdAt = 7;
+}
+
+message OrderAddResp {
+    bool succeeded = 1;
+}
+
+// ----------
+
+message OrderUpdateNoteReq {
+    int32 ezOrderId = 1;
+    string note = 2;
+    string updateBy = 3;
+}
+
+message OrderUpdateNoteRsp {
+    bool succeed = 1;
+}
+
+// ----------
+
+message OrderCancelReq {
+    int32 ezOrderId = 1;
+    string updateBy = 2;
+}
+
+message OrderCancelRsp {
+    bool succeed = 1;
+}

@@ -1,0 +1,111 @@
+syntax = "proto3";
+package garencieresmq;
+
+import "common/empty.proto";
+import "spk/spk_item.proto";
+
+service garencieres {
+	rpc SyncOrder (SyncOrderMsg) returns (common.Empty);
+	rpc InventoryNew (InventoryNewMsg) returns (common.Empty);
+	rpc OrderHistory (OrderHistoryMsg) returns (common.Empty);
+	rpc SkuStatus (SkuStatusMsg) returns (common.Empty);
+	rpc RollbackOrder (RollbackOrderMsg) returns (common.Empty);
+	rpc Stockin (StockinMsg) returns (common.Empty);
+	//验货向商品库同步重量
+	rpc SetSpkWeight(spk.ItemWeightSet) returns (common.Empty);
+	//SyncPackages 同步关联包裹号至chaplin
+	rpc SyncPackages(SyncPickingsMsg) returns (common.Empty);
+	//NotifyPackageWhenCancelStockins 在入库号取消的时候通知包裹
+	rpc NotifyPackageWhenCancelStockins(NotifyPackageWhenCancelStockinsMsg) returns (common.Empty);
+	//扫描运单号的时候更新老订单状态
+	rpc UpdateOrderStatus(UpdateOrderStatusMsg) returns (common.Empty);
+	rpc BatchOrderHistory (BatchOrderHistoryMsg) returns (common.Empty);
+
+}
+
+message NotifyPackageWhenCancelStockinsMsg{
+	// 用关联包裹号的场景
+	repeated string pickingCodes = 1;
+	// 取消入库号关联包裹的场景
+	repeated string stockinCodes = 2;
+}
+
+message SyncPickingsMsg{
+	repeated string pickingCodes = 1;
+}
+
+message SyncOrderMsg {
+	int32 orderId = 13;
+	OrderInfo orderInfo = 14;
+	bool isStockin = 15;
+}
+
+message InventoryNewMsg {
+	string locationCode = 1;	// 实际上架库位
+	int32 orderId = 2;
+	string stockinCode = 3;
+	string user = 4;
+}
+
+message OrderHistoryMsg {
+	int32 orderId = 1;
+	string newStatusName = 2;
+	string notes = 3;
+	string opUsername = 4;
+}
+
+message SkuStatusMsg {
+	string stockinCode = 1;
+ 	string user = 2;
+ 	int64 orderId = 3;
+ 	repeated int64 orderItemId = 4;
+	int32 status = 5;
+}
+
+message RollbackOrderMsg {
+	int32 orderId = 1;
+	string skus = 2;
+	string user = 3;
+}
+
+message OrderInfo {
+	int32 receivedUserId = 1;
+	int64 orderWeight = 2; //单位g
+	int64 length = 3;	// 单位毫米
+	int64 width = 4;	// 单位毫米
+	int64 height = 5;	// 单位毫米
+	string receiveAssign = 6;
+	int64 arrivedShangHaiDate = 7;
+	string user = 8;
+	int64 chargeWeight = 9;	// 单位g
+	int64 weight = 10;			// 单位g
+	int64 volumeWeight = 11;	// 单位g
+}
+
+message StockinMsg {
+	int32 orderId = 1;
+	OrderInfo orderInfo = 2;
+	string notes = 3;	// 回写 orderHistory
+}
+
+// message SetSpkWeightMsg{
+// 	int64 Gpid = 1;
+// 	int32 TotalWeight = 2;
+// 	string UpdateBy = 3;
+// 	repeated ItemWeight Items =4;
+// }
+
+// message ItemWeight {
+// 	string SkuId = 1;
+// 	int32 Qty = 2;
+// }
+
+message UpdateOrderStatusMsg{
+	int32 orderIdMssql = 1;
+	string trackingNo = 2;
+	string userName = 3;
+}
+
+message BatchOrderHistoryMsg {
+	repeated OrderHistoryMsg items = 1;
+}

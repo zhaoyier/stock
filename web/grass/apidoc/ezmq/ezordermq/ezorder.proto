@@ -1,0 +1,30 @@
+syntax = "proto3";
+package ezordermq;
+import "common/empty.proto";
+
+service ezorder {
+	rpc PayCancelBill(PayCancelBillReq) returns (common.Empty);
+
+	// 同步状态机状态
+	rpc SyncOrderItemStatus(SyncOrderItemStatusReq) returns (common.Empty);
+}
+
+
+message PayCancelBillReq {
+	string Catalog = 1;
+	int64 CustomerId = 2;
+	int64 BillId = 3;
+	int64 Amount = 4;
+	string CancelRemark = 5;
+	string Operator = 6;
+	string OldOrderNumber = 7;
+}
+
+message SyncOrderItemStatusReq {
+	string Catalog = 1;
+	int64 OrderId = 2;
+	string Content = 3;
+	int64 OrderItemId = 4; // 可选，如果不为0，则同步单条，否则同步所有orderId下的数据
+	int32 ForceStatusId = 5; // 强制按照该状态来同步
+	bool IsPendingVerification = 6; //是否是充值关联支付待确认账单
+}

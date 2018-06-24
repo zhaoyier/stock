@@ -1,0 +1,34 @@
+syntax = "proto3";
+package express;
+
+message GetPtlGroupReq {
+	// "SG", "MY", "TH", "ID"
+	string catalog_code = 1;
+	PtlStage ptl_stage = 2;
+	bool show_light = 3;
+}
+
+enum PtlStage {
+	// 进货
+	in = 0;
+	// 出货
+	out = 1;
+}
+
+message PtlGroupLight {
+	int64 light_id = 1;
+	string light_name = 2;
+	repeated int64 station_ids = 3;
+}
+
+message PtlGroup {
+	int64 group_id = 1;
+	string group_name = 2;
+	int64 delivery_type_id = 3;
+	repeated PtlGroup children = 4;
+	repeated PtlGroupLight lights = 5;
+}
+
+service PtlService {
+	rpc GetPtlGroup(GetPtlGroupReq) returns (PtlGroup) {}
+}

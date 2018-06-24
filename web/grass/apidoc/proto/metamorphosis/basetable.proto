@@ -1,0 +1,330 @@
+syntax = "proto3";
+package metamorphosis;
+
+import "common/ezbuy.proto";
+
+service BaseTable {
+	option (common.service).cacheMemoryLimit = "1G";
+
+	rpc GetOptionData(ReqOption) returns (RespOption);
+
+	rpc GetBaseTable(ReqBaseTable) returns (RespBaseTable) {
+		option (common.cache).enableClientSideCache = true;
+		option (common.cache).enableServerSideCache = true;
+		option (common.cache).cacheExpired = "60s";
+	}
+}
+
+// ----------------------------------------------------------------
+
+
+message Result {
+	int32 	code = 1;								//状态码【0：成功，非0：失败】
+	string 	message = 2;							//消息内容
+}
+
+//--------------------------------------------------------------
+
+message OptionCode {
+	string CodeName = 1;						//表名
+	string RelationCode = 2;					//过滤参数
+}
+
+message OptionResultItem {
+	int64 Id = 1;								//表Id
+	string Code = 2;							//表Code
+	string NameEn = 3;							//表英文名
+	string NameCn = 4;							//表中文名
+}
+
+message OptionResult {
+	string OptionCodeName = 1;					//表名
+	repeated OptionResultItem Items = 2;		//当前表的结果集
+}
+
+message ReqOption {
+	repeated OptionCode OptionCodes = 1;		//请求的参数集
+}
+
+message RespOption {
+	Result result = 1;							//消息的状态码，消息的错误信息
+	repeated OptionResult OptionResults = 3;	//所有请求的表的结果集
+}
+
+//--------------------------------------------------------------
+//--------------------------------------------------------------
+
+message ReqBaseTable {
+	//[1]ShipmentTypeEtaSetting
+	//[2]ShipmentTypeRegionItem
+	//[3]ShipmentTypeRegion
+	//[4]ShipmentType
+	//[5]PopulateSite
+	//[6]Warehouse
+	//[7]Catalog
+	//[8]DiscountType
+	//[9]Configuration
+	//[10]ServiceType
+	//[11]CatalogOrigin
+	//[12]PromotionCoupon
+	//[13]CustomerGrade
+	//[14]StateRegion
+	repeated int64 TableNameIds = 1;
+}
+
+message RespBaseTable {
+	Result result = 1;							//消息的状态码，消息的错误信息
+	RecordsSet recordsSet = 2;					//结果集
+}
+
+message RecordsSet {
+	repeated ShipmentTypeEtaSetting shipmentTypeEtaSetting = 1;
+	repeated ShipmentTypeRegionItem shipmentTypeRegionItem = 2;
+	repeated ShipmentTypeRegion shipmentTypeRegion = 3;
+	repeated ShipmentType shipmentType = 4;
+	repeated PopulateSite populateSite = 5;
+	repeated Warehouse warehouse = 6;
+	repeated Catalog catalog = 7;
+	repeated DiscountType discountType = 8;
+	repeated Configuration configuration = 9;
+	repeated ServiceType serviceType = 10;
+	repeated CatalogOrigin catalogOrigin = 11;
+	repeated PromotionCoupon promotionCoupon = 12;
+	repeated CustomerGrade customerGrade = 13;
+	repeated StateRegion stateRegion = 14;
+}
+
+message CatalogOrigin {
+	int64 CatalogOriginId = 1;
+	string CatalogCode = 2;
+	string OriginCode = 3;
+	string OriginName = 4;
+	string AltOriginName = 5;
+	string PriceType = 6;
+	string PriceSymbol = 7;
+	bool Status = 8;
+	string CreateBy = 9;
+	string UpdateBy = 10;
+	int64 CreateDate = 11;
+	int64 UpdateDate = 12;
+	int64 ExchangeRate = 13;						//int64(float*100000000)
+	int64 AuthorizeBalance = 14;					//int64(float*100)
+	int64 Sort = 15;
+	int64 OutExchangeRate = 16;						//int64(float*100000000)
+}
+
+message ServiceType {
+	int64 ServiceTypeId = 1;
+	string PurchaseType = 2;
+	string ServiceName = 3;
+	string AltServiceName = 4;
+	string CreateBy = 5;
+	string UpdateBy = 6;
+	int64 CreateDate = 7;
+	int64 UpdateDate = 8;
+}
+
+message ShipmentTypeEtaSetting {
+	int64 ShipmentTypeEtaSettingId = 1;
+	int64 ShipmentTypeId = 2;
+	string WarehouseCode = 3;
+	string DestCode = 4;
+	int64 RangeStart = 5;
+	int64 RangeEnd = 6;
+	string CreateBy = 7;
+	string UpdateBy = 8;
+	int64 CreateDate = 9;
+	int64 UpdateDate = 10;
+}
+
+message ShipmentTypeRegionItem {
+ 	int64 ShipmentTypeRegionItemId = 1;
+	int64 ShipmentTypeRegionId = 2;
+	int64 MoreThanWeight = 3;				//int64(float*100)
+	int64 ContinueWeightFee = 4;			//int64(float*100)
+	string CreateBy = 5;
+	string UpdateBy = 6;
+	int64 CreateDate = 7;
+	int64 UpdateDate = 8;
+	string WarehouseCode = 9;
+}
+
+message ShipmentTypeRegion {
+	int64 ShipmentTypeRegionId = 1;
+	int64 ShipmentTypeId = 2;
+	int64 MinimumWeightFee = 3;				//int64(float*100)
+	int64 ContinueWeightFee = 4;			//int64(float*100)
+	string CreateBy = 5;
+	string UpdateBy = 6;
+	int64 CreateDate = 7;
+	int64 UpdateDate = 8;
+	string EstimatedEtaDays = 9;
+	int64 ActualEtaDays = 10;
+	string OriginCode = 11;
+	string DestCode = 12;
+	int64 DemoMinimumWeightFee = 13;		//int64(float*100)
+	int64 DemoContinueWeightFee = 14;		//int64(float*100)
+	bool IsActive = 15;
+	int64 DeliveryFee = 16;
+}
+
+
+message ShipmentType {
+	int64 ShipmentTypeId = 1;
+	string ShipmentTypeCode = 2;
+	string ShipmentTypeName = 3;
+	string CreateBy = 4;
+	string UpdateBy = 5;
+	int64 CreateDate = 6;
+	int64 UpdateDate = 7;
+	string AltShipmentTypeName = 8;
+	string CatalogCode = 9;
+	string LocationPrefix = 10;
+	int64 SortBy = 11;
+	string Feature = 12;
+	string AltFeature = 13;
+	string ShipmentTypeGroup = 14;
+	int64 ShipmentTypeClassify = 15;
+}
+
+
+message PopulateSite {
+	int64 PopulateSiteId = 1;
+	string CatalogCode = 2;
+	string Domain = 3;
+	string SiteName = 4;
+	string AltSiteName = 5;
+	string SiteLogo = 6;
+	string BrandName = 7;
+	string MerchantName = 8;
+	int64 SortBy = 9;
+	bool Status = 10;
+	string CreateBy = 11;
+	string UpdateBy = 12;
+	int64 CreateDate = 13;
+	int64 UpdateDate = 14;
+	int64 PopulateSiteCatId = 15;
+	bool IsMarkup = 16;
+	int64 HandlingFee = 17;					//int64(float*100)
+}
+
+
+message Warehouse {
+	int64 WarehouseId = 1;
+	string CatalogCode = 2;
+	string OriginCode = 3;
+	string WarehouseCode = 4;
+	string WarehouseName = 5;
+	string AltWarehouseName = 6;
+	string CreateBy = 7;
+	string UpdateBy = 8;
+	int64 CreateDate = 9;
+	int64 UpdateDate = 10;
+}
+
+
+message Catalog {
+	int64 CatalogId = 1;
+	string CatalogCode = 2;
+	string PriceSymbol = 3;
+	bool Status = 4;
+	string CreateBy = 5;
+	string UpdateBy = 6;
+	int64 CreateDate = 7;
+	int64 UpdateDate = 8;
+	string CountryName = 9;
+	string AltCountryName = 10;
+	string Prefix = 11;
+	string FaceBookAppKey = 12;
+	string FaceBookAppSecret = 13;
+	string Domain = 14;
+	string CustomerServiceMail = 15;
+	string InternationalCode = 16;
+	bool IsActiveInsurance = 17;
+	bool IsActiveGst = 18;
+}
+
+message DiscountType {
+	int64 DiscountTypeId = 1;
+	string DiscountTypeCode = 2;
+	string DiscountTypeName = 3;
+	string AltDiscountTypeName = 4;
+	bool Status = 5;
+	int64 StartDate = 6;
+	int64 EndDate = 7;
+	string CatalogCode = 8;
+	string OriginCode = 9;
+	int64 ShipmentTypeId = 10;
+	string Destination = 11;
+	string DiscountType = 12;
+	string DiscountValue = 13;
+	string AppSource = 14;
+	string WarehouseCode = 15;
+	int64 ServiceTypeId = 16;
+	string CreateBy = 17;
+	string UpdateBy = 18;
+	int64 CreateDate = 19;
+	int64 UpdateDate = 20;
+	string Platform = 21;
+	string PurchaseSource = 22;
+}
+
+message Configuration {
+	int64 ConfigurationId = 1;
+	string ParamName = 2;
+	string ParamValue = 3;
+	string CreateBy = 4;
+	string UpdateBy = 5;
+	int64 CreateDate = 6;
+	int64 UpdateDate = 7;
+	string CatalogCode = 8;
+}
+
+message PromotionCoupon {
+    int64 PromotionCouponId = 1;
+    string CatalogCode = 2;
+    string ShipmentTypeCode = 3;
+    string CouponCode = 4;
+    string GradeCode = 5;
+    string CouponDescription = 6;
+    string AltCouponDescription = 7;
+    double CouponPercent = 8;
+    int64 StartDate = 9;
+    int64 EndDate = 10;
+    string CreateBy = 11;
+    string UpdateBy = 12;
+    int64 CreateDate = 13;
+    int64 UpdateDate = 14;
+    bool IsEnable = 15;
+    int64 UpperLimit = 16;
+    int64 UsageCount = 17;
+    bool IsExclusiveness = 18;
+    string OriginCode = 19;
+}
+
+message CustomerGrade {
+	int64 CustomerGradeId = 1;
+	string GradeCode = 2;
+	string GradeName = 3;
+	double AgentPriceRate = 4;
+	string CreateBy = 5;
+	string UpdateBy = 6;
+	int64 CreateDate = 7;
+	int64 UpdateDate = 8;
+	double Discount = 9;
+	int64 Level = 10;
+}
+
+message StateRegion {
+	int64 StateRegionId = 1;
+	string FromStateCode = 2;
+	string ToStateCode = 3;
+	int64 DeliveryFee = 4;							//int64(float*100)
+	string CatalogCode = 5;
+	bool IsActive = 6;
+	string CreateBy = 7;
+	int64 CreateDate = 8;
+	string UpdateBy = 9;
+	int64 UpdateDate = 10;
+	int64 ContinueDeliveryFee = 11;					//int64(float*100)
+}

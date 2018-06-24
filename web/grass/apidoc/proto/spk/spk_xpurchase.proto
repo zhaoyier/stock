@@ -1,0 +1,15 @@
+syntax = "proto3";
+package spk;
+import "common/time.proto";
+
+message XPurchaseItem {
+  int64 gpid = 1;
+  common.Time time = 2;
+  XPurchaseMode mode = 3;
+}
+
+enum XPurchaseMode {
+  XPurchaseModeInvalid = 0;
+  XPurchaseModePrime = 1;
+  XPurchaseModeEzbuy = 2;
+}

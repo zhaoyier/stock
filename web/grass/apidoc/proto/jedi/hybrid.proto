@@ -1,0 +1,28 @@
+syntax = "proto3";
+package jedi;
+import "common/ezbuy.proto";
+
+service Hybrid{
+    option (common.service).webapi = true;
+    //对接贡云的商品推送api
+    rpc ReceiveGongYunProduct(HybridReceiveGongYunProductReq) returns (HybridReceiveGongYunProductResp);
+}
+
+message HybridReceiveGongYunProductReq {
+    int32 appId = 1;
+    string appKey = 2;
+    string data = 3; //业务参数(base64之后的)
+    string sign = 4; //签名(md5之后的)
+    int32 storeId = 5; //默认传0
+    int32 baUserId = 6;//默认传0
+    int32 roleId = 7;//默认传0
+    int32 goodsId = 8; //默认传0
+    int32 userId = 9;
+    int32 contentMarketingId = 10;
+}
+
+//gongyun 规范要求成功接收商品则返回{code=10000,message="成功"}，否则视为是失败
+message HybridReceiveGongYunProductResp{
+    int32 code = 1;  //code=10000表示接收成功
+    string message = 2; //message=”成功“
+}

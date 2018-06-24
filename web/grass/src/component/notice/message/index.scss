@@ -1,0 +1,13 @@
+.searchForm {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 28px;
+}
+.announcementTitleLink {
+    cursor: pointer;
+
+    &:hover {
+        color: #1890ff;
+        text-decoration: underline;
+    }
+}

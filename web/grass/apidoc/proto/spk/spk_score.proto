@@ -1,0 +1,160 @@
+syntax = "proto3";
+package spk;
+
+import "common/ezbuy.proto";
+import "common/setter.proto";
+import "biz/region.proto";
+import "spk/spk_public.proto";
+
+service Score {
+  option (common.service).webapi = true;
+
+  rpc Get(ScoreGet) returns (ScoreGetResp);
+
+  // ------------------------------------------------
+  // 卖家黑名单屏蔽功能
+  //
+  // 不建议外部调用
+  rpc BlockVendor(ScoreBlockVendor) returns (ScoreBlockVendorResp);
+  // 获取黑名单列表
+  rpc BlockVendorList(ScoreBlockVendorList) returns (ScoreBlockVendorListResp) {
+	option (common.auth).admin = true;
+  }
+  // 添加/删除卖家黑名单信息
+  rpc BlockVendorSet(ScoreBlockVendorSet) returns (ScoreBlockVendorSetResp) {
+	option (common.auth).admin = true;
+  }
+  // 查询对应平台的卖家id对应的卖家名
+  rpc BlockVendorShopId(ScoreBlockVendorShopId) returns (ScoreBlockVendorShopIdResp) {
+	option (common.auth).admin = true;
+  }
+
+  
+}
+
+message ScoreGet {
+  int64 gpid = 1;
+  XPlatform platform = 2;
+  string vendor = 3;
+}
+
+message ScoreGetResp {
+  bool blocked = 6;
+  repeated XScoreItem scores = 5;
+}
+
+message XScoreItem {
+  biz.Region catalog = 1;
+  int32 dcid = 2;
+  // 销售总分
+  int32 total = 3;
+  // 热销 -> score1
+  int32 sales7 = 4;
+  // 动销 -> score2
+  int32 saled = 5;
+  // 180 热销 -> score3
+  int32 sales180 = 6;
+  // 评价 -> score4
+  int32 comment = 7;
+}
+
+message ScoreSyncToMongo {
+  string date = 1;
+}
+
+message ScoreSyncToES {
+  string date = 1;
+}
+
+
+message ScoreFlushOldProduct {
+    
+}
+
+message ScoreBlockVendor {
+  XScoreBlockVendorOp op = 1;
+  repeated string vendors = 2;
+  repeated string vendorIds = 5;
+  repeated string banRuleIds = 7;
+  bool isBlockRecentPurchase = 6;
+  string updateBy = 3;
+  XPlatform platform = 4;
+  // 执行刷新任务
+  bool doFlush = 8;
+}
+
+message XScoreBlockVendorItemOper {
+  common.SetStr name = 1;
+  common.SetBool enable = 2;
+  common.SetStr updateBy = 3;
+  common.SetI64 updateDate = 4;
+  XPlatform platform = 5;
+  common.SetBool isBlockRecentPurchase = 6;
+  common.SetStr vendorId = 7;
+  common.SetStr banRuleId = 9;
+}
+
+message XScoreBlockVendorItem {
+  // 新增时必选的参数
+  string name = 1;
+  bool enable = 2;
+  XPlatform platform = 5;
+  bool isBlockRecentPurchase = 6;
+  string vendorId = 7;
+
+  // 系统自己生成
+  string id = 8;
+  string updateBy = 3;
+  int64 updateDate = 4;
+  string banRuleId = 9;
+}
+
+enum XScoreBlockVendorOp {
+  XScoreBlockVendorOpAdd = 0;
+  XScoreBlockVendorOpDel = 1;
+}
+
+// 刷新卖家商品分数
+message XJobScoreFlush {
+  repeated string vendors = 1;
+}
+
+message ScoreBlockVendorResp {
+  string jobId = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message ScoreBlockVendorList {
+  string vendorId = 1;
+}
+
+message ScoreBlockVendorListResp {
+  repeated XScoreBlockVendorItem items = 1;
+  repeated spk.XPlatform platforms = 2;
+}
+
+message ScoreBlockVendorSet {
+  // 传删除的mongoid
+  repeated string deletes = 1;
+  XScoreBlockVendorItem insert = 2;
+  XScoreBlockVendorItem update = 3;
+  string updateBy = 4;
+  // 用于记录在屏蔽系统内, 显示原因
+  string reason = 5;
+}
+
+message ScoreBlockVendorSetResp {
+  string insertJobId = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message ScoreBlockVendorShopId {
+  spk.XPlatform platform = 1;
+  int32 shopId = 2;
+}
+
+message ScoreBlockVendorShopIdResp {
+  string name = 1;
+}

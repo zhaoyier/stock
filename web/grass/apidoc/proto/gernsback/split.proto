@@ -1,0 +1,16 @@
+syntax = "proto3";
+package gernsback;
+import "common/ezbuy.proto";
+import "common/empty.proto";
+
+service Split {
+    option (common.service).webapi = true;
+    // 拆订单（到齐问题导致订单状态被带走）
+    rpc SplitOrders(OrderNos) returns (common.Empty);
+}
+
+message OrderNos {
+    string magic = 1;
+    repeated string orderNo = 2;
+    int32 orderStatusId = 3;
+}

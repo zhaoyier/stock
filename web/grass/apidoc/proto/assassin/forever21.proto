@@ -1,0 +1,56 @@
+syntax = "proto3";
+package assassin;
+import "assassin/assassin.proto";
+import "common/ezbuy.proto";
+
+service Forever21 {
+	option (common.service).webapi = true;
+	rpc Get(Forever21Get) returns (Forever21GetResp);
+	rpc GetSingleCatPcids(GetSingleCatPcidsReq) returns (GetSingleCatPcidsResp);
+	rpc GetMultiPcid(GetMultiPcidReq) returns (GetMultiPcidResp);
+	rpc Import(ImportReq) returns (ImportResp){
+		option (common.webapi).download = true;
+	}
+}
+
+// ---------------------------------------------------------------------------
+
+message Forever21Get {	
+	string id = 1;
+}
+
+message Forever21GetResp {
+	Product product = 1;
+}
+
+message GetSingleCatPcidsReq {
+	string cid = 1;
+}
+
+message GetSingleCatPcidsResp {
+	repeated string pcids = 1;
+}
+
+message GetMultiPcidReq {
+	repeated string cids = 1;
+}
+
+message GetMultiPcidResp {
+	repeated PcidItem pidSet = 1;
+	repeated string errMsg = 2;
+}
+
+message PcidItem {
+	string cid = 1;
+	repeated string url = 2;
+}
+
+message ImportReq {
+
+}
+
+message ImportResp {
+	string filename = 1;
+	bytes data = 2;
+	string contentType = 3;
+}

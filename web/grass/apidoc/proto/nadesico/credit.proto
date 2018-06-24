@@ -1,0 +1,175 @@
+syntax = "proto3";
+package nadesico;
+
+
+service Credit {
+
+	//! 评论包裹增加积分
+	rpc AddCreditByComment(AddCreditByCommentReq) returns (CreditResp);
+
+	//! 用积分
+	rpc Use(UseCreditReq) returns (CreditResp);
+
+	//! 用积分
+	rpc Unuse(UnuseCreditReq) returns (CreditResp);
+
+	// ================== 用户端行为 ==================
+
+	//! 查询剩余积分, 以及未来3个月（包括本月）过期积分额度
+	rpc Remain(RemainCreditReq) returns (RemainCreditResp);
+
+	//! 查询每月积分变动
+	rpc MonthCredit(MonthCreditReq) returns (MonthCreditResp);
+
+	//! 查询积分详细流水
+	rpc DetailCredit(DetailCreditReq) returns (DetailCreditResp);
+}
+
+// ---------------------------------------------------------------------------
+
+//! 通用响应
+message CreditResp {
+    int32 code = 1; //errcode
+    string message = 2; //errmsg
+}
+
+message AddCreditByCommentReq {
+	 int64 customerId = 1;
+	 int64 commentId = 2;
+	 string remark = 3;
+}
+
+message DetailCreditReq {
+	int32 offset = 1;
+	int32 limit = 2;
+}
+
+message DetailCredit {
+	int64 changeCreditCount = 1;
+	int64 remainCreditCount = 2;
+	string remark = 3;
+	int64 createDate = 4;
+	int64 originRemainCreditCount = 5;
+}
+
+message DetailCreditResp {
+	repeated DetailCredit detailCredit = 1;
+	int32 totalPage = 2;
+	int32 code = 101; //errcode
+    string message = 102; //errmsg
+}
+
+message MonthCreditReq {
+	int32 offset = 1;
+	int32 limit = 2;
+}
+
+message MonthCredit {
+	string month = 1;
+	int64 earnedCredit = 2;
+	int64 usedCredit = 3;
+	int64 remainCredit = 4;
+	int64 expiredCredit = 5;
+}
+
+message MonthCreditResp {
+	repeated MonthCredit monthCredit = 1;
+	int32 totalPage = 2;
+	int32 code = 101; //errcode
+    string message = 102; //errmsg
+}
+
+message RemainCreditReq {
+
+}
+
+message RemainCreditResp {
+	int64 remainCreditCount = 1;
+	Expiring3MResp expiring3M = 2;
+	int32 code = 101; //errcode
+    string message = 102; //errmsg
+}
+
+message ExpiringCreditReq {
+	int64 customerId = 1;
+	int32 futureMonth = 2;
+	int32 offset = 5;
+	int32 limit = 6;
+}
+
+message ExpiringCreditResp {
+	int64 totalExpiredCreditCount = 1;
+	repeated UserCredit credits = 2;
+	int32 code = 101; //errcode
+    string message = 102; //errmsg
+}
+
+message Expiring3MResp {
+	repeated string months = 1;
+	repeated int64 creditCounts = 2;
+	int32 code = 101; //errcode
+    string message = 102; //errmsg
+}
+
+message UseCreditReq {
+	int64 customerId = 1;
+	int64 creditCount = 2;
+	// 使用积分的id，将来回退积分时使用
+	int64 usedId = 3;
+	string remark = 4;
+}
+
+message UnuseCreditReq {
+	int64 customerId = 1;
+	int64 creditCount = 2;
+	int64 usedId = 3;
+}
+
+enum CreditStatus {
+	All = 0;
+	UnUsed = 1;
+	Used = 2;
+	Expired = 3;
+}
+
+// 查询范围：
+message GetMultiCreditReq {
+	int64 customerId = 1;
+	int32 offset = 5;
+	int32 limit = 6;
+}
+
+message UserCredit {
+	int64 id = 1;
+	string addCreditType = 2;
+	int64 refId = 3;
+	int64 creditCount = 4;
+	string remark = 5;
+	// 获得积分的时间
+	int64 addDate = 6;
+	// 消费积分的时间
+	int64 usedDate = 7;
+	// 积分过期时间
+	int64 expiredDate = 8;
+}
+
+message UserCreditUsedLog {
+	int64 id = 1;
+	int64 customerId = 2;
+	int64 creditCount = 3;
+	int64 createDate = 4;
+}
+
+message GetMultiCreditResp {
+	int64 totalCreditCount = 1;
+	repeated UserCredit credits = 2;
+	int32 code = 101; //errcode
+    string message = 102; //errmsg
+}
+
+message GetMultiUsedCreditResp {
+	int64 totalCreditCount = 1;
+	repeated UserCreditUsedLog credits = 2;
+	int32 code = 101; //errcode
+    string message = 102; //errmsg
+}

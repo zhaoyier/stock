@@ -1,0 +1,1185 @@
+syntax = "proto3";
+package spike;
+import "common/ezbuy.proto";
+
+service Category {
+	// --------------------------------------------------
+	// 发布类目后台使用api
+	// --------------------------------------------------
+
+	// 添加发布类目
+	rpc AddPcat(CategoryAddPcat) returns (CategoryEmpty);
+
+	// 显示发布类目,树状结构, 一级类目的 parent = 0
+	rpc ShowPcats(CategoryShowPcats) returns (CategoryPcatResp);
+
+	// 查看发布类目详情
+	rpc GetPcatDetail(CategoryGetPcatDetail) returns (CategorySinglePcatResp);
+
+	// 修改类目信息
+	rpc UpdatePcat(CategoryUpdatePcat) returns (CategoryEmpty);
+
+	// 查询类目信息
+	rpc QueryPcats(CategoryQueryPcats) returns (CategoryPcatResp);
+
+	// 删除发布类目
+	rpc DelPcat(CategoryDelPcat) returns (CategoryEmpty);
+
+	// 排序发布类目
+	rpc SortPcat(CategorySort) returns (CategoryEmpty);
+
+	// 获取发布类目规则
+	rpc GetPcatRules(CategoryPcatRule) returns (CategoryPcatRulesResp);
+
+	// 添加发布类目规则
+	rpc AddPcatRule(CategoryAddPcatRule) returns (CategoryEmpty);
+
+	// 删除发布类目
+	rpc DelPcatRule(CategoryDelPcatRule) returns (CategoryEmpty);
+
+	// 查询某个发布类目的叶子类目
+	rpc QueryLeafPcats (CategoryQueryLeafPcats) returns (CategoryQueryLeafPcatsResp);
+
+	// 查询某个发布类目的字类目
+	// rpc PcatLeavesPcat (CategoryPcatLeavesPcat) returns (CategoryPcatLeavesPcatResp);
+
+	// --------------------------------------------------
+	// 属性相关api开始
+	// --------------------------------------------------
+
+	//查看属性
+	rpc ShowPropPairs(CategoryShowPropPairs) returns (CategoryShowPropPairsResp);
+
+	// 查询属性,返回匹配度最高的属性
+	rpc QueryPropKey(CategoryListQuery) returns (CategoryQueryPropKeyResp);
+
+	// 查询属性下面匹配的属性值
+	rpc GetPropValuesByPropKey(CategoryGetPropValuesByPropKey) returns (CategoryGetPropValuesByPropKeyResp);
+
+	// 新增属性
+	rpc AddPropKey(CategoryAddPropKey) returns (CategoryAddPropKeyResp);
+
+	// 更新属性
+	rpc UpdatePropKey(CategoryUpdatePropKey) returns (CategoryEmpty);
+
+	// 删除属性
+	rpc DelPropKey(CategoryPropKeyId) returns (CategoryEmpty);
+
+	// 查询属性值,返回匹配度最高的属性值
+	rpc QueryPropValues(CategoryListQuery) returns (CategoryQueryPropValuesResp);
+
+	// 新增属性值(先添加完属性才能进入添加属性值)
+	rpc AddPropValue(CategoryAddPropValue) returns (CategoryAddPropValueResp);
+
+	// 修改属性值
+	rpc UpdatePropValue(CategoryUpdatePropValue) returns (CategoryEmpty);
+
+	// 删除属性值(只是删除属性和属性值的对应关系。先后台没有管理属性值的删除)
+	rpc DelPropPair(CategoryPropPairId) returns (CategoryEmpty);
+
+	// --------------------------------------------------
+	// 发布类目关联属性api
+	// --------------------------------------------------
+
+	// 查看发布类目的属性
+	rpc GetPcatPropPairs(CategoryPcatPropPairs) returns (CategoryPcatPropPairsResp);
+
+	// 删除发布类目下的属性
+	rpc RemovePcatPropKey(CategoryRemovePcatPropKey) returns (CategoryEmpty);
+
+	// 新增属性
+	rpc PcatAddPropKey(CategoryPcatAddPropKey) returns (CategoryEmpty);
+
+	// 修改发布类目属性类型
+	rpc PcatPropKeyType(CategoryPcatPropKeyType) returns (CategoryEmpty);
+
+	// 查看发布类目属性下的属性值
+	rpc PcatPropValuesInPropKey(CategoryPcatPropValuesInPropKey) returns (CategoryPropValuesResp);
+
+	// 属性下面添加属性值
+	rpc PcatPropKeyAddPropValue(CategoryPcatPropPairOp) returns (CategoryEmpty);
+
+	// 删除属性下的属性值
+	rpc PcatPropKeyRemvePropValue(CategoryPcatPropPairOp) returns (CategoryEmpty);
+
+	// 获取发布类目的属性
+	rpc MultiPropPairs(CategoryMultiPropPairs) returns (CategoryMultiPropPairsResp);
+
+	// ------------------------------------------------------
+	// 展示类目相关api
+	// ------------------------------------------------------
+
+	// 展示类目层级查看
+	rpc ShowDcat(CategoryShowDcat) returns (CategoryShowDcatResp);
+
+	// 添加展示类目
+	rpc AddDcat(CategoryAddDcat) returns (CategoryEmpty);
+	// 删除展示类目
+	rpc RemoveDcat(CategoryRemoveDcat) returns (CategoryEmpty);
+	// 查看展示类目
+  rpc GetDcat(CategoryGetDcat) returns (CategoryGetDcatResp);
+  rpc GetDcats(CategoryGetDcats) returns (CategoryGetDcatsResp);
+	// 修改展示类目
+	rpc UpdateDcat(CategoryUpdateDcat) returns (CategoryEmpty);
+	// 排序类目
+	rpc SortDcat(CategorySort) returns (CategoryEmpty);
+
+	// 查看展示类目规则
+	rpc GetDcatRule(CategoryGetDcatRule) returns (CategoryGetDcatRuleResp);
+	// 删除山之类目规则
+	rpc RemoveDcatRule(CategoryRemoveDcatRule) returns (CategoryRemoveDcatRuleResp);
+	// 添加展示类目规则
+	rpc AddDcatRule(CategoryAddDcatRule) returns (CategoryAddDcatRuleResp);
+	// 查看展示类目对应的所有发布类目与淘宝类目
+    rpc GetCidsByDcid(CategoryGetCidsByDcid) returns (CategoryGetCidsByDcidResp);
+	
+	// 往指定发布类目中添加属性，并返回所有属性值
+	rpc AddPcatPropsPair(CategoryAddPcatPropsPair) returns (CategoryAddPcatPropsPairResp);
+
+	// 迁移类目用
+	rpc DcatNewParentAdd(CategoryDcatNewParentAdd) returns (CategoryDcatNewParentAddResp);
+	// 当类目迁移完毕后, 将 NewParent 换成 Parent
+	rpc DcatNewParentCommit(CategoryDcatNewParentCommit) returns (CategoryDcatNewParentCommitResp);
+
+	// ------------------------------------------------------
+	//  category profile admin
+	// ------------------------------------------------------
+	rpc ListDcatProfile(CategoryListDcatProfile) returns (CategoryListDcatProfileResp);
+	rpc AddDcatProfile(CategoryAddDcatProfile) returns (CategoryAddDcatProfileResp);
+	rpc UpdateDcatProfile(CategoryUpdateDcatProfile) returns (CategoryUpdateDcatProfileResp);
+	rpc SortDcatProfile(CategorySortDcatProfile) returns (CategorySortDcatProfileResp);
+	rpc ListDcatProfileDetail(CategoryListDcatProfileDetail) returns (CategoryListDcatProfileDetailResp);
+
+	// ------------------------------------------------------
+	//  通知
+	// ------------------------------------------------------
+	rpc ReloadCat(CategoryReloadCat) returns (CategoryEmpty);
+
+	// ------------------------------------------------------
+	//  前台调用api
+	// ------------------------------------------------------
+
+	// ------------------------------------------------------
+	//  category profile api
+	// ------------------------------------------------------
+	rpc GetEzbuyProfileDcat(CategoryGetEzbuyProfileDcat) returns (CategoryGetEzbuyProfileDcatResp);
+
+	// 卖家使用
+	// 查询类目
+	rpc EzSellerCats(CategoryEzSellerCats) returns (CategoryEzSellerCatsResp);
+	// 单个类目详情
+	rpc EzSellerCatDetail(CategoryEzSellerCatDetial) returns (CategoryEzSellerCatDetailResp);
+	// 查询属性
+	rpc PcatPropDetail(CategoryPcatPropDetail) returns (CategoryPcatPropDetailResp);
+	rpc PcatsPropDetail(CategoryPcatsPropDetail) returns (CategoryPcatsPropDetailResp) {
+		option (common.timeout) = "-1";
+	};
+
+	// ------------------------------------------------------
+	// rpc api dcat
+	// ------------------------------------------------------
+
+	//根据父类目获取前台显示的展示类目
+	rpc GetEzbuyDcats(CategoryGetEzbuyDcats) returns (CategoryGetEzbuyDcatsResp);
+
+	// 获取单个类目的信息
+	rpc GetEzbuyDcat(CategoryGetEzbuyDcat) returns (CategoryGetEzbuyDcatResp);
+
+	//获取展示类目的类目树
+	rpc GetEzbuyDcatTree(CategoryGetEzbuyDcatTree) returns (CategoryGetEzbuyDcatTreeResp);
+
+
+	// ------------------------------------------------------
+	// rpc api rule
+	// ------------------------------------------------------
+
+	// 获取商品面包屑
+	rpc GetEzbuyDcatCrumbs(CategoryGetEzbuyDcatCrumbs) returns (CategoryGetEzbuyDcatCrumbsResp);
+
+	//根据tcid 获取展示类目
+	rpc GetEzbuyDcatByTcid(CategoryGetEzbuyDcatByTcid) returns (CategoryGetEzbuyDcatByTcidResp);
+
+	//根据pcid 获取展示类目
+  rpc GetEzbuyDcatByPcid(CategoryGetEzbuyDcatByPcid) returns (CategoryGetEzbuyDcatByPcidResp);
+  rpc GetEzbuyDcatsByPcid(CategoryGetEzbuyDcatsByPcid) returns (CategoryGetEzbuyDcatsByPcidResp);
+
+	//根据tcid获取发布类目
+	rpc GetEzbuyPcat(CategoryGetEzbuyPcat) returns (CategoryGetEzbuyPcatResp);
+
+	// 根据dcid 查询pcids(包括子类目的规则)
+	rpc GetEzbuyEntireRulePcids(CategoryGetEzbuyEntireRulePcids) returns (CategoryGetEzbuyEntireRulePcidsResp);
+
+	//根据dcid 查询tcid(包括子类目的规则)
+	rpc GetEzbuyEntireRuleTcids(CategoryGetEzbuyEntireRuleTcids) returns (CategoryGetEzbuyEntireRuleTcidsResp);
+
+	// 根据pcid  查询tcid
+	rpc GetEzbuyPcatRules(CategoryGetEzbuyPcatRules) returns (CategoryGetEzbuyPcatRulesResp);
+
+	// ------------------------------------------------------
+	// 属性 api
+	// ------------------------------------------------------
+
+	// 查找属性信息
+	rpc GetEzbuyPropKey(CategoryGetEzbuyPropKey) returns (CategoryGetEzbuyPropKeyResp);
+	// 查找属性值信息
+	rpc GetEzbuyPropValue(CategoryGetEzbuyPropValue) returns (CategoryGetEzbuyPropValueResp);
+	// 查找属性对信息
+	rpc GetEzbuyPropPair(CategoryGetEzbuyPropPair) returns (CategoryGetEzbuyPropPairResp);
+
+	// 查找属性下面的属性值信息
+	rpc GetEzbuyPropValuesByPropKey(CategoryGetEzbuyPropValuesByPropKey) returns (CategoryGetEzbuyPropValuesByPropKeyResp);
+
+    // 聚合展示类目下的品牌
+	rpc GetBrandList(CategoryBrandList) returns (CategoryBrandListResp);
+
+	// 	更新展示类目下品牌信息
+	rpc UpdateDcatBrand(CategoryUpdateDcatBrand) returns (CategoryUpdateDcatBrandResp);
+
+	//
+	rpc GetPropertyList(CategoryPropertyList) returns (CategoryPropertyListResp);
+
+	//
+	rpc UpdateDcatProperty(CategoryUpdateDcatProperty) returns (CategoryUpdateDcatPropertyResp);
+
+	//
+
+	// 服务之间通知
+	rpc Notify(CategoryNotify) returns (CategoryEmpty);
+}
+
+// ----------------------------------------------------------------
+
+message CategoryNotify {
+	NotifyType type = 1;
+}
+
+enum NotifyType {
+	NotifyTypeUnknown = 0;
+	NotifyTypeDcatReload = 1;
+}
+
+
+// ------------------------------------------------------
+
+// 属性类型
+enum CategoryPropType {
+	PropTypeUnknown = 0;
+	PropTypeSale = 1;
+	PropTypeDesc = 2;
+	PropTypeAll = 3;
+}
+
+// 使用类型
+enum CategoryPropUseType {
+	UseTypeUnknown = 0;
+	UseTypeSingle = 1;
+	UseTypeMulti = 2;
+	UseTypeFixed = 3;
+}
+
+message CategoryPcat {
+	int32 pcid = 1;
+	string pcname = 2;
+	bool disabled = 3;
+	int32 count = 4;
+	map<string, string> pcatTrans = 5;
+	repeated CategoryPcat treePcats = 6; // 包含完整类目层级，反序排列
+}
+
+message CategoryAddPcat {
+	string pcname = 1;
+	int32 parent = 3;
+}
+
+message CategoryShowPcats {
+	int32 parent = 1;
+}
+
+message CategoryPcatResp {
+	repeated CategoryPcat cats = 1;
+}
+
+//pcatTrans key:
+// "en";
+// "th";
+// "ms";
+// "ko";
+// "id";
+message CategorySinglePcatResp {
+	int32 pcid = 1;
+	string pcname = 2;
+	int32 parent = 3;
+	bool disabled = 4;
+	map<string, string> pcatTrans = 5;
+}
+
+message CategoryGetPcatDetail {
+	int32 pcid = 1;
+}
+
+message CategoryUpdatePcat {
+	int32 pcid = 1;
+	string pcname = 2;	//修改类目的名称
+	int32 parent = 3;  //修改改类目的父类目
+	bool disabled = 4; //是否禁用
+	// key: en, th, ms, ko, id, zh, ...
+	map<string, string> pcatTrans = 5; //翻译的信息
+}
+
+message CategoryListQuery {
+   string prefix = 1;
+   int32 limit = 2;
+   bool caseSensitive = 3;
+}
+
+message CategoryQueryPcats {
+	int32 parent = 1;
+	CategoryListQuery query = 2;
+}
+
+message CategoryDelPcat {
+	int32 pcid = 1;
+}
+
+message CategorySort {
+	int32 sortId = 1;  //待排序的id
+	int32 prevId = 2;  //排序后 前一位的id,如果排在第一位，传递-1
+	int32 nextId = 3;  //排序后 后一位的id，如果排在最后一位，传递-1
+}
+
+message CategoryAddPcatRule {
+	int64 tcid = 1;
+	int32 pcid = 2;
+}
+
+message CategoryDelPcatRule {
+	int64 tcid = 1;
+}
+
+message CategoryPcatRule {
+	int32 pcid = 1;
+}
+
+message CategoryPcatRulesResp {
+	repeated int64 tcids = 1;
+}
+
+message CategoryReloadCat {
+}
+
+message CategoryEmpty {
+}
+
+message CategoryQueryLeafPcats {
+    int32 pcid = 1;
+}
+
+message CategoryQueryLeafPcatsResp {
+    repeated CategoryPcat pcats = 1;
+}
+
+// -----------------------------------------------------------------------------
+message CategoryShowPropPairs {
+	string prefix = 1;
+	int32 limit = 2;
+	bool caseSensitive = 3;
+	int32 offset = 4;
+}
+
+message CategoryAddPropKey {
+	string propKeyName = 1;
+}
+
+message CategoryUpdatePropKey {
+	int32 propKeyId = 1;
+	string propKeyName = 2;
+	bool disabled = 3;
+	map<string, string> propKeyTrans = 4;
+}
+
+message CategoryAddPropValue {
+	int32 propKeyId = 1;
+	string propValueName = 2;
+}
+
+message CategoryPropKey {
+	int32 propKeyId = 1;
+	string propKeyName = 2;
+	map<string,string> propKeyTrans = 3;
+	CategoryPropType propType = 4;
+}
+
+message CategoryPropKeyDetail {
+	int32 propKeyId = 1;
+	string propKeyName = 2;
+	map<string, string> propKeyTrans = 3;
+}
+
+
+message CategoryAddPropKeyResp {
+	CategoryPropKey propKey = 1;
+}
+
+message CategoryUpdatePropValue {
+	int32 propValueId = 1;
+	string propValueName = 2;
+	bool disabled = 3;
+	map<string, string> propValueTrans = 4;
+}
+
+message CategoryPropValue {
+	int32 propValueId = 1;
+	string propValueName = 2;
+	map<string,string> propValueTrans = 3;
+}
+
+message CategoryPropPair {
+	int32 propPairId = 1;
+	CategoryPropKey propKey = 2;
+	CategoryPropValue propValue = 3;
+}
+
+message CategoryGetPropValuesByPropKey {
+	int32 propKeyId = 1;
+	int32 limit = 2;
+	int32 offset = 3;
+}
+
+message CategoryGetPropValuesByPropKeyResp {
+	int32 total = 1;
+	repeated CategoryPropValue propValues = 2;
+	CategoryPropKeyDetail propKeyDetail =3;
+}
+
+message CategoryAddPropValueResp {
+	CategoryPropValue propValue = 1;
+}
+
+message CategoryQueryPropValuesResp {
+	repeated CategoryPropValue propValues = 1;
+}
+
+message CategoryQueryPropKeyResp {
+	repeated CategoryPropKey propKeys = 1;
+}
+
+message CategoryShowPropPair {
+	CategoryPropKey propKey = 1;
+	repeated CategoryPropValue propValues = 2;
+}
+
+message CategoryShowPropPairsResp {
+	int32 total = 1;
+	repeated CategoryShowPropPair propPairs = 2;
+}
+
+message CategoryPropKeyId {
+	int32 propKeyId = 1;
+}
+
+message CategoryPropPairId {
+	int32 propKeyId = 1;
+	int32 propValueId = 2;
+}
+
+// -----------------------------------------------------------------------------
+message CategoryBoolResp {
+	bool ret = 1;
+}
+
+
+message CategoryPcatAddPropKey {
+	int32 pcid = 1;
+	int32 propKeyId = 2;
+}
+
+message CategoryRemovePcatPropKey {
+	int32 pcid = 1;
+	int32 propKeyId = 2;
+}
+
+message CategoryPcatCrumb {
+	int32 pcid = 1;
+	string pcname = 2;
+}
+
+message CategoryPcatPropPairs {
+	int32 pcid = 1;
+	CategoryPropType propType = 2;
+	int32 limit = 3;
+	int32 offset = 4;
+}
+
+message CategoryPcatPropPairsResp {
+	int32 total = 1;
+	repeated CategoryPcatCrumb crumbs = 2;
+	repeated CategoryShowPropPair propPairs = 3;
+}
+
+message CategoryPcatPropKeyType {
+	int32 pcid = 1;
+	int32 propKeyId = 2;
+	CategoryPropType propType = 3;
+	CategoryPropUseType useType = 4;
+}
+
+message CategoryPcatPropValuesInPropKey {
+	int32 pcid = 1;
+	int32 propKeyId = 2;
+	int32 limit = 3;
+	int32 offset = 4;
+}
+
+message CategoryPropValuesResp {
+	int32 total = 1;
+	CategoryPropKey propKey = 2;
+	CategoryPropType propType = 3;
+	CategoryPropUseType useType = 4;
+	repeated CategoryPropValue propValues = 5;
+}
+
+message CategoryPcatPropPairOp {
+	int32 pcid = 1;
+	int32 propKeyId = 2;
+	int32 propValueId = 3;
+}
+//------------------------------------------------------------
+message CategoryDcat {
+	int32 dcid = 1;
+	string name =2;
+	bool disabled = 3;
+	int32 count = 4;
+	BlockInfo blockInfo = 5;  // 废弃
+	map<string,CatalogInfo> catalogInfo = 6;
+}
+
+message BlockInfo {
+	bool isSGBlock = 1;
+	bool isMYBlock = 2;
+	bool isIDBlock = 3;
+	bool isTHBlock = 4;
+	bool isPKBlock = 5;
+}
+
+message CategoryShowDcat {
+	int32 parent = 1;
+	CategoryListQuery query = 2;
+}
+
+message CategoryShowDcatResp {
+	repeated CategoryDcat cats = 1;
+}
+
+message CategoryAddDcat {
+	int32 parent = 1;
+	string name = 2;
+	string pictureUrl = 3;
+	// catalogs: "SG","MY","ID","TH"
+	repeated string catalogs = 4;
+	BlockInfo blockInfo = 5;
+	map<string,CatalogInfo> catalogInfo = 6;
+}
+
+message CategoryGetDcat {
+	int32 dcid = 1;
+}
+
+message CategoryRemoveDcat {
+	int32 dcid = 1;
+}
+
+message CategoryRemoveDcatRule {
+	int32 dcid = 1;
+	int32 pcid = 2;
+}
+
+message CategoryRemoveDcatRuleResp {
+    string jobId = 1;
+}
+
+message CategoryGetDcatResp {
+	int32 dcid = 1;
+	string name =2;
+	bool disabled = 3;
+	string pictureUrl = 4;
+	int32 parent = 5;
+	int32 newParent = 10;
+	// key: en, th, ms, ko, id, zh, ...
+	map<string, string> dcatTrans = 6;
+	// catalogs: "SG","MY","ID","TH"
+	repeated string catalogs = 7;
+	BlockInfo blockInfo = 8;
+	map<string,CatalogInfo> catalogInfo = 9;
+}
+
+message BannerInfo {
+	string pictureUrl = 1;
+	string link = 2;
+	int64 startTime = 3;
+	int64 endTime = 4;
+	string deepLink = 5;
+}
+
+message CatalogInfo {
+	BannerInfo bannerInfo = 1;
+	bool block = 2;
+}
+
+message CategoryUpdateDcat {
+	int32 dcid = 1;
+	string name =2;
+	bool disabled = 3;
+	string pictureUrl = 4;
+	int32 parent = 5;  //类目迁移的时候用到。修改父类目
+	// key: en, th, ms, ko, id, zh, ...
+	map<string, string> dcatTrans = 6;
+	// catalogs: "SG","MY","ID","TH"
+	repeated string catalogs = 7;
+	BlockInfo blockInfo = 8;
+	map<string,CatalogInfo> catalogInfo = 9;
+}
+
+message CategoryGetDcatRule {
+	int32 dcid = 1;
+	int32 limit = 2;
+	int32 offset = 3;
+}
+
+// todo 等待prd出现再改
+message CategoryDCatPcatRule {
+	int32 pcid = 1;
+	string crumbs = 2;
+	repeated int64 tcids = 3;
+}
+
+
+message CategoryGetDcatRuleResp {
+	int32 total = 1;
+	repeated CategoryDCatPcatRule rules = 2;
+}
+
+message CategoryAddDcatRule {
+	int32 dcid = 1;
+	int32 pcid = 2;
+}
+
+message CategoryAddDcatRuleResp {
+    string jobId = 1;
+}
+
+//---------------------------------------------------------------
+
+message CategoryEzSellerCats {
+	int32 parent = 1;
+	// key: en, th, ms, ko, id, zh, ...
+	string lang = 2;
+}
+
+message CategoryBreadCrumb {
+	int32 pcid = 1;
+	string name = 2;
+	map<string, string> crumbTrans = 3;
+}
+
+message CategoryEzSellerCat {
+	int32 pcid = 1;
+	string name = 2;
+	repeated CategoryBreadCrumb breadCrumbs = 3;
+	map<string, string> pcatTrans = 4;
+
+	bool disabled = 5;
+    int32 parentPcid = 6;
+}
+
+message CategoryEzSellerCatsResp {
+	repeated CategoryEzSellerCat cats = 1;
+}
+
+message CategoryEzSellerCatDetial {
+	int32 pcid = 1;
+	string lang = 2;
+}
+
+message CategoryEzSellerCatDetailResp {
+	CategoryEzSellerCat cat = 1;
+}
+
+
+message CategoryPcatPropDetail {
+	int32 pcid = 1;
+	// en, th, ms, ko, id, zh, ...
+	string lang = 2;
+}
+
+message CategoryPcatsPropDetail {
+	repeated int32 pcids = 1;
+	// en, th, ms, ko, id, zh, ...
+	string lang = 2;
+}
+
+message CategoryEzSellerPropPair {
+	int32 propPairId = 1;
+	int32 propValueId = 2;
+	string propValueName = 3;
+	string propSlug = 4;
+	map<string, string> propValueTrans = 5;
+}
+
+message CategoryEzSellerPropKey {
+	int32 propKeyId = 1;
+	string propKeyName = 2;
+	CategoryPropUseType userType = 3;
+	repeated CategoryEzSellerPropPair propPairs = 4;
+	map<string, string> propKeyTrans = 5;
+}
+
+message CategoryPcatPropDetailResp {
+	repeated CategoryBreadCrumb breadCrumbs = 1;
+	repeated CategoryEzSellerPropKey skuProps = 2;
+	repeated CategoryEzSellerPropKey descProps = 3;
+}
+
+message CategoryPcatsPropDetailResp {
+	repeated CategoryPcatPropDetailResp details = 1;
+}
+
+//---------------------------------------------------------------
+
+message CategoryCountCond {
+	bool isPrime = 1;
+	bool isEzbuy = 2;
+	bool isCashOff = 3;
+  	bool isFreeShipping = 4;
+  	bool isEzsellerOnly = 6;
+	string catalog = 5;
+	int32 freeShippingType = 7;
+}
+
+message CategoryOptCond {
+	string lang = 1;
+	string catalog = 2;
+	bool needCrumbs = 3;
+	bool needCount = 4;
+	CategoryCountCond countCond = 5;
+}
+
+message CategoryEzbuyDcatCrumb {
+	int32 dcid = 1;
+	string dcname = 2;
+	BlockInfo blockInfo = 3;
+	map<string,CatalogInfo> catalogInfo = 4;
+}
+
+message CategoryEzbuyDcat {
+	int32 dcid = 1;
+	string dcname = 2;
+	string dcatImage = 3;
+	repeated CategoryEzbuyDcatCrumb crumbs = 4;
+	int64 count = 5;
+	map<string,CatalogInfo> catalogInfo = 6;
+}
+
+message CategoryGetEzbuyDcats {
+	int32 parent = 1;
+	CategoryOptCond optCond = 2;
+}
+
+message CategoryGetEzbuyDcatsResp {
+	repeated CategoryEzbuyDcat dcats = 1;
+}
+
+message CategoryGetEzbuyDcat {
+   int32 dcid = 1;
+   CategoryOptCond optCond = 2;
+}
+
+message CategoryGetEzbuyDcatResp {
+	CategoryEzbuyDcat dcat = 1;
+}
+
+message CategoryEzbuyDcatParent {
+	int32 dcid = 1;
+	string dcname = 2;
+	string dcatImage = 3;
+	CategoryEzbuyDcatParent parent = 4;
+	int64 count = 5;
+}
+
+message CategoryEzbuyDcatSub {
+	int32 dcid = 1;
+	string dcname = 2;
+	string dcatImage = 3;
+	repeated CategoryEzbuyDcatSub subDcats = 4;
+	int64 count = 5;
+	map<string,CatalogInfo> catalogInfo = 6;
+}
+
+message CategoryGetEzbuyDcatTree {
+	int32 dcid = 1;
+	string lang = 2;
+	string catalog = 3;
+	bool needCount = 4;
+	CategoryCountCond countCond = 5;
+}
+
+message CategoryGetEzbuyDcatTreeResp {
+	int32 dcid = 1;
+	string dcname = 2;
+	string dcatImage = 3;
+	CategoryEzbuyDcatParent parent = 4;
+	repeated CategoryEzbuyDcatSub subDcats = 5;
+	int64 count = 6;
+}
+
+// ------------------------------------------------------------------------
+// rpc api tcid
+// ------------------------------------------------------------------------
+
+message CategoryGetEzbuyDcatByTcid{
+	int64 tcid = 1;
+}
+
+message CategoryGetEzbuyDcatByTcidResp {
+	repeated CategoryDcat dcats = 1;
+}
+
+message CategoryGetEzbuyDcatByPcid {
+	int32 pcid = 1;
+}
+
+message CategoryGetEzbuyDcatsByPcid {
+	int32 pcid = 1;
+}
+
+message CategoryGetEzbuyDcatsByPcidResp {
+	repeated DcatTree dcats = 1;
+}
+
+message DcatTree {
+  repeated CategoryDcat dcats = 1;
+}
+
+message CategoryGetEzbuyDcatByPcidResp {
+	repeated CategoryDcat dcats = 1;
+}
+
+//pcid 和 tcid随便传递一个值。。都有以pcid为准
+message CategoryGetEzbuyPcat {
+	int32 pcid = 1;
+	int64 tcid = 2;
+	CategoryOptCond optCond = 3; //必填
+
+	// 是否需要验证pcat合法,按照类目树的结构返回最底层的合法类目
+	// verifyPcat 为false只返回类目的信息,(提供给商品查询它所在的合法类目)
+	bool verifyPcat = 4;
+}
+
+
+message CategoryEzbuyPcat {
+	int32 pcid = 1;
+	string pcname = 2;
+	repeated CategoryPcatCrumb crumbs = 3;
+	int64 count = 4;
+    int32 parentPcid = 5;
+}
+
+message CategoryGetEzbuyPcatResp {
+	CategoryEzbuyPcat pcat = 1;
+}
+
+
+// ------------------------------------------------------------------------
+// category profile
+// ------------------------------------------------------------------------
+
+message CategoryDcatProfile {
+	string key = 1;
+	string name = 2;
+}
+
+message CategoryListDcatProfile {
+	int32 limit = 1;
+	int32 offset = 2;
+}
+
+message CategoryListDcatProfileResp {
+	repeated CategoryDcatProfile dcatProfiles = 1;
+	int32 total = 2;
+}
+
+message CategoryAddDcatProfile {
+	CategoryDcatProfile dcatProfile = 1;
+}
+
+message CategoryAddDcatProfileResp {
+}
+
+message CategoryUpdateDcatProfile {
+	string key = 1;
+	bool disable = 2;
+	string name = 3;
+}
+
+message CategoryUpdateDcatProfileResp {
+}
+
+message CategorySortDcatProfile {
+	string key = 1;
+	int32 sortId = 2;
+	int32 prevId = 3;
+	int32 nextId = 4;
+}
+
+message CategorySortDcatProfileResp {
+}
+
+message CategoryListDcatProfileDetail {
+	string key = 1;
+	int32 parent = 2;
+}
+
+message CategoryListDcatProfileDetailResp {
+	repeated CategoryDcat dcats = 1;
+}
+
+message CategoryGetEzbuyProfileDcat {
+	string key = 1;
+	int32 parent = 2;
+	CategoryOptCond optCond = 3;
+}
+
+message CategoryGetEzbuyProfileDcatResp {
+	repeated CategoryEzbuyDcat dcats = 1;
+}
+
+message CategoryGetEzbuyEntireRulePcids {
+	int32 dcid = 1;
+}
+
+message CategoryGetEzbuyEntireRulePcidsResp {
+	repeated int32 pcids = 1;
+}
+
+message CategoryGetEzbuyEntireRuleTcids {
+	int32 dcid = 1;
+}
+
+message CategoryGetEzbuyEntireRuleTcidsResp {
+	repeated int64 tcids = 1;
+}
+
+message CategoryGetEzbuyDcatCrumbs {
+	int32 pcid = 1;
+	int64 tcid = 2;
+
+	string catalog = 3;
+	string lang = 4;
+}
+
+message CategoryGetEzbuyDcatCrumbsResp {
+	repeated CategoryEzbuyDcatCrumb dcatCrumbs = 1;
+}
+
+// -------------------------------------------------------------------
+
+message CategoryEzbuyPropKey {
+	int32 propKeyId = 1;
+	string propKeyName = 2;
+	map<string,string> propKeyTrans = 3;
+}
+
+message CategoryEzbuyPropValue {
+	int32 propValueId = 1;
+	string PropValueName = 2;
+	map<string,string> propValueTrans = 3;
+}
+
+message CategoryEzbuyPropPair {
+	int32 propPairId = 1;
+	CategoryEzbuyPropKey propKey = 2;
+	CategoryEzbuyPropValue propValue = 3;
+}
+
+message CategoryGetEzbuyPropKey {
+	int32 propKeyId = 1;
+}
+
+message CategoryGetEzbuyPropKeyResp {
+	CategoryEzbuyPropKey propKey = 1;
+}
+
+message CategoryGetEzbuyPropValue {
+	int32 propValueId =1;
+}
+
+message CategoryGetEzbuyPropValueResp {
+	CategoryEzbuyPropValue propValue = 1;
+}
+
+message CategoryGetEzbuyPropPair {
+	int32 propPairId = 1;
+}
+
+message CategoryGetEzbuyPropPairResp {
+	CategoryEzbuyPropPair propPair = 1;
+}
+
+message CategoryGetEzbuyPropValuesByPropKey {
+	int32 propKeyId = 1;
+}
+
+message CategoryGetEzbuyPropValuesByPropKeyResp {
+	CategoryEzbuyPropKey propKey = 1;
+	repeated CategoryEzbuyPropValue propValue = 2;
+}
+
+message CategoryGetEzbuyPcatRules {
+	int32 pcid = 1;
+
+	// 是否包含子类目的规则
+	bool all = 2;
+}
+
+message CategoryGetEzbuyPcatRulesResp{
+	repeated int64 tcids = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message CategoryBrandList {
+	// 展示类目id
+	int32 dcid = 1;
+    bool forceReload = 2;
+	int64 limit = 3;
+}
+
+message CategoryBrandListResp {
+	repeated CategoryBrandInfo brandList = 1;
+}
+
+message CategoryBrandInfo {
+	string name = 1;
+	int64 count = 2;
+}
+
+// ---------------------------------------------------------------------------
+
+message CategoryUpdateDcatBrand {
+	int32 dcid = 1;
+	int64 limit = 2;
+}
+
+message CategoryUpdateDcatBrandResp {
+	repeated CategoryBrandInfo brandList = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message CategoryGetCidsByDcid {
+	int32 dcid = 1;
+}
+
+message CategoryGetCidsByDcidResp {
+	repeated int32 pcids = 1;
+	repeated int64 tcids = 2;
+}
+
+// ---------------------------------------------------------------------------
+
+message CategoryPropertyList {
+	// 展示类目id
+	int32 dcid = 1;
+	bool forceReload = 2;
+	int64 limit = 3;
+	int64 valLimit = 4;
+	string lang = 5;
+}
+
+message CategoryPropertyListResp {
+	repeated CategoryPropertyInfo properties = 1;
+}
+
+message CategoryPropertyInfo {
+	string name = 1;
+	int32 id = 2;
+	repeated CategoryPropertyValue values = 3;
+}
+
+message CategoryPropertyValue {
+	string name = 1;
+	int32 id = 2;
+	int64 count = 3;
+}
+
+// ---------------------------------------------------------------------------
+
+message CategoryUpdateDcatProperty{
+	int32 dcid = 1;
+	int64 limit = 2;
+}
+
+message CategoryUpdateDcatPropertyResp{
+}
+
+
+// ---------------------------------------------------------------------------
+
+message CategoryGetDcats {
+  repeated int32 dcid = 1;
+}
+
+message CategoryGetDcatsResp {
+  repeated CategoryDcat dcats = 1;
+}
+
+// -----------------------------------------------------------------------------
+
+message CategoryPcatLeavesPcat {
+	int32 pcid = 1;
+}
+
+message CategoryPcatLeavesPcatResp {
+	repeated CategoryPcat pcats = 1;
+}
+
+// -------------------------------------------------------------------------------
+
+message CategoryMultiPropPairs {
+	repeated int32 keyId = 1;
+}
+
+message CategoryMultiPropPairsResp {
+	repeated CategoryShowPropPair propPairs = 1;
+}
+
+
+// ----------------------------------------------------------------------------------
+
+message CategoryAddPcatPropsPair{
+	int32 pcid = 1;
+	repeated CategoryAddPropValue propValueItems = 2;
+	string updateBy = 3;
+}
+
+message CategoryAddPcatPropsPairResp {
+	repeated CategoryPropPairId propPairs = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message CategoryDcatNewParentAdd {
+  int32 dcid = 1;
+  int32 newParent = 2;
+}
+
+message CategoryDcatNewParentAddResp {
+  
+}
+
+message CategoryDcatNewParentCommit {
+  
+}
+
+message CategoryDcatNewParentCommitResp {
+  repeated int32 dcids = 1;
+}

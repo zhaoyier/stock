@@ -1,0 +1,235 @@
+syntax = "proto3";
+package falke;
+
+import "common/file.proto";
+import "common/ezbuy.proto";
+import "common/empty.proto";
+import "falke/common_public.proto";
+
+
+service Erp{
+    //入库(OrderNoLocation)
+  //GetOrderNoRelations gets orderinfo <=> (Locationinfo) <=> channelinfo relations
+  rpc GetOrderNoRelations(GetOrderNoRelationsReq) returns (GetOrderNoRelationsResp);
+  //MultiSetChannel sets channel according to the orderinfo (actually the locationid)
+  rpc MultiSetChannels(SetChannelReq) returns (common.Empty);
+  //SingleSetChannel ...
+  rpc SingleSetChannel(SingleSetChannelReq) returns (common.Empty);
+  //ImportOrderNoRelations imports the relations data via Excel.
+  rpc ImportOrderNoRelations(ImportOrderNoRelationsReq) returns (ImportOrderNoRelationsResp){
+    option (common.webapi).upload = true;
+  }
+  //DownloadOrderNoTemplate will download the default template.
+  rpc DownloadOrderNoTemplate(DownloadOrderNoTemplateReq) returns (DownloadOrderNoTemplateResp);
+  //出库(PkgLocation)
+  //GetPkgRelation gets pkginfo <=> (Locationinfo) <=> channelinfo relations
+  rpc GetPkgRelation(GetPkgRelationReq) returns (GetPkgRelationResp);
+  //AddLocationFromStation add a pkg relation
+  rpc AddLocationFromStation(AddLocationFromStationReq) returns (common.Empty);
+  //DeleteStationLocation delete station
+  rpc DeleteStationLocations(DeleteStationLocationsReq) returns (common.Empty);
+  //GetAllStations get all stations from express ,and append with a exist status
+  rpc GetAllStations(GetAllStationsReq) returns (GetAllStationsResp);
+  //AddWeightType add a weight type
+  rpc AddWeightType(AddWeightTypeReq) returns (common.Empty);
+  //ModifyWeightType modify a weight type
+  rpc ModifyWeightType(ModifyWeightTypeReq) returns (common.Empty);
+  //InActiveWeightType delete a weight type
+  rpc InActiveWeightType(InActiveWeightTypeReq) returns (common.Empty);
+  //GetAllWeightType get all weight type
+  rpc GetAllWeightType(GetAllWeightTypeReq) returns (GetAllWeightTypeResp);
+  //GetLocationStationsByOptions 根据条件获取出库站点列表
+  rpc GetLocationStationsByOptions(GetLocationStationsByOptionsReq) returns (GetLocationStationsByOptionsResp);
+  //GetChildRegion get exist region's child regions
+  /*rpc GetChildRegion(GetChildRegionReq) returns (GetChildRegionResp);*/
+
+  //USELESS NOW !
+  //InactiveChannel will inactive the channel (is_valid = 0)
+  rpc InactiveChannel(InactiveChannelReq) returns (InactiveChannelResp);
+  //ActiveChannel will active the channel (is_valid = 1)
+  rpc ActiveChannel(ActiveChannelReq) returns (ActiveChannelResp);
+}
+
+message GetLocationStationsByOptionsReq{
+  int64 region_id = 1;
+  int64 delivery_type_id =3;
+  TimePeriod time_period =6;
+  int32 channel_id = 7;
+  int32 weight_type_id = 8;
+}
+
+message GetLocationStationsByOptionsResp{
+  repeated DeliveryStation stations = 1;
+}
+
+message AddLocationFromStationReq{
+  int64 region_id = 2;
+  bool  setWeightType = 3;
+  TimePeriod time_period = 4;
+  repeated LocationStationsInfo station = 1;
+}
+
+message DeleteStationLocationsReq{
+  repeated int64 location_id = 1;
+}
+
+message GetChildRegionReq{
+  int64 region_id = 1;
+}
+
+message GetChildRegionResp{
+    repeated Region regions = 1;
+}
+
+message GetAllStationsReq{
+  int64 delivery_type_id =1;
+  int64 region_id = 2;
+  int64 station_id = 3;
+}
+
+message GetAllStationsResp{
+  repeated LocationStationsInfo stations = 1;
+}
+
+
+message LocationStationsInfo{
+  DeliveryType delivery_type = 1;
+  int64  region_id = 5;
+  string region_code = 2;
+  string station_name = 3;
+  int64 station_id = 6;
+  bool exist = 4;
+}
+
+message AddWeightTypeReq{
+  int64 region_id = 1;
+  int64 min_weight = 2;
+  int64 max_weight = 3;
+}
+
+message ModifyWeightTypeReq{
+  int32 weight_type_id = 1;
+  int64 region_id = 4;
+  int64 min_weight = 2;
+  int64 max_weight = 3;
+}
+
+message InActiveWeightTypeReq{
+  int32 weight_type_id = 1;
+}
+
+message GetAllWeightTypeReq{
+  int64 region_id = 1;
+}
+
+message GetAllWeightTypeResp{
+  repeated WeightType  weight_types = 1;
+}
+
+//DeliveryStation info
+message DeliveryStation{
+    int64 delivery_station_id = 1;
+    string delivery_station_name = 2;
+}
+//PkgRelations ...
+message PkgRelations{
+    int64 location_id =1;
+    int32 channel_id =2;
+    int64 region_id=3;
+    string region_name=4;
+    DeliveryType delivery_type_info =5;
+    DeliveryStation delivery_station_info =6;
+    TimePeriod time_period =7;
+    int32 weight_type_id = 8;
+    string weight_type_code = 9;
+}
+//OrderNoRelations ...
+message OrderNoRelations{
+    int64 location_id =1;
+    int32 channel_id =2;
+    string shelf_code =3;
+}
+
+
+//GetOrderNoRelationsReq sets the optional `shelf_code`,if empty,it will return all relations.
+message GetOrderNoRelationsReq{
+    string shelf_code =1;
+    string order_no =4;
+    int32 offset =2;
+    int32 limit =3;
+}
+//GetOrderNoRelationsResp returns relations.
+message GetOrderNoRelationsResp{
+    repeated OrderNoRelations relations =1;
+    int64 total = 2;
+}
+//SetChannelReq ...
+message SetChannelReq{
+    repeated int64 location_id =1;
+    int32 weight_type_id = 2;
+    int32 channel_id =3;
+}
+
+message SingleSetChannelReq{
+    int64 location_id = 1;
+    int32 weight_type_id = 2;
+    int32 channel_id = 3;
+    TimePeriod period = 4;
+}
+
+
+//InactiveChannelReq ...
+message InactiveChannelReq{
+    int64 location_id =1;
+}
+//InactiveChannelResp ...
+message InactiveChannelResp{
+    string status =1;
+}
+//ActiveChannelReq ...
+message ActiveChannelReq{
+    int64 location_id =1;
+}
+//ActiveChannelResp ...
+message ActiveChannelResp{
+    string status =1;
+}
+//ImportOrderNoRelationsReq ...
+message ImportOrderNoRelationsReq{
+    common.File file =1;
+}
+//ImportOrderNoRelationsResp ...
+message ImportOrderNoRelationsResp{
+    string status =1;
+}
+//DownloadOrderNoTemplateReq ...
+message DownloadOrderNoTemplateReq{
+}
+//DownloadOrderNoTemplateResp ...
+message DownloadOrderNoTemplateResp{
+    string temp_url =1;
+}
+//GetPkgRelationReq will get the result according to the different column,all columns are optional,if empty,will return all data.
+message GetPkgRelationReq{
+    int64 region_id = 1;
+    int64 delivery_type_id =3;
+    int64 delivery_station_id=4;
+    TimePeriod time_period =6;
+    int32 channel_id = 7;
+    int32 weight_type_id = 8;
+    int32 offset =9;
+    int32 limit =10;
+}
+//GetPkgRelationResp ...
+message GetPkgRelationResp{
+    repeated  PkgRelations relations =1;
+}
+
+
+enum DeliveryType{
+		ALLTYPE = 0;
+		Home =4;
+		MRT = 3;
+		WAREHOUSE =1;
+		NeighbourhoodStation = 2;
+}

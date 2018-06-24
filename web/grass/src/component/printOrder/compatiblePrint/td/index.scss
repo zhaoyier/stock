@@ -1,0 +1,12 @@
+.Td_Wrap {
+  border: 1px solid #ccc;
+  padding: 2px;
+  line-height: 100%;
+  min-height: 30px;
+}
+
+.limitText {
+  overflow: hidden;
+  text-overflow:ellipsis;
+  white-space: nowrap;
+}

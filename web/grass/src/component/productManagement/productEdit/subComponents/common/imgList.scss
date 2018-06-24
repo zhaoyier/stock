@@ -1,0 +1,21 @@
+@mixin clearfix {
+  content: "."; 
+  visibility: hidden; 
+  display: block; 
+  height: 0; 
+  clear: both;
+}
+
+.clearfix {
+  &:after {
+    @include clearfix;
+  }
+}
+
+.imgItem {
+  float: left;
+  margin-right: 16px;
+  width: 104px;
+  height: 104px;
+}
+

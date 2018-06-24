@@ -1,0 +1,285 @@
+syntax = "proto3";
+package gospm;
+
+import "common/ezbuy.proto";
+
+service Spm {
+    option (common.service).webapi = true;
+
+    //频道
+    //Get时，若传递的为空数组，则全部返回
+    rpc GetChannel (SpmGetChannel) returns (SpmGetChannelResp);
+    rpc AddChannel (SpmAddChannel) returns (SpmAddChannelResp);
+    rpc DelChannel (SpmDelChannel) returns (SpmDelChannelResp);
+
+    //活动
+    //查询规则：活动名和创建人是模糊查询，活动ID为准确查询。
+    rpc GetActivity (SpmGetActivity) returns (SpmGetActivityResp);
+    rpc AddActivity (SpmAddActivity) returns (SpmAddActivityResp);
+    rpc DelActivity (SpmDelActivity) returns (SpmDelActivityResp);
+
+    //推广平台
+    rpc GetPlatform (SpmGetPlatform) returns (SpmGetPlatformResp);
+    rpc AddPlatform (SpmAddPlatform) returns (SpmAddPlatformResp);
+    rpc DelPlatform (SpmDelPlatform) returns (SpmDelPlatformResp);
+
+    //推广模式
+    rpc GetModel (SpmGetModel) returns (SpmGetModelResp);
+    rpc AddModel (SpmAddModel) returns (SpmAddModelResp);
+    rpc DelModel (SpmDelModel) returns (SpmDelModelResp);
+
+    //站内spm申请
+    rpc Add (SpmAdd) returns (SpmAddResp);
+
+    //站外spm申请
+    rpc AddOutside(SpmAddOutside) returns (SpmAddOutsideResp);
+
+    //获取spm（不区分站内站外）
+    rpc Get (SpmGet) returns (SpmGetResp);
+
+    //修改存在于number池中的source的值
+    rpc SetNumber (SpmSetNumber) returns (SpmSetNumberResp);
+
+    //页面detail
+    rpc GetPage (SpmGetPage) returns (SpmGetPageResp);
+    rpc SetPage (SpmSetPage) returns (SpmSetPageResp);
+    rpc DelPage (SpmDelPage) returns (SpmDelPageResp);
+}
+
+// ---------------------------- Channel ----------------------------
+
+message ChannelNameAndId {
+    string name = 1;
+    int32 id = 2;
+}
+
+message SpmGetChannel {
+    repeated string name = 1;
+}
+
+message SpmGetChannelResp {
+    repeated ChannelNameAndId infos = 1;
+}
+
+message SpmAddChannel {
+    repeated string name = 1;
+}
+
+message SpmAddChannelResp {
+    repeated ChannelNameAndId infos = 1;
+}
+
+message SpmDelChannel {
+    repeated int32 id = 1;
+}
+
+message SpmDelChannelResp {}
+
+// ---------------------------- Activity ----------------------------
+
+message ActivityInfo {
+	string name = 1;
+	int32 id = 2;
+    int64 startDate = 3;
+    int64 endDate = 4;
+    map<string, bool> platform = 5;
+    int64 createDate = 6;
+    string createBy = 7;
+}
+
+message SpmGetActivity {
+    //如果只传limit和offset，则返回所有数据
+	string name = 1;
+    ActivityType type = 2;
+    int32 limit = 3;
+    int32 offset = 4;
+    int32 id = 5;
+}
+
+message SpmGetActivityResp {
+	repeated ActivityInfo infos = 1;
+}
+
+message SpmAddActivity {
+    string name = 1;
+    int64 startDate = 2;
+    int64 endDate = 3;
+    map<string, bool> platform = 4;     //"Android", "Ios", "Pc", "Msite"
+}
+
+message SpmAddActivityResp {
+    int32 id = 1;
+}
+
+message SpmDelActivity {
+    int32 id = 1;
+}
+
+message SpmDelActivityResp {
+	bool result = 1;
+}
+
+enum ActivityType {
+    All = 0;
+    Valid = 1;
+}
+
+// ---------------------------- Promote Platform ----------------------------
+
+message PlatformAndId {
+    string name = 1;
+    int32 id = 2;
+}
+
+message SpmGetPlatform {
+    repeated string name = 1;
+}
+
+message SpmGetPlatformResp {
+    repeated PlatformAndId infos = 1;
+}
+
+message SpmAddPlatform {
+    string name = 1;
+}
+
+message SpmAddPlatformResp {
+    int32 id = 1;
+}
+
+message SpmDelPlatform {
+    int32 id = 1;
+}
+
+message SpmDelPlatformResp {
+    bool result = 1;
+}
+
+// ---------------------------- Promote Model ----------------------------
+
+message ModelAndId {
+    string name = 1;
+    int32 id = 2;
+}
+
+message SpmGetModel {
+    repeated string name = 1;
+}
+message SpmGetModelResp {
+    repeated ModelAndId infos = 1;
+}
+
+message SpmAddModel {
+    string name = 1;
+}
+
+message SpmAddModelResp {
+    int32 id = 1;
+}
+
+message SpmDelModel {
+    int32 id = 1;
+}
+
+message SpmDelModelResp {
+    bool result = 1;
+}
+
+// ---------------------------- SPM ----------------------------
+
+message SpmAdd {
+    int32 platform = 1;
+    int32 pageId = 2;
+    int32 channelId = 3;
+    int32 activityId = 4;
+    string activityName = 5;
+}
+
+message SpmAddResp {
+    string spm = 1;
+}
+
+message SpmAddOutside {
+    int32 platform = 1;
+    int32 proPlatform = 2;
+    int32 model = 3;
+    int32 activityId = 4;
+    string activityName = 5;
+    string inf = 6;
+}
+
+message SpmAddOutsideResp {
+    string spm = 1;
+}
+
+message SpmGet {
+    SearchType type = 1;
+    string query = 2;
+    int32 limit = 3;
+    int32 offset = 4;
+}
+
+message SpmGetResp {
+    repeated SpmInfo infos = 1;
+}
+
+message SpmInfo {
+    string activity = 1;
+    SpmType type = 2;       //站内或站外
+    string spm = 3;
+    string inf = 4;         //网红名
+    int64 createDate = 5;
+    string createBy = 6;
+}
+
+enum SearchType {
+    Unknown = 0;
+    Activity = 1;
+    SpmCode = 2;
+    Inf = 3;        //网红名
+    CreateBy = 4;
+}
+
+enum SpmType {
+    Inside = 0;
+    Outside = 1;
+}
+
+// ---------------------------- NumberPool ----------------------------
+
+message SpmSetNumber {
+    string source = 1;
+    int32 value = 2;
+}
+
+message SpmSetNumberResp {}
+
+// ---------------------------- PAGE ----------------------------
+
+message PageInfo {
+    int32 pageId = 1;
+    string name = 2;
+    string detail = 3;
+}
+
+message SpmGetPage {
+    repeated string name = 1;
+}
+
+message SpmGetPageResp {
+    repeated PageInfo infos = 1;
+}
+
+message SpmSetPage {
+    PageInfo info = 1;
+}
+
+message SpmSetPageResp {}
+
+//pageId优先
+message SpmDelPage {
+    string name = 1;
+    int32 pageId = 2;
+}
+
+message SpmDelPageResp {}

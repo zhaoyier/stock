@@ -1,0 +1,20 @@
+syntax = "proto3";
+package assassin;
+import "assassin/assassin.proto";
+import "common/ezbuy.proto";
+
+service Philips {
+  option (common.service).webapi = true;
+  rpc Get(PhilipsGet) returns (PhilipsGetResp);
+}
+
+// ---------------------------------------------------------------------------
+
+message PhilipsGet {	
+  string id = 1;
+  bool notRealtime = 2;
+}
+
+message PhilipsGetResp {
+	Product product = 1;
+}

@@ -1,0 +1,355 @@
+syntax = "proto3";
+package spike;
+import "spk/spk_public.proto";
+import "common/table.proto";
+
+message TCategory{
+	int32 dcid = 1;
+	string name = 2;
+}
+
+message TProductDps {
+	int32 favoritesItemId = 1;
+	int32 FavoriteCatId = 2;
+	string specialHandlingFeeMessage = 3;
+	string specialHandlingFeePercent = 4;
+	// PropertyNames 废弃
+}
+
+message TProductOptional {
+	TProduct product = 1;
+	bool isNotFound = 2;
+	bool isOutOfStock = 3;
+	string error = 4;
+}
+
+message TSimpleProductOptional {
+	TSimpleProduct product = 1;
+	bool isNotFound = 2;
+	bool isOutOfStock = 3;
+	string error = 4;
+}
+
+
+message TProductList {
+	int64 gpid = 1;
+	string refId = 2;
+	string name = 5;
+	string originUrl = 6;
+	string productImage = 7;
+	TPrice price = 8;
+	string discountRate = 9;     //折扣率  例如 50% off
+  string originalProductName = 10;
+  string originCode = 11;
+  bool isPrime = 12;
+}
+
+message TSimpleProduct {
+	int64 gpid = 1;
+	string refId = 2;
+	string name = 5;
+	string originUrl = 7;
+	string primaryImage = 8;
+	string vendorName = 10;
+	// 用于展示的店铺名, 可能与真实店铺名不一致
+    string displayVendorName = 91;
+  	string shopName = 22;
+	repeated TProductSku skus = 14;
+	repeated TProductSkuSimple simpleSku = 65;
+	string originCode = 15;
+	string originCountry = 24;
+	string skuImage = 70;
+	TPrice price = 16;
+	bool isPrime = 17;
+	bool isEzbuy = 18;
+  	int64 tcid = 29; // taobao cid
+	bool isBuyforme = 30;
+	TShippingFee domesticShippingFee = 23;
+	string primeShippingName = 42;
+	string ezbuyDefaultShippingName = 39;
+	repeated TEzbuyShipmentMethod ezbuyShipmentMethods = 48;
+	repeated TPrimeShipmentMethod primeShipmentMethods = 54;
+	int32 ezbuyShipmentType = 49;
+  	int32 primeShipmentType = 50;
+	string location = 34;
+	TProductExtra extra = 19;
+	TPrice localPrice = 20;
+	int64 weightInt = 46;
+	double weight = 32;
+	double exchange = 33;
+	string specialHandlingFeeMessage = 44;
+	double specialHandlingFeePercent = 45;
+    repeated TWarehouseShippingFee warehouses = 36;
+    repeated TWarehouseShippingFee ezbuyWarehouses = 83;
+    repeated TWarehouseShippingFee primeWarehouses = 84;
+    repeated TWarehouseShippingFee b4mWarehouses = 85;
+	string internalProductUrl = 66;
+	string originName = 75;
+	string realOriginCode = 76;
+	bool isOnSale = 77;
+	string selectedSkuId = 78; // 所选的SKU ID，如果没有选择 SKU 则为空字符串
+	bool isBlockDetail = 79;
+	int32 pcid = 80;
+	int64 version = 81;
+	spk.XPlatform platform = 82;
+  repeated int32 dcids = 31;
+  repeated int32 allDcids = 89;
+	repeated spk.XTitleIcon titleIcons = 90;
+}
+
+message TProduct {
+	int64 gpid = 1;
+	string refId = 2;
+	string name = 5;
+	map<string, string> altNames = 6;
+	string originUrl = 7;
+	string primaryImage = 8;
+	string skuImage = 70;
+	repeated string images = 9;
+	string vendorName = 10;
+	// 用于展示的店铺名, 可能与真实店铺名不一致
+	string displayVendorName = 92;
+	string brandName = 11;
+	string description = 12;
+	repeated string descriptionImages = 37; // 描述的图片列表
+	repeated TProperty properties = 13;
+	repeated TProductSku skus = 14;
+	repeated TProductSkuSimple simpleSku = 65;
+	string originCode = 15;
+	TPrice price = 16;
+	bool isPrime = 17;
+	bool isEzbuy = 18;
+	bool isBuyforme = 30;
+	TProductExtra extra = 19;
+	TPrice localPrice = 20;
+	repeated string descAttrs = 21;
+	string shopName = 22;
+	TShippingFee domesticShippingFee = 23;
+	string originCountry = 24;
+	bool containGSTFee = 26;
+	bool isBlockDetail = 27;
+	bool isShowSeller = 28;
+	int64 tcid = 29; // taobao cid
+	int32 pcid = 38;
+	repeated TCategory tCats = 31;
+	double weight = 32;
+	int64 weightInt = 46;
+	double exchange = 33;
+	string location = 34;
+	string aroundWarehouse = 35;
+	repeated TWarehouseShippingFee warehouses = 36;
+    repeated TWarehouseShippingFee ezbuyWarehouses = 83;
+    repeated TWarehouseShippingFee primeWarehouses = 84;
+    repeated TWarehouseShippingFee b4mWarehouses = 85;
+	string ezbuyDefaultShippingName = 39;
+	string ezbuyDefaultShippingFee = 41;
+	string defaultWarehouse = 53;
+	repeated TEzbuyShipmentMethod ezbuyShipmentMethods = 48;
+	repeated TPrimeShipmentMethod primeShipmentMethods = 54;
+	TProductEta ezbuyEta = 43;
+	string primeShippingName = 42;
+	TProductEta primeEta = 25;
+	string gstFee = 40;
+	int32 ezbuyShipmentType = 49;
+	int32 primeShipmentType = 50;
+	string notice = 60;
+
+	string specialHandlingFeeMessage = 44;
+	double specialHandlingFeePercent = 45;
+	int32 quantity = 55;
+	string internalProductUrl = 66;
+	string realOriginCode = 76;
+	string originInfo = 77;
+	bool isOnSale = 78;
+	string selectedSkuId = 79;
+	TJoinPrimeInfo joinPrime = 80;
+	int64 version = 81;
+	spk.XPlatform platform = 82;
+	repeated spk.XTitleIcon titleIcons = 86;
+	// 废弃
+	string sellerBanner = 87;
+	// 取代 sellerBanner
+	spk.XBanner banner = 90;
+
+  common.Table rule = 88;
+  repeated int32 allDcids = 89;
+  bool useSellerShop = 91;
+  bool showRemark = 94;
+}
+
+message TProductSkuSimple {
+	string skuId = 1;
+}
+
+message TProductExtra {
+	TProductExtraFlashSale flashSale = 1;
+	TProductExtraCashOff cashOff = 2;
+    TProductExtraFreeShipping freeShipping = 3;
+	TProductExtraPremium premium = 4;
+    TProductExtraMNCashOff mncashoff = 5;
+    TProductExtraFastDelivery fastDelivery = 6;
+}
+
+message TPrice {
+	double unitPrice = 1;
+	int64 unitPriceInt = 5;
+	double originalPrice = 2;
+	int64 originalPriceInt = 6;
+	double discount = 3;
+	string symbol = 4;
+}
+
+
+message TProperty {
+	string name = 1;
+	string propId = 4;
+	map<string, string> altNames = 2;
+	repeated TProperyItem propItems = 3;
+}
+
+message TProperyItem {
+	string value = 1;
+	map<string, string> altValue = 2;
+	string propValue = 3;
+	string propValueId = 6;
+	map<string, string> altPropValue = 4;
+	string imageUrl = 5;
+}
+
+message TProductSku {
+  int64 gpid = 15;
+  string skuId = 1;
+  TPrice price = 2;
+  int32 quantity = 3;
+  repeated string propValues = 4;
+  double estWeight = 5;
+  int64 weightInt = 9;
+  double estVolumeWeight = 6;
+  TPrice localPrice = 7;
+  repeated string propIds = 8;
+  repeated string propValuesLang = 10;
+  string skuUrl = 11;
+  string skuTitle = 12;
+  map<string, string> altSkuTitle = 13;
+  double exchange = 14;
+  repeated string imgs = 16;
+  string primaryImg = 17;
+}
+
+message TWarehouseShippingFee {
+	string Warehouse = 1;
+	TShippingFee fee = 2;
+	int64 eta = 3;
+}
+
+message TShippingFee {
+	TPrice fee = 1;
+	TPrice localFee = 2;
+}
+
+message TProductEta {
+	int32 minimumDays = 1;
+	int32 maximumDays = 2;
+	int32 domesticDays = 3;
+}
+
+message TProductExtraFlashSale {
+	bool available = 1;
+	TPrice price = 2;
+	int64 beginAt = 3;
+	int64 endAt = 4;
+	int32 quantity = 5;
+	int32 orderLimit = 6;
+	TPrice localPrice = 7;
+	// 废弃
+	bool couponAvailable = 8;
+	int64 beginTS = 9;
+	int64 endTS = 10;
+  string settingId = 11;
+
+  bool marked = 12;
+}
+
+message TProductExtraCashOff {
+	bool available = 1;
+	string cashOffZoneKey = 2;
+	string cashOffZoneName = 3;
+  string cashOffTagColor = 4;
+  string link = 5;
+}
+
+message TProductExtraMNCashOff {
+  string tagImg = 1;
+  string url = 2;
+  string name = 3;
+}
+
+message TProductExtraFreeShipping {
+	bool available = 1;
+	string url = 2;
+	string name = 3;
+	FreeShippingType type = 4;
+}
+
+message TProductExtraPremium {
+	bool isPremium = 1;
+	string bannerUrl = 2;
+}
+
+message TUserInfo {
+	int32 customerId = 1;
+	bool isPrime = 2;
+}
+
+message TPrimeShipmentMethod {
+	int32 id = 1;
+	string name = 2;
+	string code = 3;
+	bool isSea = 4;
+	bool isSensitive = 9;
+	map<string, TProductEta> eta = 8; // 带仓库的eta
+}
+
+message TEzbuyShipmentMethod {
+	int32 id = 1;
+	string name = 2;
+	string code = 3;
+	bool isSea = 4;
+	bool isSensitive = 9;
+	double minWeightFee = 6;
+	double continueWeightFee = 7;
+	map<string, TProductEta> eta = 8; // 带仓库的eta
+	repeated TEzbuyShipmentMethodItem items = 5;
+}
+
+message TEzbuyShipmentMethodItem {
+	string warehouse = 1;
+	double moreThanWeight = 2;
+	double continueWeightFee = 3;
+}
+
+message TEzbuyShipmentMethodList {
+	repeated TEzbuyShipmentMethod methods = 1;
+}
+
+enum FreeShippingType {
+	Unknown = 0;
+	FromCN = 1;
+	FromUSA = 2;
+}
+
+message TJoinPrimeInfo {
+    string url = 1;
+    string title = 2;   // 使用 %s 占位给 params 填充
+    repeated string params = 3;
+}
+
+message DescProperty {
+	string name = 1;
+	string value = 2;
+}
+
+message TProductExtraFastDelivery {
+	bool isFastDelivery = 1;
+	string bannerUrl = 2;
+}

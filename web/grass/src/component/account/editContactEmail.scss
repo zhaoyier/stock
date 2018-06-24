@@ -1,0 +1,25 @@
+.box{
+  width: 900px;
+  height: 100px;
+  margin: 0 auto;
+  margin-top: 130px;
+  margin-left: 200px;
+  font-size: 15px;
+  position: relative;
+  div{
+    min-width: 100px;
+    display: inline-block;
+    height: 100%;
+    overflow: hidden;
+    margin-right: 43px;
+    input{
+      width: 230px;
+      height:28px;
+    }
+  }
+  .openPush{
+    position: absolute;
+    left: 0;
+    top: 100px;
+  }
+}

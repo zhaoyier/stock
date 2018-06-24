@@ -1,0 +1,6 @@
+[submodule "admindoc"]
+	path = admindoc
+	url = ssh://git@gitlab.1dmy.com:10022/ezbuy/admindoc.git
+[submodule "apidoc"]
+	path = apidoc
+	url = ssh://git@gitlab.1dmy.com:10022/65daigou/apidoc.git

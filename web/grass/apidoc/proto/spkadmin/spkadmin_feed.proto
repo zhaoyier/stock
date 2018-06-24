@@ -1,0 +1,89 @@
+syntax = "proto3";
+package spkadmin;
+
+import "common/ezbuy.proto";
+import "common/html.proto";
+import "biz/region.proto";
+
+// product feed
+service Feed {
+  option (common.service).webapi = true;
+  // 
+  rpc Index(FeedIndex) returns (common.Html);
+  rpc Download(FeedDownload) returns (common.GzipStream) {
+	option (common.webapi).download = true;
+  }
+  rpc TightsList(FeedTightsList) returns (common.Html);
+  rpc TightsAdd(FeedTightsAdd) returns (common.Html);
+  rpc SellerList(FeedSellerList) returns (common.Html);
+  rpc SellerAdd(FeedSellerAdd) returns (common.Html);
+  // 更新账号信息
+  rpc UserUpdate(FeedUserUpdate) returns (common.Html);
+}
+
+// ---------------------------------------------------------------------------
+
+enum XFeedType {
+  XFeedTypeUnknown = 0;
+  XFeedTypeTights = 1;
+  XFeedTypeSeller = 2;
+  XFeedTypeRecent = 3;
+  XFeedTypeAll = 4;
+}
+
+// ---------------------------------------------------------------------------
+
+message FeedIndex {
+}
+
+message FeedDownload {
+  string name = 1;
+  string platform = 2;
+  string catalog = 3;
+
+  string id = 4;
+  XFeedType type = 5;
+  biz.Region region = 6;
+  FeedDownloadFileType fType = 7;
+}
+
+message FeedAddTights {
+  string name = 1;
+  string type = 2;
+}
+
+// ---------------------------------------------------------------------------
+
+message FeedTightsList {
+  int32 page = 1;
+}
+
+
+message FeedTightsAdd {
+  string name = 1;
+  string slug = 2;
+  repeated string tabname = 3;
+}
+
+// ---------------------------------------------------------------------------
+
+message FeedSellerAdd {
+  string name = 1;
+  string vendor = 2;
+}
+
+message FeedSellerList {
+  int32 page = 1;
+}
+
+enum FeedDownloadFileType {
+  Csv = 0;
+  Xml = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message FeedUserUpdate {
+  string name = 1;
+  bool isDelete = 2;
+}

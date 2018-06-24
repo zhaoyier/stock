@@ -1,0 +1,12 @@
+.ant-upload {
+  > div {
+    display: none !important;
+  }
+  .customImageContainer {
+    display: block;
+    position: absolute;
+    border: 1px dashed #ccc;
+    cursor: pointer;
+    text-align: center;
+  }
+}

@@ -1,0 +1,193 @@
+syntax = "proto3";
+package eltreummq;
+
+import "common/empty.proto";
+
+service eltreum {
+	rpc SyncPurchasedOrders (SyncPurchasedOrdersMsg) returns (common.Empty);
+	rpc SetEzStatusInEltreum (SetEzStatusInEltreumMsg) returns (common.Empty);
+	rpc SendToOutsourcing (OrdersForOutsourcing) returns (common.Empty);
+	//众包下单返回
+	rpc OutSourcingReturn (OutSourcingReturnMsg) returns (common.Empty);
+}
+
+//------------------------------------------------------------------------------
+
+enum OrderStatus {
+	// 已下单
+    PoPlaced = 0;
+	// 已取消
+    Cancelled = 1;
+}
+
+message MssqlOrderItemInfo {
+	//Msql 订单ItemId
+	int64 OrderItemId = 1;
+}
+
+message MssqlOrderInfo {
+	//Msql 订单Id
+	int64 OrderId = 1;
+	//订单状态
+	OrderStatus OrderStatus = 2;
+	//Msql 订单Id下的订单Items
+	repeated MssqlOrderItemInfo OrderItems = 3;
+	// 仓库
+	string WarehouseCode = 4;
+	// 采购单号
+	string PoNumber = 5;
+	// 最后一个sku下单时间
+	int64 PoPlaceDate = 6;
+	// 采购人
+	string PurchasedBy = 7;
+	// 问题标签Id
+	int64 IssueLabelId = 8;
+	// 问题标签创建人
+	string IssueLabelCreateBy = 9;
+	// 淘宝账号Id
+	int64 TaobaoAccountId = 10;
+	// 运单号（台湾美国）
+	string TrackingNos = 11;
+}
+
+message SyncPurchasedOrdersMsg {
+	//需要同步的Msql 订单列表
+	repeated MssqlOrderInfo OrderInfos = 1;
+}
+
+enum OrderItemNewStatus {
+	ILLEGALITY = 0; // 非法状态
+	SKU_PENDING_ALLOCATION = 2500; // 待分配
+	SKU_PURCHASING = 2700; // 采购中
+	PURCHASING_ORDER = 3000; // 采购已下单
+}
+
+message SetEzStatusInEltreumMsg {
+	int64 NewOrderId = 1;
+	int64 NewOrderItemId = 2;
+
+	//将这个Sku的状态从From状态变化到To的状态，如果sku的当前状态不是From，那么不会改变成To状态
+	OrderItemNewStatus StatusFrom = 3;
+	OrderItemNewStatus StatusTo = 4;
+
+	//更新状态的原因
+	string Content = 5;
+	//更新状态的操作人
+	string Operator = 6;
+}
+
+message OrdersForOutsourcing {
+	repeated OrderForOutsourcing Orders = 1;
+}
+
+message OrderForOutsourcing {
+	int64 OperPurchaseOrderId = 1;
+	int64 OrderIdMysql = 2;
+	int64 OrderItemIdMysql = 3;
+	int64 OrderIdMssql = 4;
+	int64 OrderItemIdMssql = 5;
+	int64 CustomerId = 6;
+	string NickName = 7;
+	int64 RegionId = 8;
+	int64 ServiceTypeId = 9;
+	int64 WarehouseId = 10;
+	int64 ShipmentTypeId = 11;
+	int64 OrderDate = 12;                 
+	int64 BillCompleteDate = 14;
+	int64 Gpid = 15;
+	string SkuId = 16;
+	string Remark = 17;
+	int64 Qty = 18;
+	int64 InternalUnitPrice = 19;
+	int64 InternalTotalProductPrice = 20;
+	int64 InternalShipmentFee = 21;
+	string ProductName = 22;
+	string AltProductName = 23;            
+	string ProductUrl = 24;
+	string SkuImgUrl = 25;
+	string SkuProperties = 26;
+	string Sku = 27;
+	string AltSku = 28;
+	string VendorName = 29;
+	string ShopName = 30;
+}
+
+message OutSourcingPoMapping {
+	//采购订单Id
+	int64 OperPurchaseOrderId = 1;
+	//采购单号
+	string PoNumber = 2;
+	//实际采购单价[采购地价格]
+	int64 InternalUnitPrice = 3;
+	//实际国内运费[采购地价格]
+	int64 InternalShipmentFee = 4;
+	//实际采购数量[采购地价格]
+	int64 Qty = 5;
+	//下单账号
+	string PlaceAccount = 6;
+	//创建人
+	string CreateBy = 7;
+	//修改人
+	string UpdateBy = 8;
+	//创建时间
+	int64 CreateDate = 9;
+	//修改时间
+	int64 UpdateDate = 10;
+}
+
+message OutSourcingRemark {
+	//采购订单Id
+	int64 OperPurchaseOrderId = 1;
+	//备注内容
+	string Content = 2;
+	//创建人
+	string CreateBy = 3;
+	//修改人
+	string UpdateBy = 4;
+	//创建时间
+	int64 CreateDate = 5;
+	//修改时间
+	int64 UpdateDate = 6;
+}
+
+message OutSourcingOrderLabel {
+	//采购订单Id
+	int64 OperPurchaseOrderId = 1;
+	//标签Id
+	int64 IssueLabelId = 2;
+	//是否有效
+	bool IsActive = 3;
+	//创建人
+	string CreateBy = 4;
+	//修改人
+	string UpdateBy = 5;
+	//创建时间
+	int64 CreateDate = 6;
+	//修改时间
+	int64 UpdateDate = 7;
+}
+
+enum OutSoucingOrderReturnType {
+	// 已下单
+    Placed = 0;
+	// 转问题单
+    IssueOrder = 1;
+}
+
+message OutSoucingOrderInfo {
+	//采购订单Id
+	int64 OperPurchaseOrderId = 1;
+	//返回采购系统的类型
+	OutSoucingOrderReturnType ReturnType = 2;
+}
+
+message OutSourcingReturnMsg {
+	//采购信息
+	repeated OutSourcingPoMapping PoMappings = 1;
+	//备注信息
+	repeated OutSourcingRemark Remarks = 2;
+	//问题标签信息
+	repeated OutSourcingOrderLabel OrderLabels = 3;
+	//采购单信息
+	repeated OutSoucingOrderInfo OrderInfos = 4;
+}

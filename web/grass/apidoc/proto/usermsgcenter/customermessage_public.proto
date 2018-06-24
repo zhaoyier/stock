@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package usermsgcenter;
+
+option csharp_namespace = "Zen.DataAccess.CustomerMessage";
+option java_package = "com.daigou.sg.rpc.message";
+
+import "appcommon/messagecenter.proto";
+
+enum TMessageType {
+	TMessageTypeNormal = 0;
+	TMessageTypeOrderPending = 1;
+	TMessageTypeOrderArrived = 2;
+	TMessageTypeParcelArrangeable = 3;
+	TMessageTypeEnquiry = 4;
+	TMessageTypeWeb = 5;
+	TMessageTypeParcelPending = 6;
+	TMessageTypeFirebaseCallback = 7;
+}
+
+message TMessage {
+	int32 id = 1;
+	string messageType = 2;
+	string message = 3;
+	bool isRead = 4;
+	int32 orderId = 5;
+	int32 packageId = 6;
+	string url = 7;
+	string updateDate = 8;
+	TMessageType type = 9;
+	appcommon.TReadyToShipGroup readyToShipGroup = 10;
+}
+
+message UserDeleteMessagesRequest {
+	repeated int32 messageIDs = 1;
+}
+
+message UserGetMessagesRequest {
+	int32 offset = 1;
+	int32 limit = 2;
+}
+
+message UserGetUnreadMessageCountRequest {
+}
+
+message UserSetAllMessagesReadRequest {
+}
+
+message UserSetMessageReadRequest {
+	int32 messageId = 1;
+}
+
+message UserSetMessagesReadRequest {
+	repeated int32 messageIDs = 1;
+}
+
+message UserDeleteMessagesResponse {
+	bool Result = 1;
+}
+
+message UserGetMessagesResponse {
+	repeated TMessage Result = 1;
+}
+
+message UserGetUnreadMessageCountResponse {
+	int32 Result = 1;
+}
+
+message UserSetAllMessagesReadResponse {
+	bool Result = 1;
+}
+
+message UserSetMessageReadResponse {
+}
+
+message UserSetMessagesReadResponse {
+}
+
+service CustomerMessage {
+	rpc UserDeleteMessages(UserDeleteMessagesRequest) returns (UserDeleteMessagesResponse);
+	rpc UserGetMessages(UserGetMessagesRequest) returns (UserGetMessagesResponse);
+	rpc UserGetUnreadMessageCount(UserGetUnreadMessageCountRequest) returns (UserGetUnreadMessageCountResponse);
+	rpc UserSetAllMessagesRead(UserSetAllMessagesReadRequest) returns (UserSetAllMessagesReadResponse);
+	rpc UserSetMessageRead(UserSetMessageReadRequest) returns (UserSetMessageReadResponse);
+	rpc UserSetMessagesRead(UserSetMessagesReadRequest) returns (UserSetMessagesReadResponse);
+}

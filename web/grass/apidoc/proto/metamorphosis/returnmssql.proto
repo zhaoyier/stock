@@ -1,0 +1,261 @@
+syntax = "proto3";
+package metamorphosis;
+
+service ReturnMssql {
+
+	//新采购管理，采购完，将MsSql 的Order级别同步回老库
+	rpc PurchaseSyncMssql(ReqPurchaseSyncMssql) returns (RespPurchaseSyncMssql);
+	//新采购管理，进入新采购管理，就调用此服务进行锁定操作
+	rpc PurchaseLock(ReqPurchaseLock) returns (RespPurchaseLock);
+	//新采购管理，进入新采购管理，就调用此服务进行锁定操作,根据新订单 id 进行锁定
+	rpc PurchaseLockByNewOrder(ReqPurchaseLockByNewOrder) returns (RespPurchaseLock);
+	//从老库读取备注信息，传入订单列表
+	rpc LoadRemarkByOrderIds(ReqLoadRemarkByOrderIds) returns (RespLoadRemarkByOrderIds);
+	// 采购单号回写SqlServer的Order表
+	rpc BackPoNumber(ReqBackPoNumber) returns (RespBackPoNumber);
+	//ordertrack服务需要的同步订单接口
+	rpc SyncOrderTrack(ReqSyncOrderTrack) returns (RespSyncOrderTrack);
+    rpc LogProblemOrder(ReqLogProblemOrder) returns (RespLogProblemOrder);
+    rpc UpdateOrder(ReqUpdateOrder) returns (RespUpdateOrder);
+	// 更新Local订单状态到Shipped
+	rpc ShipLocalOrderByPackageId(ReqShipLocalOrderByPackageId) returns (RespShipLocalOrderByPackageId);
+	// 入库完  同步相应的数据
+	rpc SyncStockinData (ReqSyncStockinData) returns (RespSyncStockinData);
+	rpc SyncPutawayData (ReqSyncPutawayData) returns (RespSyncPutawayData);
+	rpc SyncOrderHistory (ReqSyncOrderHistory) returns (RespSyncOrderHistory);
+	// 葛兰雪 回退业务
+	rpc RollbackOrder (ReqRollbackOrder) returns (RespRollbackOrder);
+	// 获得最新的ShipmentId
+	rpc GetShipmentIdByOldOrderIds (ReqGetShipmentIdByOldOrderIds) returns (RespGetShipmentIdByOldOrderIds);
+}
+
+// ----------------------------------------------------------------
+
+
+message ResultForReturnMssql {
+	int32 	code = 1;								//状态码【0：成功，非0：失败】
+	string 	message = 2;							//消息内容
+}
+
+//--------------------------------------------------------------
+
+enum OrderStatus {
+	// 已下单
+    PoPlaced = 0;
+	// 已取消
+    Cancelled = 1;
+}
+
+message MssqlOrderItemInfo {
+	//Msql 订单ItemId
+	int64 OrderItemId = 1;
+}
+
+message MssqlOrderInfo {
+	//Msql 订单Id
+	int64 OrderId = 1;
+	//订单状态
+	OrderStatus OrderStatus = 2;
+	//Msql 订单Id下的订单Items
+	repeated MssqlOrderItemInfo OrderItems = 3;
+	// 仓库
+	string WarehouseCode = 4;
+	// 采购单号
+	string PoNumber = 5;
+	// 最后一个sku下单时间
+	int64 PoPlaceDate = 6;
+	// 采购人
+	string PurchasedBy = 7;
+	// 问题标签Id
+	int64 IssueLabelId = 8;
+	// 问题标签创建人
+	string IssueLabelCreateBy = 9;
+	// 淘宝账号Id
+	int64 TaobaoAccountId = 10;
+}
+
+message ReqPurchaseSyncMssql {
+	//需要同步的Msql 订单列表
+	repeated MssqlOrderInfo OrderInfos = 1;
+}
+
+message RespPurchaseSyncMssql {
+	ResultForReturnMssql Result = 1;
+}
+
+message ReqPurchaseLockByNewOrder {
+	//需要Lock的OrderId列表
+	repeated NewOrderEntity Orders = 1;
+}
+
+message NewOrderEntity {
+	// 新订单 id
+	int64 NewOrderId = 1;
+	// 新订单 item id
+	int64 NewOrderItemId = 2;
+}
+
+message ReqPurchaseLock {
+	//需要Lock的OrderId列表
+	repeated int64 MssqlOrderIds = 1;
+}
+
+message RespPurchaseLock {
+	ResultForReturnMssql Result = 1;
+	// 返回 mapping 表中不存在的 NewOrderId
+	repeated int64 missing = 10;
+}
+
+message ReqLoadRemarkByOrderIds {
+	//需要查询备注的OrderId列表
+	repeated int64 MssqlOrderIds = 1;
+}
+
+message RespLoadRemarkByOrderIdsEntity {
+	//MssqlOrderId
+	int64 MssqlOrderId = 1;
+	//等待客户答复
+	bool PendingReply = 2;
+	//客户已答复，等待处理
+	bool PendingAttention = 3;
+	//最后一条前台备注
+	string FrontRemark = 4;
+	//最后一条全局备注
+	string AlwaysRemark = 5;
+	//附件Url
+	string Attachment = 6;
+	// 采购备注
+	string PurchaseRemark = 7;
+	string FrontRemarkBy = 8;
+	int64 FrontRemarkDate = 9;
+	//验货环节全局备注
+	string GlobalRemark = 10;
+	string GlobalRemarkBy = 11;
+	int64 GlobalRemarkDate = 12;
+	//商品备注
+	string ProductRemark = 13;
+	string ProductRemarkBy = 14;
+	int64 ProductRemarkDate = 15;
+}
+
+message RespLoadRemarkByOrderIds {
+	//返回的结果集
+	repeated RespLoadRemarkByOrderIdsEntity Entities = 1;
+}
+
+message ReqBackPoNumber {
+	int64 MssqlOrderId = 1;
+	//采购单号列表，以逗号隔开
+	string PoNumbers = 2;
+	//操作人
+	string Operator = 3;
+	int64 TaobaoAccountId = 4;
+}
+
+message RespBackPoNumber {
+
+}
+
+
+//----------------------
+message ReqSyncOrderTrack {
+  int64 orderId = 1;
+  int64 orderIdMysql = 7;
+  int64 orderItemIdMysql = 8;
+  string shipperName = 2;
+  string trackingNo = 3;
+  string trackingStatus = 4;
+  int64 syncDate = 5;
+  string updateBy = 6;
+}
+
+message RespSyncOrderTrack {
+}
+
+//----------------------
+message ReqLogProblemOrder {
+  int64 orderId = 1;
+  int32 problemType = 2;
+  string notes = 3;
+}
+
+message RespLogProblemOrder {
+}
+
+//---------------------
+enum OpType {
+  UpdateSignedDate = 0;
+  UpdateOrderStatus = 1;
+}
+message ReqUpdateOrder {
+  OpType opType = 1;    
+  int64 orderId = 2;
+  int64 signedDate = 3;
+}
+
+message RespUpdateOrder {
+}
+
+//----------------------------
+message ReqSyncStockinData {
+	int32 orderId = 1;
+	int32 receivedUserId = 2;
+	int64 orderWeight = 3;
+	int64 length = 4;	// 单位毫米
+	int64 width = 5;	// 单位毫米
+	int64 height = 6;	// 单位毫米
+	string receiveAssign = 7;
+	int64 arrivedShangHaiDate = 8;
+	string user = 9;
+	int64 chargeWeight = 10;
+	int64 weight = 11;
+	int64 volumeWeight = 12;
+}
+
+message RespSyncStockinData {}
+
+message ReqSyncPutawayData {
+	string locationCode = 1;	// 实际上架库位
+	int32 orderId = 2;
+	string stockinCode = 3;
+	string user = 4;
+}
+
+message RespSyncPutawayData {}
+
+message ReqSyncOrderHistory {
+	int32 orderId = 1;
+	string newStatusName = 2;
+	string notes = 3;
+}
+
+message RespSyncOrderHistory {}
+
+message ReqRollbackOrder {
+	int32 orderId = 1;
+	string skus = 2;
+	string user = 3;
+}
+
+message RespRollbackOrder {}
+
+message ReqGetShipmentIdByOldOrderIds {
+	repeated int32 OldOrderIds =  1;
+}
+
+message GetShipmentIdByOldOrderIdsEntity {
+	int32 OldOrderId = 1;
+	int32 ShipmentId = 2;
+}
+
+message RespGetShipmentIdByOldOrderIds {
+	repeated GetShipmentIdByOldOrderIdsEntity Entities = 1;
+}
+
+message ReqShipLocalOrderByPackageId {
+	int32 PackageId = 1;
+}
+
+message RespShipLocalOrderByPackageId {
+	
+}

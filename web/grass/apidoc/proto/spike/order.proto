@@ -1,0 +1,40 @@
+syntax = "proto3";
+package spike;
+import "common/time.proto";
+import "common/ezbuy.proto";
+
+service Order {
+    // 获取日期段内段商品销量列表
+  rpc ListProductSalesByDateRange(OrderListProductSalesByDateRange) returns (OrderListProductSalesByDateRangeResp) {
+	option (common.timeout) = "-1";
+  }
+}
+
+// ---------------------------------------------------------------------------
+message OrderListProductSalesByDateRange {
+    common.Time dateBeg = 1;
+    common.Time dateEnd = 2;
+}
+
+message OrderListProductSalesByDateRangeResp {
+    repeated OrderProductSalesEntity orderProductSalesEntities = 1;
+}
+
+message OrderProductSalesEntity {
+  int64 orderId = 1;
+  int64 gpid = 11;
+    string productRefId = 2;
+    string productUrl = 3;
+    int64 number = 6;
+    common.Time date = 7; // 2006-01-02 15:04:05
+    bool isPrime = 8;
+    common.Time time = 9; // 2006-01-02 15:04:05 ,  精确的时间
+    PurchaseType purchaseType = 10;
+}
+
+enum PurchaseType {
+    PurchaseTypeUnknown = 0;
+    Ezbuy = 1;
+    Prime = 2;
+    BuyForMe = 3;
+}

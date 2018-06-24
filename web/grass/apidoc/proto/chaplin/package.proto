@@ -1,0 +1,379 @@
+syntax = "proto3";
+package chaplin;
+
+import "chaplin/common.proto";
+import "common/ezbuy.proto";
+import "common/empty.proto";
+import "common/html.proto";
+import "appcommon/common_public.proto";
+
+service PackageService{
+  option (common.service).webapi = true;
+
+  rpc CreatePackage(CreatePackageReq) returns (CreatePackageResp);
+  rpc CancelPackage(CancelPackageReq) returns (common.Empty);
+  rpc FetchPackage(FetchPackageReq) returns (FetchPackageResp);
+  rpc FetchPackagesStockinCodes(FetchPackagesStockinCodesReq) returns (FetchPackagesStockinCodesResp);
+  rpc UpdatePackageColor(UpdatePackageColorReq) returns (common.Empty);
+  rpc UpdatePackageStatus(UpdatePackageStatusReq) returns (common.Empty);
+  rpc UpdatePackageTransportNumber(UpdatePackageTransportNumberReq) returns (common.Empty);
+  rpc FetchPackageSKU(FetchPackageSKUReq) returns (FetchPackageSKUResp);
+  rpc SearchPackage(SearchPackageReq) returns (SearchPackageResp);
+  rpc SearchMultiPackage(SearchMultiPackageReq) returns (SearchMultiPackageResp);
+  rpc CheckPackages(CheckPackagesReq) returns (CheckPackagesResp);
+  rpc CheckStockinShipped(CheckStockinShippedReq) returns (CheckStockinShippedResp);
+  rpc CheckStockinPacked(CheckStockinPackedReq) returns (CheckStockinPackedResp);
+  rpc GetPackagePickingCode(GetPackagePickingCodeReq) returns (GetPackagePickingCodeResp);
+  rpc SetProblemPackingPkgStatus(SetProblemPackingPkgStatusReq) returns (common.Empty);
+  // my获取dhl运单
+  rpc GetMYDHLExpressInfo(GetMYDHLExpressInfoReq) returns (GetMYDHLExpressInfoResp);
+
+  rpc ReportPackages(common.Empty) returns (common.Html);
+  //CheckStockinPackagesOnShelf 校验 入库号 对应的包裹号 是否是 部分打包 并且是已上架状态
+  rpc IsStockinPackagesPartiallyPackedAndOnShelf(IsStockinPackagesPartiallyPackedAndOnShelfReq) returns (IsStockinPackagesPartiallyPackedAndOnShelfResp);
+  // 运单号
+  rpc GetTransportNumber(GetTransportNumberReq) returns (GetTransportNumberResp);
+  rpc GetSubPkgsByContainerNo(GetSubPkgsByContainerNoReq) returns (GetSubPkgsByContainerNoResp);
+
+  rpc CreateTH711Package(CreateTH711PackageReq) returns (CreateTH711PackageResp);
+  // 批量获取第三方物流单基础信息
+  rpc MultiGetThirdShipmentInfo(MultiGetThirdShipmentInfoReq) returns (MultiGetThirdShipmentInfoResp);
+
+  // 葛兰雪服务
+  rpc GetPackageByStockin (GetPackageByStockinReq) returns (GetPackageByStockinResp);
+  rpc UpdatePackageStatusByStockInCode(UpdatePackageStatusByStockInCodeReq) returns (common.Empty);
+  // 包裹管理搜索
+  rpc PkgMgmtSearch(PkgMgmtSearchReq) returns (PkgMgmtSearchResp);
+  //GetStockinCodesByPkgCodes 根据包裹号获取全部入库号
+  rpc GetStockinCodesByPkgCodes(GetStockinCodesByPkgCodesReq) returns (GetStockinCodesByPkgCodesResp);
+}
+
+message GetStockinCodesByPkgCodesReq{
+  repeated string pkgCodes = 1;
+}
+
+message GetStockinCodesByPkgCodesResp{
+  map<string, GetStockinCodesByPkgCodesRes> result = 1;
+}
+
+message GetStockinCodesByPkgCodesRes{
+  repeated string stockinCodes = 1;
+}
+
+message IsStockinPackagesPartiallyPackedAndOnShelfReq{
+  repeated string stockinCodes = 1;
+}
+
+message IsStockinPackagesPartiallyPackedAndOnShelfResp{
+  map<string,bool> CheckResult = 2;
+}
+
+message SetProblemPackingPkgStatusReq{
+  repeated string pkgCodes = 1;
+}
+
+message PkgLocation {
+  string pkgCode = 1;
+  string locationCode = 2;
+}
+
+message GetPackagePickingCodeReq {
+  string package_code = 1;
+}
+
+message GetPackagePickingCodeResp {
+  string picking_code = 1;
+}
+
+message CancelPackageReq{
+  string package_code = 1;
+}
+
+message GetTransportNumberReq{
+}
+
+message GetTransportNumberResp{
+  //! 运单号
+  string code = 1;
+}
+
+message UpdatePackageTransportNumberReq{
+  //! 包裹号
+  string package_code = 1;
+  //! 运单号
+  string transport_number = 2;
+}
+
+message UpdatePackageStatusReq{
+  //! 包裹号
+  string package_code = 1;
+  //! 状态
+  PackageStatus status = 2;
+}
+
+message CheckStockinShippedReq {
+  repeated string stockin_codes = 1;
+}
+
+message StockinPacakge {
+  string stockin_code = 1;
+  string package_code = 2;
+  string color_name = 3;
+  string color_value = 4;
+}
+
+message CheckStockinShippedResp {
+  repeated StockinPacakge items = 1;
+}
+
+message CheckStockinPackedReq {
+  repeated string stockin_codes = 1;
+}
+
+message StockinPacked {
+  string stockin_code = 1;
+  repeated string package_codes = 2;
+  int64 last_update_date = 3;
+}
+
+message CheckStockinPackedResp {
+  repeated StockinPacked items = 1;
+}
+
+message CheckPackagesReq{
+  //! 包裹号
+  repeated string packages = 1;
+}
+
+message PickingResult{
+  //! 包裹号
+  string package_code = 1;
+  //! 拣货号
+  string picking_code = 2;
+  //! 拣货号是否全部打包
+  bool picking_packed = 3;
+}
+
+message CheckPackagesResp{
+  repeated PickingResult pickings = 1;
+}
+
+message UpdatePackageColorReq{
+  string package_code = 1;
+  string color_name = 2;
+  string color_value = 3;
+}
+
+
+message CreatePackageReq{
+  //! 拣货号
+  string picking_code = 4;
+  //! 仓库编号
+  int64 warehouse_id = 5;
+  //! 库区编号
+  int64 area_id = 3;
+  repeated string stock_codes = 1;
+  //! 重新打包包裹号
+  repeated string package_codes = 2;
+  //! 是否大货，默认小货
+  bool is_big = 6;
+  //! 是否异常
+  bool is_exception = 7;
+  //! 是否buyforme
+  bool is_buy_for_me = 8;
+  //! 拣货号是大货(>=30KG)
+  bool is_picking_big = 9;
+  //! 拣货重量
+  int64 picking_weight = 10;
+}
+
+
+message CreatePackageResp{
+  string package_code = 1;
+}
+
+message FetchPackagesStockinCodesReq {
+  repeated string package_codes = 1;
+}
+
+message FetchPackagesStockinCodesResp {
+  repeated PackageStockIn items = 1;
+}
+
+message FetchPackageReq{
+  string package_code = 1;
+}
+
+message FetchPackageResp{
+  PackageInfo pkg = 1;
+}
+
+message FetchPackageSKUReq {
+  string package_code = 1;
+}
+
+message PackageSKU {
+  string goods_description = 1;
+  string chinese_category = 2;
+  string trade_category = 3;
+  string unit_type = 4;
+  int32 qty = 5;
+  int64 unit_value = 6;
+  int64 cid = 7;
+  string hs_code = 8;
+  string english_category = 9;
+  int64 order_id = 10;
+  int64 order_item_id = 11;
+}
+
+message FetchPackageSKUResp {
+  repeated PackageSKU skus = 1;
+}
+
+message SearchMultiPackageReq {
+  repeated string picking_codes = 1;
+}
+
+message PickingPackages{
+  string picking_code = 1;
+  repeated string package_codes = 2;
+}
+
+message SearchMultiPackageResp {
+  repeated PickingPackages items = 1;
+}
+
+message SearchPackageReq {
+  repeated string stockin_code = 2;
+}
+
+message SearchPackageResp {
+  repeated string package_codes = 1;
+}
+
+message GetSubPkgsByContainerNoReq {
+  string containerNo = 1;
+}
+
+message GetSubPkgsByContainerNoResp {
+  repeated string packageNumbers = 1;
+}
+
+message MultiGetThirdShipmentInfoReq {
+  repeated string subPackageNumbers = 1; // ezbuy 二级包裹号
+}
+
+message ThirdShipmentInfo {
+  string subPackageNumber = 1; // ezbuy 二级包裹号
+  string transportNumber = 2; // 第三方物流单号
+  string packageNumber = 3; // 第三方包裹号
+  string expressName = 4; // 第三方物流商
+}
+
+message MultiGetThirdShipmentInfoResp {
+  repeated ThirdShipmentInfo shipments = 1; // 第三方物流单基础信息
+}
+
+message CreateTH711PackageReq {
+  string packageCode = 1;
+  repeated PackageItem items = 2; // 商品信息
+}
+
+message PackageItem {
+  string name = 1;    // 商品名称
+  int64 price = 2;    // 商品单价 以分计
+  int32 quantity = 3; // 商品件数
+  string nameEN = 4;    // 商品英文名称: 现在传入英文类别名称： english_category
+  string nameTH = 5;    // 商品泰文名称（4，5必需有1个不为空）
+}
+
+message CreateTH711PackageResp {
+  // 711运单号，示例：000200000702
+  string ez711WaybillNo = 1;
+  // 711包裹号，示例：X000000702
+  string ez711PackageNo = 2;
+  // 面单url：pdf
+  string labelUrl = 3;
+  // ezbuy包裹号：
+  string ezPackageCode = 4;
+  // 711仓库，示例：CT04
+  string carrierWarehouseCode = 5;
+  // 711站点码，示例：05762
+  string carrierStoreCode = 6;
+  // 711站点名，示例：กระทรวงกลาโหม (ศาลหลักเมือง)
+  string carrierStoreName = 7;
+  string labelBase64 = 8;
+  appcommon.ResultResp result = 101;
+}
+
+message GetPackageByStockinReq {
+  repeated string stockinCodes = 1;
+}
+
+message GetPackageByStockinResp {
+  map<string,PkgLocation> stockinMpackage = 2;
+}
+
+message UpdatePackageStatusByStockInCodeReq {
+  string stockInCode = 1;
+}
+
+enum TriOption {
+  A = 0; // All
+  Y = 1; // Yes
+  N = 2; // No
+}
+
+message PkgMgmtSearchReq {
+  int32 offset = 1;
+  int32 limit = 2;
+  string pkgCode = 3;
+  string stockInCode = 4;
+  string packingBoxCode = 5;
+  // 是否在中转仓货架上
+  TriOption isOnTransitShelf = 6;
+  PackageStatus status = 7;
+}
+
+message PkgMgmtPkg {
+  string pkgCode = 1;
+  string pkgStatus = 2;
+  int64 updateDate = 3;
+  string catalogCode = 4;
+  string warehouseName = 5;
+  // 创建时间，即打包时间
+  int64 createDate = 6;
+  // 分拣口
+  string pickingChannel = 7;
+  // 封箱号
+  string packingBoxNo = 8;
+  // 中转仓库位号
+  string transitLocationCode = 9;
+  string nickname = 10;
+  // 运输方式
+  string shipmentType = 11;
+  // 主单号
+  string containerNo = 12;
+}
+
+message PkgMgmtSearchResp {
+  repeated PkgMgmtPkg pkgs = 1;
+  int32 pkgCount = 2;
+}
+
+message GetMYDHLExpressInfoReq {
+    int64 weight = 1;
+    string packageCode = 2;
+    string address = 3;
+    string customerName = 4;
+    string telephone = 5;
+    string postCode = 6;
+    string shipToStates = 7; // west malaysia除了Sarawak,Sabah
+    int64 deliveryTypeId = 8;
+    int64 destinationRegionId = 9; // 目的地国家
+}
+
+message GetMYDHLExpressInfoResp {
+    string labelURL = 1; // DHL直接返回链接
+    string content = 2; // content
+}

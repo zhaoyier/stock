@@ -1,0 +1,44 @@
+syntax = "proto3";
+package garencieres;
+
+import "common/ezbuy.proto";
+
+//Scanner is for Android ezbiz
+service Scanner {
+    //ScanStockCode 扫描入库号
+    rpc ScanStockCode (ScanStockCodeReq) returns (ScanStockCodeResp);
+    //ScanAbsentPkgCode 扫描拣缺
+    rpc ScanAbsentPkgCode (ScanAbsentPkgCodeReq) returns (ScanAbsentPkgCodeResp);
+    //CommitPickingCodes 提交所有拣货号
+    rpc CommitPickingCodes (CommitPickingCodesReq) returns (CommitPickingCodesResp);
+}
+
+////message
+
+message ScanStockCodeReq{
+    string stockInCode = 1;
+}
+
+message ScanStockCodeResp{
+    bool success = 1;
+    string errMsg = 2;
+}
+
+message ScanAbsentPkgCodeReq{
+    string pkgCode = 1;
+}
+
+message ScanAbsentPkgCodeResp{
+    bool success = 1;
+    string errMsg = 2;
+    string pickingCode = 3;
+}
+
+message CommitPickingCodesReq{
+    repeated string pickingCodes = 1;
+}
+
+message CommitPickingCodesResp{
+    bool success = 1;
+    string errMsg = 2;
+}

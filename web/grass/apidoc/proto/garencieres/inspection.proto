@@ -1,0 +1,1228 @@
+syntax = "proto3";
+package garencieres;
+import "common/ezbuy.proto";
+import "common/empty.proto";
+import "common/html.proto";
+import "garencieres/flaworder_public.proto";
+import "spk/spk_xitem.proto";
+import "garencieres/common.proto";
+
+service Inspection{
+    option (common.service).webapi = true;
+
+    //查询接口
+    rpc FetchOrder(InspectionFetchOrder) returns (InspectionFetchOrderResp);
+    rpc FetchOrderByTrackingNo(InspectionFetchOrderByTrackingNo) returns (InspectionFetchOrderResp);
+    rpc IsPrevTrackingNoScanCompleted(IsPrevTrackingNoScanCompletedReq) returns (IsPrevTrackingNoScanCompletedResp);
+    rpc FetchOrderByGroup(InspectionFetchOrder) returns (InspectionFetchOrderByGroupResp);
+
+    //订单搜索查询接口
+    rpc SearchOrder(InspectionFetchOrder) returns (InspectionFetchOrderByGroupResp);
+
+    //临时给仓库处理扫不出的接口
+    rpc SearchGroup(InspectionFetchOrder) returns (InspectionFetchOrderResp);
+    rpc SearchOrderByGroup(InspectionFetchOrder) returns (InspectionFetchOrderByGroupResp);
+    rpc Insert(InspectionInsert) returns (common.Empty);
+    rpc TmpOrder(InspectionTmpOrder) returns (InspectionInsert);
+
+    //导出线下拍单问题件
+    rpc ExportIssueOrder(InspectionExportIssueOrder) returns (InspectionExportStockinCodeResp){
+        option (common.webapi).download = true;
+    }
+
+    // 入库接口 && 退回入库接口
+    rpc StockIn(InspectionStockIn) returns (InspectionStockInResp);
+    rpc EditStockInfo(InspectionEditStockInfo) returns (InspectionEditStockInfoResp);
+    rpc Rollback(InspectionRollback) returns (InspectionRollbackResp);
+    rpc SplitOrder(InspectionSplitOrder) returns (InspectionSplitOrderResp);
+
+    //问题标签
+    rpc IssueLabel(InspectionIssueLabel) returns (InspectionIssueLabelResp);
+    //分配组 && 取消分组
+    rpc Assign(InspectionAssign) returns (InspectionAssignResp);
+    rpc CancelAssign(InspectionAssign) returns (InspectionAssignResp);
+
+    //备注
+    rpc Remark(InspectionRemark) returns (InspectionRemarkResp);
+    //入库单状态回写接口
+    rpc UpdateStockIn(InspectionUpdateStockIn) returns (InspectionUpdateStockInResp);
+    //修改运输方式
+    rpc ChangeShipmentType(InspectionChangeShipmentType) returns (InspectionChangeShipmentTypeResp);
+    //差额补齐
+    rpc MakeOffset(InspectionMakeOffset) returns (InspectionMakeOffsetResp);
+    //批量退单
+    rpc CancelOrder(InspectionCancelOrder) returns (InspectionCancelOrderResp);
+    //类型分类
+    rpc SetType(InspectionSetType) returns (InspectionSetTypeResp);
+    //新加运单号 && 批量添加运单号
+    rpc AddTrackingNo(InspectionAddTrackingNo) returns (InspectionAddTrackingNoResp);
+    //打印sku号
+    rpc PrintSku(InspectionPrintSku) returns (InspectionPrintSkuResp);
+    //获取收货备注
+    rpc GetStockinRemark(InspectionGetStockinRemark) returns (InspectionGetStockinRemarkResp);
+
+    //ErpUser 相关接口
+    rpc GetAllDepartment(InspectionGetAllDepartment) returns (InspectionGetAllDepartmentResp);
+    rpc GetAllErpUser(InspectionGetAllErpUser) returns (InspectionGetAllErpUserResp);
+
+    //通过入库号获取入库号对应的订单的老的订单号 和所对应的入库号。
+    rpc GetOldIdByCode(InspectionGetOldIdByCode) returns (InspectionGetOldIdByCodeResp);
+
+    // 临时给gernsback调用的方法，要干掉的
+    rpc GetOldIdByPackageCodes(GetOldIdByPackageCodesReq) returns (GetOldIdByPackageCodesResp);
+
+    //检查运单号是否到货齐全 返回到齐的入库号。
+    rpc CheckStockinCode(InspectionCheckStockinCode) returns (InspectionCheckStockinCodeResp);
+    // 给erp服务，用于上架接口
+    rpc GetOrderInfo (InspectionGetOrderInfo) returns (InspectionGetOrderInfoResp);
+
+    // 手动回写老order，避免因线上各种神秘操作导致没有回写。
+    rpc WbOrder (InspectionWbOrder) returns (InspectionWbOrderResp);
+
+    rpc WbOrderHistory (InspectionWbOrderHistory) returns (InspectionWbOrderHistoryResp);
+
+    // 临时接口，修改由于同步接口的改动，导致9月29号之前数据有问题。
+    rpc WbOrderAndHis (InspectionWbOrderAndHis) returns (InspectionWbOrderAndHisResp);
+
+    //入库号查询接口
+    rpc FetchStockinCode(InspectionFetchStockinCode) returns (InspectionFetchStockinCodeResp);
+
+    rpc FetchOrderByStockinCode(InspectionFetchOrderByStockinCode) returns (InspectionFetchOrderByStockinCodeResp);
+    rpc GetStockinStatus(InspectionGetStockinStatus) returns (InspectionGetStockinStatusResp);
+    rpc StockinCodeRemark(InspectionStockinCodeRemark) returns (InspectionStockinCodeRemarkResp);
+    rpc FetchStockinCodeRemark(InspectionFetchStockinCodeRemark) returns (InspectionFetchStockinCodeRemarkResp);
+    rpc ExportStockinCode(InspectionFetchStockinCode) returns (InspectionExportStockinCodeResp) {
+        option (common.webapi).download = true;
+    }
+    //获取最新的一条备注
+    rpc FetchNewRemark(InspectionFetchNewRemark) returns (InspectionFetchNewRemarkResp);
+
+    //跟单系统取消订单
+    rpc CancelOrderByOldId(InspectionCancelOrderByOldId) returns (InspectionCancelOrderByOldIdResp);
+
+    // 通过 运输方式和仓库 获取没有取消的订单，给erp 分配库位使用.
+    rpc GetOrders (InspectionGetOrders) returns (InspectionGetOrdersResp);
+
+    // erp
+    rpc GetSkuByStockin (InspectionGetSkuByStockin) returns (InspectionGetSkuByStockinResp);
+
+    // erp 获取指定类型的入库单
+    rpc GetStockinByStatus (InspectionGetStockinByStatus) returns (InspectionGetStockinByStatusResp);
+
+    // erp 更新入库单状态，上架log，inventoryNew表
+    rpc Putaway (InspectionPutaway) returns (InspectionPutawayResp);
+
+    // 查询后台
+    rpc ReportStockin(common.Empty) returns (common.Html);
+
+    // 设置入库号状态
+    rpc SetStockinStatus (InspectionSetStockinStatus) returns (InspectionSetStockinStatusResp);
+
+    rpc ExportOrder (InspectionExportOrder) returns (InspectionExportOrderResp) {
+        option (common.webapi).download = true;
+    }
+
+    // 查询老的OrderId下面所有的新的OrderId和OrderItemId
+    rpc GetOrdersByOldId(InspectionGetOrdersByOldId) returns (InspectionGetOrdersByOldIdResp);
+
+    //商家信息收集
+    //新增商家或更新商家
+    rpc UpsertSeller(InspectionUpsertSeller) returns (common.Empty);
+    rpc CollectionSeller(InspectionCollectionSeller) returns (common.Empty);
+    rpc FecthSeller(InspectionFecthSeller) returns (InspectionFecthSellerResp);
+    rpc ExportSeller(InspectionFecthSeller) returns (InspectionExportSellerResp) {
+        option (common.webapi).download = true;
+    }
+    //查询商家是否在待收集列表
+    rpc FindSeller (InspectionFindSeller) returns (InspectionFindSellerResp);
+
+    // 设置问题件 && 回收问题件
+    rpc SetProblem (InspectionSetProblem) returns (InspectionSetProblemResp);
+    rpc FetchFlawOrder(InspectionFetchFlawOrder) returns (InspectionFetchFlawOrderResp);
+    rpc SetFlawOrderStatus(InspectionSetFlawOrderStatus) returns (common.Empty);
+    rpc MacthFlawOrder(InspectionMacthFlawOrder) returns (common.Empty);
+    rpc ChangeLocation(InspectionChangeLocation) returns (common.Empty);
+
+    //查询运单号扫描记录
+    rpc FetchTrackLog(InspectionFetchTrackLog) returns (InspectionFetchTrackLogResp);
+    rpc ExportTrackLog(InspectionFetchTrackLog) returns (InspectionExportTrackLogResp) {
+        option (common.webapi).download = true;
+    }
+    rpc GetPurchasers(common.Empty) returns (GetPurchasersResp);
+    // RePurchaseOrders 补拍(退/差额之前的订单并生成新的订单)
+    rpc RePurchaseOrders(RePurchaseOrdersReq) returns (RePurchaseOrdersResp);
+    // RetryRePurchaseOrderOffset 补拍差额补齐重试
+    rpc RetryRePurchaseOrderOffset(RetryRePurchaseOrderOffsetReq) returns (RetryRePurchaseOrderOffsetResp);
+    // RetryRePurchaseOrderCancel 补拍退单重试
+    rpc RetryRePurchaseOrderCancel(RetryRePurchaseOrderCancelReq) returns (RetryRePurchaseOrderCancelResp);
+}
+
+message RetryRePurchaseOrderOffsetReq{
+  int64 offsetID = 1;
+  int64 orderID = 2;
+  int64 orderItemID = 3;
+  int64 orderIDMssql = 4;
+  string orderNumberMssql = 5;
+  int64 offsetedQty = 6;
+  int64 regionID = 7;
+  int64 rePruchaseTaskID = 8;
+}
+
+message RetryRePurchaseOrderOffsetResp{}
+
+message RetryRePurchaseOrderCancelReq{
+  string stockinCode= 1;
+  int64 regionID = 2;
+  int64 orderID = 3;
+  int64 orderItemID = 4;
+  int64 rePruchaseTaskID = 5;
+}
+
+message RetryRePurchaseOrderCancelResp{}
+
+message RePurchaseOrdersReq{
+  //orderItems are the skuNumbers literally.
+  repeated RePurchaseOrderItem orderItems = 1;
+  //frontRemark 前台备注
+  string frontRemark = 2;
+  // 入库号
+  string stockinCode = 3;
+}
+
+message RePurchaseOrdersResp{
+  bool    ok = 1;
+  repeated RePurchaseOrderItem undoneOrderItems = 2;
+  //if !ok, lastFailedReason will fill with the failed reason
+  string  lastFailedReason = 3;
+
+  string  lastFrontRemark = 4;
+}
+
+message InspectionFetchOrderByTrackingNo{
+    string TrackingNo = 1;
+    int64 RegionId = 2;
+    int32 Offset = 3;
+    int32 Limit = 4;
+}
+
+message InspectionFetchOrder{
+    //国家
+    int64 RegionId = 1;
+    //运输方式
+    int64 ShipmentTypeId = 2;
+    //订单sku号
+    string SkuNumber = 3;
+    //会员昵称
+    string CustomerName = 4;
+    //筛选类型
+    // ======2期再做
+    //敏感词 0 代表不勾选该条件；1:有敏感词；2:无敏感字
+    int64 IsSensitiveWords = 6;
+    //域名
+    int64 DomainId = 7;
+    //客户备注
+    string CustomerRemark = 8;
+    //商家名称
+    string VendorName = 9;
+    //部门
+    int64 StaffId = 10;
+    //收货分组
+    int64 ReceiveUserId = 11;
+    //打标人
+    int64 LabelUserId = 12;
+    //问题标签
+    int64 IssueLabelId = 13;
+    //是否问题件
+    bool IsIssueLabel = 14;
+    //商品名称
+    string ProductName = 15;
+    //Sku
+    string Sku = 16;
+    //采购账号和采购单号后四位匹配
+    int64 PurchaseUserId = 17;
+    //实际数量
+    int64 ActualQty = 18;
+    //打标日期
+    int64 LabelStartDate = 19;
+    int64 LabelEndDate = 20;
+    string TrackingNo = 22;
+    int64 Offset = 23;
+    int64 Limit = 24;
+    int64 WarehouseId = 25;
+    string OrderNumber = 26;
+    InspectionFetchOrders GroupInfo = 27;
+    string PoNumber = 28;
+    int64 TaoBaoAccountId = 29;
+    //下单账号
+    string PlaceAccount = 30;
+    bool IsProductNameLike = 31;
+    //单位元
+    int64 maxPrice = 32;
+    int64 minPrice = 33;
+    string createBy = 34;
+    int64 noReplyIssueCreateDate = 35;
+}
+
+message InspectionFetchOrderResp{
+    repeated InspectionFetchOrders Orders = 1;
+    string Msg = 2;
+    repeated CancelInfo CancelOrders = 3;
+}
+
+message GetOldIdByPackageCodesReq{
+    repeated string packageCodes = 1;
+}
+
+message OldIdPackageCodesItem {
+    int64 OrderIdMssql = 1;
+    string packageCode = 2;
+}
+
+message GetOldIdByPackageCodesResp{
+    repeated OldIdPackageCodesItem items = 1;
+}
+
+message InspectionFetchOrders{
+    string CustomerName = 1;
+    int64 ShipmentTypeId = 2;
+    string ShipmentTypeName = 3;
+    int64 SkuQty = 5;
+    string VendorName = 6;
+    int64 WarehouseId = 9;
+    string WarehouseName = 10;
+    repeated SkuInfo Sku = 11;
+    int64 CustomerId = 13;
+    string createBy = 14;
+
+}
+message InspectionFetchOrderByGroupResp{
+    repeated SkuInfo Orders = 1;
+    int64 SkuQty = 2;
+}
+message OrderInfos{
+    repeated SkuInfo Sku = 11;
+}
+message SkuInfo{
+    int64 OrderId = 1;
+    int64 OrderItemId = 2;
+    int64 OrderIdMssql = 3;
+    int64 OrderItemIdMssql = 4;
+    int64 SkuId = 5;
+    string ProductName = 6;
+    int64 UnitPrice = 7;
+    int64 PurchaseQty = 8;
+    int64 Weight = 9;
+    // //体积重
+    int64 VolumeWeight = 10;
+    //已经入库数量
+    int64 AlreadyQty = 11;
+    repeated string TaobaoAccount = 12;
+    repeated string PoNumber = 13;
+    string Sku = 14;
+    string AltSku = 15;
+    //敏感词
+    string SkuSensitiveWords = 16;
+    string SellerName = 17;
+    bool IsPartialWarehousing = 18;
+    string PartialWarehousingReson = 19;
+    int64 PartialWarehousingDate = 20;
+    string StockBy = 21;
+    repeated IssueLabelInfo IssueLabel = 22;
+    string ReceiveRemark = 23;
+    int64 ReceiveRemarkDate = 24;
+    string ReceiveRemarkBy = 25;
+    string CustomerRemark = 26;
+    string ProductUrl = 27;
+    string OrderNumber = 28;
+    //来源国id
+    int64 ProsourceRegionId = 29;
+    string ProsourceRegionName = 30;
+    //目的地id
+    int64 RegionId = 31;
+    string RegionCode = 32;
+    int64 DeliveryTypeId = 33;
+    int64 DeliveryStationId = 34;
+    int64 ProductId = 35;
+    string SkuNumber = 36;
+    //sku状态
+    int64 SkuStatusId = 37;
+    repeated string TrackingNo = 38;
+    bool IsEzseller = 39;
+    //最后一条前台备注
+	string FrontRemark = 40;
+	string FrontRemarkBy = 41;
+	int64 FrontRemarkDate = 42;
+    //验货环节全局备注
+	string GlobalRemark = 43;
+	string GlobalRemarkBy = 44;
+	int64 GlobalRemarkDate = 45;
+    //商品备注
+	string ProductRemark = 46;
+	string ProductRemarkBy = 47;
+	int64 ProductRemarkDate = 48;
+    //等待客户答复
+	bool PendingReply = 49;
+	//客户已答复，等待处理
+	bool PendingAttention = 50;
+     int64 ReceiveUserId = 51;
+    string ReceiverName = 52;
+    string SkuImgUrl = 53;
+    int64 OrderDate = 54;
+    int64 ServiceTypeId = 55;
+    int64 WarehouseId = 56;
+    string WarehouseName = 57;
+    repeated string createBys = 58;
+}
+
+message IssueLabelInfo {
+    int64 IssueLabelId = 1;
+    string IssueLabelName = 2;
+    int64 CreateDate = 3;
+    string CreateBy = 4;
+    int64 OrderId = 5;
+    int64 OrderItemId = 6;
+    int64 LabelUserId = 7;
+}
+enum SkuStatus{
+    //已下单、卖家已发货、仓库已签收
+    IsPurchase = 0;
+    IsDispatch = 1;
+    IsArrive = 2;
+}
+
+message InspectionIssueLabel{
+    int64 OrderId = 1;
+    int64 OrderItemId = 2;
+    repeated LabelInfo Labels = 3;
+    repeated LableOrder Orders = 4;
+}
+
+message LableOrder{
+    int64 OrderId = 1;
+    int64 OrderItemId = 2;
+}
+
+message LabelInfo {
+    int64 IssueLabelId = 1;
+    string IssueLabel = 2;
+}
+
+message InspectionIssueLabelResp{
+
+}
+
+message OrderInfo{
+    int64 PurchaseOrderId = 1;
+    int64 CustomerId = 2;
+    int64 RegionId = 3;
+    int64 ServiceTypeId = 4;
+    int64 ShipmentTypeId = 5;
+    int64 DeliveryTypeId = 6;
+    int64 DeliveryStationId = 7;
+    int64 Weight = 8;
+    int64 VolumeWeight = 9;
+    int64 OrderItemId = 10;
+}
+
+message InspectionStockIn{
+     repeated OrderItem Orders = 1;
+     int32 BP = 2; //盒子传1 袋子传2
+     //临时字段 检查重复采购的订单
+     string TrackingNo = 3;
+}
+message OrderItem{
+    int64 Qty = 1; //本次入库数量
+	int64 OrderId = 2;
+    int64 OrderItemId = 3;
+    int64 ActualWeight = 8;		//实际重量
+	int64 ActualVolumeWeight = 9;	//实际体积重
+    string PartialWarehousingReson = 16;//部分入库原因
+    int64 Length = 12;
+    int64 Width = 13;
+    int64 Height = 14;
+    string TrackingNo = 25;
+    //上面必传
+    bool IsPartialWarehousing = 15; //是否部分入库
+    int64 Weight = 6;		//重量
+	int64 VolumeWeight = 7;	//体积重
+    int64 CustomerId = 4;
+    string NickName = 5;
+    int64 LastQty = 10; //上次入库数量
+    int64 PurchaseQty = 11;//采购数量
+    int64 SkuId = 17;
+    int64 ProductId = 18;
+    int64 OrderIdMssql = 19;
+    bool IsEzseller = 20;
+    int64 ShipmentTypeId = 21;
+    int64 DeliveryTypeId = 22;
+	int64 DeliveryStationId = 23;
+    int64 RegionId = 24;
+    int64 WarehouseId = 26;
+    repeated string TrackingNos = 27;
+    int64 ServiceTypeId = 28;
+    int64 OrderDate = 29;
+    int64 Gpid = 30;
+    string OrderNumber = 31;
+}
+
+message InspectionStockInResp{
+    string StockinCode = 1;
+    string LocationCode = 2;
+    string StockBy = 4;
+    StockCode Stock = 3;
+    string NickName = 5;
+    repeated string OrderNumbers = 6;
+}
+
+enum StockCode {
+    //选择相同会员同一order同一国家入库
+    StockCodeNotSameCustomer = 0;
+    //部分入库的SKU一定要单独的入库号
+    StockCodePartialWarehouse = 1;
+    //重量或体积重任意有值且大于0才可用入库
+    StockCodeHaveWeight = 2;
+    //入库时必须选择盒子或袋子
+    StockCodeHaveBP = 3;
+    //卖家商品必须发货才能入库
+    StockCodeEzseller = 4;
+    //入库总数量不能大于采购数量
+    StockCodeQty = 5;
+    //运单号一致才能一起入库
+    StockCodeTrackNo = 6;
+    //同派送方式才能一起入库
+    StockCodeDeliveryTypeId = 7;
+    //成功入库
+    StockCodeSuccess = 8;
+    //多个运单号的sku必须部分入库
+    StockCodeMustPartial = 9;
+    //新马上线卡时间点
+    StockCodeOverDate = 10;
+}
+
+
+message InspectionAssign{
+    repeated AssignInfo Orders = 1;
+    int64 AssignUserId = 2;
+}
+
+message AssignInfo{
+    int64 OrderId = 1;
+    int64 OrderItemId = 2;
+}
+
+message InspectionAssignResp {}
+
+message InspectionUpdateStockIn{
+    StockInCodeStatus Status = 1;
+    string StockinCode = 2;
+    string user = 3;
+    bool isSmall = 4;
+}
+
+message InspectionUpdateStockInResp{}
+
+enum StockInCodeStatus {
+    Unknown = 0; // 非法值
+    StockIn = 1; // 已入库
+    PickUp = 2;  // 已拣货
+    PutAway = 3; // 已上架
+    SoldOut = 4; // 已下架
+    PackUp = 5;  // 已打包
+    Cancel = 6;  // 已取消
+}
+
+message InspectionRemark{
+    int64 OrderId = 1;
+    int64 OrderItemId = 2;
+    string Remark = 3;
+    repeated RemarkOrder Orders = 4;
+}
+
+message RemarkOrder{
+    int64 OrderId = 1;
+    int64 OrderItemId = 2;
+}
+
+message InspectionRemarkResp{}
+
+
+message InspectionGetAllDepartment{}
+
+message InspectionGetAllDepartmentResp{
+    repeated DepartmentInfo Departments = 1;
+}
+
+message DepartmentInfo{
+	int64 DepartmentId = 1;
+	string DepartmentName = 2;
+}
+
+message InspectionGetAllErpUser{}
+
+message InspectionGetAllErpUserResp{
+    repeated ErpUserInfo Users = 1;
+}
+
+message ErpUserInfo {
+    int64 UserId = 1;
+    string UserName = 2;
+    string CatalogCode = 3;
+}
+
+message InspectionMakeOffset{
+  int64 OrderId = 1;
+  int64 OrderItemId = 2;
+  repeated OffsetInfo Infos = 3;
+}
+
+message OffsetInfo {
+    //差额补齐类型
+    OffsetType OffsetType = 1;
+    //差额补齐的值，可以是金额，也可以是数量
+    int64 OffsetValue = 2;
+    //差额补齐的备注
+    string Remark = 3;
+    //差额补齐的原因
+    string Reason = 4;
+}
+
+message offsetRes {
+  int64 orderID = 1;
+  int64 orderItemID = 2;
+  int64 offsetID = 3;
+}
+
+message InspectionMakeOffsetResp{
+}
+
+
+enum OffsetType {
+	Unknow_Balance = 0;
+	InternalExpress = 1;
+	Qty = 2;
+	UnitPrice = 3;
+	Other = 99;
+}
+
+message InspectionCancelOrder{
+    repeated CancelInfo Orders = 1;
+   	//退单备注
+    string CancelRemark = 2;
+	//退单原因
+	string CancelReason = 3;
+	//手动修改的费用
+	int64 ManualFee = 4;
+}
+
+message CancelInfo{
+    int64 OrderId = 1;
+    int64 OrderItemId = 2;
+}
+
+message InspectionCancelOrderResp{}
+
+message InspectionChangeShipmentType{
+    //采购单Id
+	repeated CancelInfo Orders = 1;
+	//运输方式Id
+	int64 ShipmentTypeId = 2;
+	//备注
+    string Remark = 3;
+    spk.XEzbuyOper ezbuy = 4;
+    spk.XPrimeOper prime = 5;
+    string Reason = 6;
+}
+
+
+message InspectionChangeShipmentTypeResp{}
+
+message InspectionSetType{
+    int64 Gpid = 1;
+    repeated Type ProductType = 2;
+}
+
+enum Type{
+    // 贵重物品
+    IsValueable = 0;
+    // 易碎品
+    IsFragile = 1;
+    // 易分开发货
+    IsSplitable = 2;
+}
+
+message InspectionSetTypeResp{}
+
+message InspectionAddTrackingNo{
+    repeated CancelInfo Orders = 1;
+    string TrackingNo = 2;
+    repeated string TrackingNos = 3;
+}
+
+message InspectionAddTrackingNoResp{}
+
+message InspectionPrintSku{
+   repeated PrintSkuInfo Skus = 1;
+}
+
+message PrintSkuInfo{
+    int64 OrderId = 1;
+    int64 OrderItemId = 2;
+}
+
+message InspectionPrintSkuResp{
+    string UserName = 1;
+}
+
+message InspectionGetOldIdByCode{
+    string StockInCode = 1;
+}
+
+message InspectionGetOldIdByCodeResp{
+    repeated OldOrderInfo OldOrders = 1;
+}
+
+message OldOrderInfo{
+    int64 OrderIdMssql = 1;
+    repeated string StockInCode = 2;
+    repeated string LocationCode = 3;
+}
+
+message InspectionCheckStockinCode{
+    repeated string stockinCode = 1;
+}
+
+message InspectionCheckStockinCodeResp{
+    repeated string stockinCode = 1;
+}
+message InspectionGetOrderInfo {
+    string stockinCode = 1;
+}
+
+message InspectionGetOrderInfoResp {
+    int64 orderId = 1;
+    int64 weight = 2;
+    int32 bp = 3;
+}
+
+message InspectionWbOrder {
+    repeated int64 orderIdMssqls = 1;
+}
+
+message InspectionWbOrderResp {
+    repeated int64 orderIdMssqls = 1;
+}
+
+message InspectionWbOrderHistory {
+    string stockinCode = 1;
+    int64  orderIdMssql = 2;
+}
+
+message InspectionWbOrderHistoryResp {}
+
+message InspectionWbOrderAndHis {
+    repeated string orderNumber = 1;
+}
+
+message InspectionWbOrderAndHisResp {}
+
+message InspectionFetchStockinCode{
+    string StockinCode = 1;
+    string SkuNumber = 2;
+    string TrackingNo = 3;
+    int64 StockBy = 4;
+    string ProductName = 5;
+    int64 WarehouseId = 6;
+    int64 StockinStart = 7;
+    int64 StockinEnd = 8;
+    int64 StockinStatus = 9;
+    string LocationCode = 10;
+    string ActualLocationCode = 11;
+    string OrderNumber = 12;
+    string VendorName = 13;
+    string CustomerName = 14;
+    // 0代表没给此参数，1代表是，2代表否
+    int64 IsDiffArea = 15;
+    int32 Offset = 16;
+    int32 Limit = 17;
+    string PoNumber = 18;
+    int64 TimeOut = 19;
+}
+
+message InspectionFetchStockinCodeResp{
+    repeated StockinInfo Stocks = 1;
+}
+
+message StockinInfo{
+    string StockinCode = 1;
+    int64 WarehouseId = 2;
+    string WarehouseName = 3;
+    int64 LocationId = 4;
+    string LocationCode = 5;
+    int64 ActualLocationId = 6;
+    string ActualLocationCode = 7;
+    int64 RegionId = 8;
+    string RegionCode = 9;
+    string NickName = 10;
+    int64 BP = 11;
+    string StockBy = 12;
+    int64 StockinDate = 13;
+    string StockinStatus = 14;
+    int64 ShipmentTypeId = 15;
+    string ShipmentTypeName = 16;
+    int64 TotalWeight = 17;
+    int64 TotalVolumeWeight = 18;
+    string StockinCodeRemark = 19;
+    int64 StockinCodeRemarkDate = 20;
+    string StockinCodeRemarkBy = 21;
+    int64 StockinStatusId = 22;
+    int64 StatusTime = 23;
+    int64 WrongLocationId = 24;
+    string WrongLocationCode = 25;
+    string deliveryTypeCode = 26;
+    string serviceType = 27;
+}
+
+message InspectionFetchOrderByStockinCode{
+    InspectionFetchStockinCode Filter = 1;
+    string StockInCode = 2;
+}
+
+message InspectionFetchOrderByStockinCodeResp{
+    repeated StockInOrder Orders = 1;
+}
+
+message StockInOrder{
+    int64 OrderId = 1;
+    int64 OrderItemId = 2;
+    string SkuNumber = 3;
+    string ProductName = 4;
+    string ProductUrl = 5;
+    string Sku = 6;
+    int64 UnitPrice = 7;
+    string VendorName = 8;
+    int64 SkuStatusId = 9;
+    int64 ShipmentTypeId = 10;
+    string ShipmentTypeName = 11;
+    int64 Weight = 12;
+    int64 VolumeWeight = 13;
+    int64 StockinQty = 14;
+    bool IsAllStockin = 15;
+    int64 RegionId = 16;
+    string RegionCode = 17;
+    string OrderNumber = 18;
+    int64 Length = 19;
+    int64 Width = 20;
+    int64 Height = 21;
+    int64 ProsourceRegionId = 22;
+    string CustomerName = 23;
+    repeated string TrackingNo = 24;
+    bool IsActive = 25;
+    int64 OrderIdMssql = 26;
+}
+
+message InspectionCancelOrderByOldId {
+    //老的订单id
+    int64 OrderIdMssql = 1;
+    //退单备注
+    string CancelRemark = 2;
+	//退单原因
+	string CancelReason = 3;
+	//手动修改的费用
+	int64 ManualFee = 4;
+}
+
+message InspectionCancelOrderByOldIdResp{}
+
+message InspectionGetStockinRemark{
+    int64 OrderId = 1;
+    int64 OrderItemId = 2;
+    int32 Offset = 3;
+    int32 Limit = 4;
+}
+
+message InspectionGetStockinRemarkResp{
+    repeated StockinRemarkInfo Remarks = 1;
+}
+
+message StockinRemarkInfo{
+    string ReceiveRemark = 1;
+    int64 ReceiveRemarkDate = 2;
+    string ReceiveRemarkBy = 3;
+}
+
+message InspectionGetOrders {
+    int64 orderId = 1;
+    int64 shipmentTypeId = 2;
+    int64 warehouseId = 3;
+}
+
+message InspectionGetOrdersItem {
+    int64 orderItemId = 1;
+    int64 weight = 2;
+    int64 volumeWeight = 3;
+    int64 qty = 4;
+}
+
+message InspectionGetOrdersResp {
+    repeated InspectionGetOrdersItem orderItems =1;
+}
+
+message InspectionGetStockinStatus{}
+
+message InspectionGetStockinStatusResp{
+    repeated StatusInfo Statuses = 1;
+}
+
+message StatusInfo{
+    int64 StatusId = 1;
+    string StatusName = 2;
+}
+
+message InspectionGetSkuByStockin {
+    string stockinCode = 1;
+}
+
+message GetSkuByStockinItem {
+    int64 orderItemId = 1;
+    repeated string stockinCodes = 2;
+}
+
+message InspectionGetSkuByStockinResp {
+    int64 orderId = 1;
+    repeated GetSkuByStockinItem items = 2;
+    repeated string codes = 3;
+}
+
+message InspectionGetStockinByStatus {
+    StockInCodeStatus status = 1;
+    repeated string codes = 2;
+}
+
+message InspectionGetStockinByStatusResp {
+    repeated string codes = 1;
+}
+
+message InspectionPutaway {
+    string stockinCode = 1;
+    string user = 2;
+    string assLocCode = 3;
+    string actLocCode = 4;
+    bool isChangeStatus = 5;
+    string wrongLocCode = 6;
+    string msg = 7;
+}
+
+message InspectionPutawayResp {}
+
+message InspectionStockinCodeRemark{
+    repeated string StockinCode = 1;
+    string Remark = 2;
+}
+
+message InspectionStockinCodeRemarkResp{}
+
+message InspectionFetchStockinCodeRemark{
+     string StockinCode = 1;
+     int32 Offset = 2;
+     int32 Limit = 3;
+}
+
+message InspectionFetchStockinCodeRemarkResp{
+    repeated StockinCodeRemark Remarks = 1;
+}
+
+message StockinCodeRemark{
+    string Remark = 1;
+    int64  RemarkDate = 2;
+    string RemarkBy = 3;
+    string StockinCode = 4;
+}
+
+message InspectionFetchNewRemark{
+    repeated string StockinCode = 1;
+}
+
+message InspectionFetchNewRemarkResp{
+    repeated StockinCodeRemark Remarks = 1;
+}
+
+message InspectionRollback{
+    string StockinCode = 1;
+    repeated RollbackOrder Skus = 2;
+}
+
+message RollbackOrder{
+    int64 OrderId = 1;
+    int64 OrderItemId = 2;
+}
+message InspectionRollbackResp{
+
+}
+
+message InspectionEditStockInfo{
+    string StockinCode = 1;
+    int64 OrderId = 2;
+    int64 OrderItemId = 3;
+    int64 Weight = 4;
+    int64 VolumeWeight = 5;
+    int64 Length = 6;
+    int64 Width = 7;
+    int64 Height = 8;
+}
+
+message InspectionEditStockInfoResp{}
+
+message InspectionSetStockinStatus {
+    repeated string stockinCodes = 1;
+    int64 statusId = 2;
+    bool isForce = 3;
+}
+
+message InspectionSetStockinStatusResp {
+    repeated string stockinCodes = 1;        //返回设置失败的入库号.
+}
+
+message InspectionExportOrder {}
+
+message InspectionExportOrderResp {
+    string contentType = 1;
+	bytes data = 2;
+	string filename = 3;
+}
+
+message InspectionExportStockinCodeResp {
+	string contentType = 1;
+	bytes data = 2;
+	string filename = 3;
+}
+
+message InspectionGetOrdersByOldId{
+    repeated int64 OrderIdMssql = 1;
+}
+
+message InspectionGetOrdersByOldIdResp{
+    repeated MssqlOrderInfo Orders = 1;
+}
+
+message MssqlOrderInfo{
+    int64 OrderIdMssql = 1;
+    repeated MssqlOrder Order = 2;
+}
+
+message MssqlOrder {
+    int64 OrderId = 1;
+    int64 OrderItemId = 2;
+}
+
+message InspectionExportIssueOrder{
+    string PlaceAccount = 1;
+}
+
+message InspectionInsert{
+    repeated TmpPurchase PurchaseOrders = 1;
+}
+
+message TmpPurchase{
+    string FileName = 1;
+    string OrderNumber = 2;
+    string PoNumber = 3;
+    string PlaceAccount = 4;
+    string UserName = 5;
+    string Sku = 6;
+    string ProductName = 7;
+    string VendorName = 8;
+    string ServiceType = 9;
+    string RegionCode = 10;
+    string WarehouseName  = 11;
+    string ProductUrl = 12;
+    string PhoneNumber = 13;
+}
+
+message InspectionTmpOrder {
+    string PlaceAccount = 1;
+    string PoNumber = 2;
+    string ProductName = 3;
+    string Sku = 4;
+    string PhoneNumber = 5;
+    int32 Limit = 6;
+    int32 Offset = 7;
+}
+
+message InspectionUpsertSeller{
+    int64 DomainId = 1;
+    string SellerName = 2;
+    //0代表没给此字段，1代表需要true，2代表false
+    int64 IsActive = 3;
+}
+
+message InspectionCollectionSeller{
+    string SellerName = 1;//卖家名称
+    string VendorName = 2;//店铺店铺名称
+    string VendorUrl = 3;
+    string Sender = 4;
+    string PhoneNumber = 5;
+    string Address = 6;
+    int64 DomainId = 7;
+}
+
+message InspectionFecthSeller{
+    string SellerName = 1;
+    int32 Limit = 2;
+    int32 Offset = 3;
+}
+
+message InspectionFecthSellerResp{
+   repeated SellerInfo Sellers = 1;
+}
+
+message SellerInfo{
+    string SellerName = 1;
+    string VendorName = 2;
+    string VendorUrl = 3;
+    string Sender = 4;
+    string PhoneNumber = 5;
+    string Address = 6;
+    int64 DomainId = 7;
+}
+
+message InspectionExportSellerResp{
+    string contentType = 1;
+	bytes data = 2;
+	string filename = 3;
+}
+
+message InspectionFindSeller{
+    string SellerName = 1;
+    int64 DomainId = 2;
+}
+
+message InspectionFindSellerResp{
+    bool Exist = 1;
+}
+
+message InspectionSplitOrder {
+    int64 OrderId = 1;
+    repeated  int64 OrderItemId = 2;
+}
+
+message InspectionSplitOrderResp{
+    string BeforeOrderNumber = 1;
+    string AfterOrderNumber = 2;
+    string StockinCode = 3;
+}
+
+message InspectionSetProblem{
+    int64 WarehouseId = 1;
+    string ProductName = 2;
+    //不填写运单号就认为是勾选了三无。自动生成一个运单号
+    string TrackingNo = 3;
+    int64 Qty = 4;
+    repeated string ProductImgs = 5;
+    string ShipperName = 6;
+    //库区ID
+    int64 WarehouseAreaId = 7;
+}
+
+message InspectionSetProblemResp{
+    int64 Date = 1;
+    int64 Qty = 2;
+    string TrackingNo = 3;
+}
+
+message InspectionCancelProblem{
+    int64 OrderIdMssql = 1;
+    string TrackingNo = 2;
+}
+
+message InspectionFetchFlawOrder{
+    int64 WarehouseId = 1;
+    int64 FlawOrderStatusId = 2;
+    //库区ID
+    int64 WarehouseAreaId = 3;
+    //库位Id
+    int64 LocationId = 4;
+    string ProductName = 5;
+    string TrackingNo = 6;
+    int64 Inspector = 7;
+    //0代表没传此字段 1代表是  2代表否
+    int64 IsHaveTN = 8;
+    int32 Offset = 9;
+    int32 Limit = 10;
+    string ShipperName = 11;
+}
+
+message FlawOrderInfo{
+    string TrackingNo = 1;
+    string ProductName = 2;
+    int64 Qty = 3;
+    repeated string ProductImgs = 4;
+    int64 LocationId = 5;
+    string LocationCode = 6;
+    int64 Date = 7;
+    int64 FlawOrderStatusId = 8;
+    string Inspector = 9;
+    repeated string OrderNumbers = 10;
+    string ShipperName = 11;
+}
+
+message InspectionFetchFlawOrderResp{
+    repeated FlawOrderInfo FlawOrders = 1;
+}
+
+message InspectionSetFlawOrderStatus{
+    repeated string TrackingNos = 1;
+    int64 FlawOrderStatusId = 2;
+}
+
+message InspectionMacthFlawOrder{
+    string TrackingNo = 1;
+    repeated string OrderNumbers = 2;
+}
+
+message InspectionChangeLocation{
+    string TrackingNo = 1;
+    string LocationCode = 2;
+}
+
+message InspectionFetchTrackLog{
+    int64 ScanUserId = 1;
+    garencieres.ScanResult ScanResultId = 2;
+    string TrackingNo = 3;
+    int64 StartDate = 4;
+    int64 EndDate = 5;
+    int32 Offset = 6;
+    int32 Limit = 7;
+}
+
+message InspectionFetchTrackLogResp{
+    repeated TrackingNoinfo TrackingNos = 1;
+}
+
+message TrackingNoinfo{
+    string TrackingNo = 1;
+    repeated string SkuNumber = 2;
+    int64 ScanDate = 3;
+    int64 WarehouseId = 4;
+    string ScanUser = 5;
+    garencieres.ScanResult ScanResultId = 6;
+}
+
+
+message InspectionExportTrackLogResp {
+	string contentType = 1;
+	bytes data = 2;
+	string filename = 3;
+}
+
+message GetPurchasersResp {
+        repeated string purchasers = 1;
+}
+
+message IsPrevTrackingNoScanCompletedReq {
+        string trackingNo = 1;
+}
+
+message IsPrevTrackingNoScanCompletedResp {
+        string msg = 1;
+        int64 code = 2;
+}

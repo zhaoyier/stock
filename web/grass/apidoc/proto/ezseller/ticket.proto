@@ -1,0 +1,177 @@
+syntax = "proto3";
+package ezseller;
+
+import "common/ezbuy.proto";
+import "common/empty.proto";
+
+service Ticket {
+    option (common.service).webapi = true;
+	option (common.service).public = true;
+
+    // 工单管理列表
+    rpc UserTicketList(UserTicketListReq) returns (UserTicketListResp);
+
+    // 工单详情页面
+    rpc UserTicketDetail(UserTicketDetailReq) returns (UserTicketDetailResp);
+
+    // 查看回复内容接口
+    rpc UserTicketReplies(UserTicketRepliesReq) returns (UserTicketRepliesResp);
+
+    // 回复工单
+    rpc UserTicketReply(UserTicketReplyReq) returns (common.Empty);
+
+    // 缺货登记工单添加
+    rpc UserTicketStockOut(UserTicketStockOutReq) returns (common.Empty);
+
+    // 查询卖家缺货登记工单
+    rpc MultiGetStockOutTicket(MultiGetStockOutTicketReq) returns (MultiGetStockOutTicketResp);
+
+    // 通过店铺名获取店铺Id
+    rpc GetShopIdByShopName(GetShopIdByShopNameReq) returns (GetShopIdByShopNameResp);
+
+    // openapi缺货登记
+    rpc JediTicketStockOut(JediTicketStockOutReq) returns (JediTicketStockOutResp);
+
+    // 获取需要回复工单数量
+    rpc UserTicketNeedReplyCount(UserTicketNeedReplyCountReq) returns (UserTicketNeedReplyCountResp);
+
+    // 通过新订单获取店铺Id，供erp侧生成工单使用。
+    rpc GetShopIdByOrder(GetShopIdByOrderReq) returns (GetShopIdByOrderResp);
+}
+
+// 工单状态：未分配/待回复/已回复/处理完成，默认为空 
+enum TicketStatus {
+    TicketStatusUnknown = 0;
+
+    TicketStatusPending = 1001;
+    TicketStatusWaitFor = 1002;
+    TicketStatusReplied = 1003;
+    TicketStatusFinished = 1004;
+}
+
+message UserTicketListFilter {
+    int64 ticketId = 1;
+    string orderItemNum = 2;
+    TicketStatus status = 3;
+    int64 createDateFrom = 4;
+    int64 createDateTo = 5;
+    int64 updateDateFrom = 6;
+    int64 updateDateTo = 7;
+    int64 finishDateFrom = 8;
+    int64 finishDateTo = 9;
+}
+
+message UserTicketListReq {
+    UserTicketListFilter filter = 1;
+    int64 offset = 2;
+    int64 limit = 3;
+}
+
+message UserTicketListResp {
+    repeated TicketItem list = 1;
+}
+
+message TicketItem {
+    int64 ticketId = 1;
+    string typeName = 2;
+    string orderItemNum = 3;
+    TicketStatus status = 4;
+    int64 createDate = 5;
+    int64 updateDate = 6;
+    int64 finishDate = 7;
+}
+
+message UserTicketDetailReq {
+    int64 ticketId = 1;
+}
+
+message UserTicketDetailResp {
+    TicketItem ticket = 1;
+    TicketSku sku = 2;
+}
+
+message TicketSku {
+    string productName = 1;
+    string skuName = 2;
+    int64 qty = 3;
+    int64 price = 4;
+    int64 errQty = 5;
+}
+
+message UserTicketRepliesReq {
+    int64 ticketId = 1;
+}
+
+message UserTicketRepliesResp {
+    repeated TicketReply replies = 1;
+}
+
+message TicketReply {
+    int64 createDate = 1;
+    string username = 2;
+    string replyContext = 3;
+    bool isReplyContextLocal = 4;
+}
+
+message UserTicketReplyReq {
+    int64 ticketId = 1;
+    string replyContext = 2;
+    bool isReplyContextLocal = 3;
+}
+
+message UserTicketStockOutReq {
+    uint64 orderItemId = 1;
+    int64 qty = 2;
+    string remark = 3;
+    bool isRemarkLocal = 4;
+}
+
+message Reply {
+    string content = 1;
+    bool isContentLocal = 2;
+    string replyBy = 3;
+}
+
+message GetShopIdByShopNameReq {
+    string shopName = 1;
+}
+
+message GetShopIdByShopNameResp {
+    int64 shopId = 1;
+}
+
+message MultiGetStockOutTicketReq {
+    repeated uint64 orderItemIds = 1;
+}
+
+message MultiGetStockOutTicketResp {
+    repeated int64 ticketIds = 1;
+}
+
+message JediTicketStockOutReq {
+    string orderItemNum = 1;
+    int64 qty = 2;
+    string remark = 3;
+    int32 shopId = 4;
+}
+
+message JediTicketStockOutResp {
+    bool success = 1;
+    string message = 2;
+}
+
+message UserTicketNeedReplyCountReq {
+}
+
+message UserTicketNeedReplyCountResp {
+    int64 total = 1;
+}
+
+message GetShopIdByOrderReq {
+    int64 orderId = 1;
+    int64 orderItemId = 2;
+}
+
+message GetShopIdByOrderResp {
+    int64 shopId = 1;
+}

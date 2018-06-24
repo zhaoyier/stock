@@ -1,0 +1,48 @@
+syntax = "proto3";
+package jedi;
+import "jedi/common.proto";
+
+
+service Auth {
+    //为卖家应用生成一组app key/secret
+    rpc CreateAppKeySecret(CreateAppKeySecretReq) returns (CreateAppKeySecretResp);
+
+    //刷新app secret
+    rpc ResetAppSecret(ResetAppSecretReq) returns (ResetAppSecretResp);
+
+    //获取卖家app应用信息
+    rpc GetAppInfo(GetAppInfoReq) returns (GetAppInfoResp);
+}
+
+message CreateAppKeySecretReq {
+    string appName = 1;
+    int32 shopId = 2;
+}
+
+message CreateAppKeySecretResp{
+    RespStatus status = 1;
+    string appKey = 2;
+    string appSecret = 3;
+}
+
+message ResetAppSecretReq{
+    string appKey = 1;
+}
+
+message ResetAppSecretResp {
+    RespStatus status = 1;
+    string oldSecret = 2;
+    string newSecret = 3;
+}
+
+message GetAppInfoReq {
+    string appKey = 1;
+}
+
+message GetAppInfoResp {
+    RespStatus status = 1;
+    string appName = 2;
+    int32 shopId = 3;
+    string appKey = 4;
+    string appSecret = 5;
+}

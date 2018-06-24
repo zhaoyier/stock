@@ -1,0 +1,239 @@
+syntax = "proto3";
+package nadesico;
+
+import "common/ezbuy.proto";
+import "common/empty.proto";
+import "appcommon/common_public.proto";
+
+service Prime {
+	rpc Ping(common.Empty) returns (common.Empty);
+
+	rpc GetPrimeMembership(GetPrimeMembershipReq) returns (GetPrimeMembershipResp);
+	
+	// 获取prime价格：可降价或渠道优惠
+	rpc GetPrimePrice(GetPrimePriceReq) returns (GetPrimePriceResp);
+
+	// 前端请求，创建primebill
+	rpc CreatePrimeBill(CreatePrimeBillReq) returns (CreatePrimeBillResp);
+
+	// 支付primeBill，会触发扣款
+	rpc PayPrimeBill(PayPrimeBillReq) returns (PayPrimeBillResp);
+	// 支付多笔prime会员账单
+	rpc MultiPayPrimeBill(MultiPayPrimeBillReq) returns (MultiPayPrimeBillResp);
+	// 老系统支付完成通知nadesico[prime 重构1期]
+	rpc OldPayCallBack(PayPrimeBillReq) returns (PayPrimeBillResp);
+
+	// 取消账单:
+	rpc CancelPrimeBill(CancelPrimeBillReq) returns (CancelPrimeBillResp);
+
+	rpc SyncPrime(common.Empty) returns (appcommon.ResultResp){
+		option (common.timeout) = "10m";
+	};
+
+	rpc SyncUserPrime(SyncUserPrimeReq) returns (appcommon.ResultResp);
+	// 同步增量数据
+	rpc SyncIncrPrime(common.Empty) returns (appcommon.ResultResp);
+	// 同步增量数据: 解绑
+	rpc SyncIncrUnPrime(SyncIncrUnPrimeReq) returns (appcommon.ResultResp);
+
+	// 若触发ezOrder支付PrimeMembership账单, ezOrder通知用户中心负责同步并完成支付
+	rpc SyncPayPrime(SyncPayPrimeReq) returns (SyncPayPrimeResp);
+
+	// ERP更新prime信息
+	rpc UpdatePrime(UpdatePrimeReq) returns (appcommon.ResultResp){
+		option (common.webapi).enable = false;
+	};
+
+	rpc IsPrime(IsPrimeReq) returns (IsPrimeResp){
+		option (common.webapi).enable = false;
+	};
+
+	rpc HasYearPrime(HasYearPrimeReq) returns (HasYearPrimeResp){
+		option (common.webapi).enable = false;
+	};
+
+	// 删除prime有效期的缓存
+	rpc DecachPrime(DecachPrimeReq) returns (appcommon.ResultResp);
+
+	// prime会员账单未支付账单数
+	rpc UnpayedPrimeBillCount(UnpayedPrimeBillCountReq) returns (UnpayedPrimeBillCountResp);
+	// prime会员账单(未支付账单)
+	rpc GetMultiPrimeBill(GetMultiPrimeBillReq) returns (GetMultiPrimeBillResp);
+	rpc GetPrimeBill(GetPrimeBillReq) returns (PrimeBillInfo);
+
+}
+
+enum PrimeMembershipType {
+	Unknow     = 0;
+	Trial      = 1;
+	Year       = 2;
+	YearRenew  = 3;
+	HalfYear   = 4;
+}
+
+enum PayBillStatusCode {
+	Success = 0;
+	NoEnoughMoney = 1; // 余额不足
+	ServerErr = 2; // 其他原因
+}
+
+message GetPrimePriceReq {
+	string identId = 2; // 优惠标识, 普通购买传空
+}
+
+message PrimePrice {
+	PrimeMembershipType primeMembershipType = 1;
+	int32 price = 2; // 以最小单位计算（分）, 兼容前端int类型
+	string currencyCode = 3; // 币种
+	int32 originPrice = 4; // 原价
+}
+
+message GetPrimePriceResp {
+	bool canBuyPrimeTrial = 1; // 是否可以购买prime试用会员（原 月会员），未登录用户返回true
+	repeated PrimePrice primeTypes = 2;
+	bool isYearRenew = 3; // 是否是年会员续费
+	int32 primeTrialTimes = 4; // prime 月会员可购买次数（系统配置，和用户无关）
+	int64 prepay = 5;	//用户余额
+	appcommon.ResultResp result = 101;
+}
+
+message GetPrimeMembershipReq {
+	int64 customerId = 1;
+}
+
+message GetPrimeMembershipResp {
+	PrimeMembership primeMembership = 1;
+	appcommon.ResultResp result = 101;
+}
+
+// 参数1，2 二者选其一
+message CreatePrimeBillReq {
+	PrimeMembershipType primeMembershipType = 1;
+	string identId = 2; // 优惠标识
+}
+
+message CreatePrimeBillResp {
+	int64 primeBillId = 1; // 老账单ID
+	int32 billAmount = 2;
+	string paymentNumber = 3;
+	string encryptPaymentId = 4;
+	string billType = 5;
+	int64 billId = 6; // 新账单ID
+	appcommon.ResultResp result = 101;
+}
+
+message PayPrimeBillReq {
+	int64 primeBillId = 1;		// 支付账单回调
+	int64 oldPrimeBillId = 2; // 老账单id
+}
+
+message PayPrimeBillResp {
+	string paymentId = 1;
+	string paymentNumber = 2;
+	PayBillStatusCode code = 3; // 扣款响应
+	appcommon.ResultResp result = 101;
+}
+
+message MultiPayPrimeBillReq {
+	repeated int64 primeBillIds = 1;		// 支付账单回调
+	repeated int64 oldPrimeBillIds = 2; // 老账单id
+}
+
+message MultiPayPrimeBillResp {
+	PayBillStatusCode code = 3; // 扣款响应
+	appcommon.ResultResp result = 101;
+}
+
+message SyncPayPrimeReq {
+	string paymentNumber = 1;
+}
+
+message SyncPayPrimeResp {
+	appcommon.ResultResp result = 101;
+}
+
+// 1,2参数 二选一
+message CancelPrimeBillReq {
+	string paymentNumber = 1; // 老账单号
+	int64 primeBillId = 2; // 新账单id
+}
+
+message CancelPrimeBillResp {
+	appcommon.ResultResp result = 101;
+}
+
+message PrimeMembership {
+	int64 customerId = 1;
+	PrimeMembershipType primeMembershipType = 2;
+	int64 primeStartDate = 3;
+	int64 primeEndDate = 4;
+	bool hadAvaiablePrime = 5; // 是否有有效的prime有效期（解绑不算有）
+}
+
+message UpdatePrimeReq {
+	int64 customerId = 1;
+	bool isSetUnPrime = 2;
+	int64 primeEndDate = 3;
+}
+
+message IsPrimeReq {
+	int64 customerId = 1;
+}
+
+message IsPrimeResp {
+	bool isPrime = 1;
+}
+
+message HasYearPrimeReq {
+	int64 customerId = 1;
+}
+
+message HasYearPrimeResp {
+	bool isPrime = 1;
+	bool hasYearPrime = 2;
+}
+
+message DecachPrimeReq {
+	int64 customerId = 1;
+}
+
+message UnpayedPrimeBillCountReq {
+	int64 customerId = 1;
+}
+
+message UnpayedPrimeBillCountResp {
+	int32 count = 1;
+}
+
+message PrimeBillInfo {
+	int64 id = 1; // 新账单Id，
+	string paymentNumber = 2; // 账单号，
+	int64 billAmount = 3; // 账单金额，
+	string billType = 4; // 账单服务类型（固定类似为 PrimeMembership ）,
+	bool isPayed = 5; // 是否支付，
+	bool isCancelled = 6; // 是否取消，
+	int64 createDate = 7; // 创建时间，
+	int32 oldPaymentId = 8; // 老账单ID
+}
+
+message GetMultiPrimeBillReq {
+	int64 customerId = 1;
+	int32 offset = 2;
+	int32 limit = 3;
+}
+
+message GetMultiPrimeBillResp {
+	repeated PrimeBillInfo primeBills = 1;
+}
+
+message GetPrimeBillReq {
+	int64 billId = 1; // 新账单ID
+}
+
+message SyncUserPrimeReq {
+	int64 customerId = 1;
+}
+
+message SyncIncrUnPrimeReq {
+	int64 fromUpdateDate = 1; // customer表的UpdateDate起始时间开始同步
+}

@@ -1,0 +1,88 @@
+{
+  "/api/ezseller.Ticket/UserTicketList": {
+    "list": [
+      {
+        "createDate": "1523352775",
+        "finishDate": "1523352775",
+        "orderItemNum": "52440690",
+        "status": "TicketStatusPending",
+        "ticketId": "52440690",
+        "typeName": "non",
+        "updateDate": "1523352775"
+      },
+      {
+        "createDate": "1523352775",
+        "finishDate": "1523352775",
+        "orderItemNum": "52440690",
+        "status": "TicketStatusUnknown",
+        "ticketId": "26990",
+        "typeName": "ex in",
+        "updateDate": "1523352775"
+      }
+    ]
+  },
+  "/api/ezseller.Ticket/UserTicketReplies": {
+    "replies": [
+      {
+        "createDate": "1523436522",
+        "isReplyContextLocal": false,
+        "replyContext": "irure voluptate labore",
+        "username": "ullamco tempor"
+      },
+      {
+        "createDate": "1523436529",
+        "isReplyContextLocal": false,
+        "replyContext": "aute amet ea irure",
+        "username": "minim a"
+      },
+      {
+        "createDate": "1523436522",
+        "isReplyContextLocal": false,
+        "replyContext": "irure voluptate labore",
+        "username": "ullamco tempor"
+      },
+      {
+        "createDate": "1523436529",
+        "isReplyContextLocal": false,
+        "replyContext": "aute amet ea irure",
+        "username": "minim a"
+      },
+      {
+        "createDate": "1523436522",
+        "isReplyContextLocal": false,
+        "replyContext": "irure voluptate labore",
+        "username": "ullamco tempor"
+      },
+      {
+        "createDate": "1523436529",
+        "isReplyContextLocal": false,
+        "replyContext": "aute amet ea irure",
+        "username": "minim a"
+      }
+    ],
+    "total": "3699421310"
+  },
+  "/api/ezseller.Ticket/UserTicketReply": {
+    "result": true,
+    "msg": "Ut qui irure officia consequat"
+  },
+  "/api/ezseller.Ticket/UserTicketStockOut": {},
+  "/api/ezseller.Ticket/UserTicketDetail": {
+    "ticket": {
+      "ticketId": "391",
+      "typeName": "non reprehenderit dolore",
+      "orderItemNum": "sunt cupidatat eu nisi et",
+      "status": "TicketStatusWaitFor",
+      "createDate": "1523528087",
+      "updateDate": "1523528087",
+      "finishDate": "1523528087"
+    },
+    "sku": {
+      "productName": "ut culpa ea mollit",
+      "skuName": "adipisicing Excepteur et consequat",
+      "qty": "242392",
+      "price": "77068",
+      "errQty": "5"
+    }
+  }
+}

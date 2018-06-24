@@ -1,0 +1,95 @@
+syntax = "proto3";
+package spkadmin;
+import "spk/spk_public.proto";
+import "common/ezbuy.proto";
+
+// 找出异常的数据
+service Fix {
+  option (common.service).webapi = true;
+  // 找到某个平台商品里面没有匹配到发布类目的商品
+  rpc PcidMissing(FixPcidMissing) returns (FixPcidMissingResp);
+  // 找到某些平台发布类目没有匹配到重量的
+  rpc PcidNoWeight(FixPcidNoWeight) returns (FixPcidNoWeightResp);
+  rpc OrderVendorName(FixOrderVendorName) returns (FixOrderVendorNameResp);
+  // 修复淘宝cid里面
+  rpc OrderItemCid(FixOrderItemCid) returns (FixOrderItemCidResp);
+  // 修复amazon商品因为base切换导致没有prime
+  rpc Amazon(FixAmazon) returns (FixAmazonResp);
+}
+
+// ---------------------------------------------------------------------------
+
+message FixPcidMissing {
+  spk.XPlatform platform = 1;
+}
+
+message FixPcidMissingResp {
+  repeated FixPcidMissingItem item = 1;
+}
+
+message FixPcidMissingItem {
+  string scid = 1;
+  int32 count = 2;
+  string name = 3;
+  int64 cid = 4;
+}
+
+// ---------------------------------------------------------------------------
+
+message FixPcidNoWeight {
+  repeated spk.XPlatform platforms = 1;
+}
+
+message FixPcidNoWeightItem {
+  int32 pcid = 1;
+  int32 count = 2;
+  string name = 3;
+}
+
+message FixPcidNoWeightResp {
+  repeated FixPcidNoWeightItem item = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message FixOrderVendorName {
+  
+}
+
+message FixOrderVendorNameItem {
+  int32 orderId = 1;
+  string vendor = 2;
+  string url = 3;
+  string sql = 4;
+}
+
+message FixOrderVendorNameResp {
+  repeated FixOrderVendorNameItem items = 1;
+}
+
+message FixOrderItemCid {
+  int64 start = 1;
+  int32 limit = 2;
+  bool execute = 3;
+}
+
+message FixOrderItemCidItem {
+  string url = 1;
+  int32 orderItemId = 2;
+  int32 cid = 3;
+  string sql = 4;
+}
+
+message FixOrderItemCidResp {
+  int32 total = 2;
+  repeated FixOrderItemCidItem item = 1;
+  int32 skip = 3;
+}
+
+message FixAmazon {
+  
+}
+
+message FixAmazonResp {
+  string jobId = 1;
+}

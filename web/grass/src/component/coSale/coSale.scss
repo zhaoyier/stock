@@ -1,0 +1,27 @@
+@import "../../scss/_base";
+.coSale{
+  h1{
+    margin:10px 5px;
+    font-weight: 200;
+    font-size: 20px;
+  }
+  .filter{
+    padding: 15px;
+    background: white;
+    border: 1px solid #ebebeb;
+    margin-bottom: 25px;
+  }
+  .coSaleList{
+    padding: 15px 10px;
+    background: white;
+    border: 1px solid #ebebeb;
+    margin-bottom: 25px;
+  }
+}
+.skuScrollContainer{
+  overflow: scroll;
+  padding:10px;
+  .skuScroll{
+    width:2100px;
+  }
+}

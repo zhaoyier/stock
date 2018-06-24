@@ -1,0 +1,92 @@
+
+syntax                                    = "proto3";
+package zhantang;
+option swift_prefix = "GR";
+import "common/ezbuy.proto";
+import "appcommon/common_public.proto";
+
+//---------------------------------------------------------------------- 
+//  zhantang 为tong/moxiaobei 的代理服务，不做业务逻辑处理
+//---------------------------------------------------------------------- 
+
+service PaymentProxy {
+    // for tong
+    rpc ProxyTopUp (ProxyWalletTopUp) returns (ProxyWalletTopUpResp);
+    rpc ProxyQueryTopUpStatus (ProxyWalletQueryStatus) returns (ProxyWalletQueryStatusResp);
+
+    // for moxiaobei
+    rpc ProxyCouponEligible(ProxyCoupon) returns (ProxyCouponResp); // 检查是否有资格享受优惠
+}
+
+//--------------------tong ------------------------------ 
+
+message ProxyWalletQueryStatus {
+    string topUpNumber = 1;
+}
+
+enum ProxyPaymentStatus {
+       INIT         = 0;
+       PENDING      = 1;
+       DOUBLECHECK  = 2;
+       CANCEL       = 903;
+       CONFIRMED    = 904;
+}
+
+message ProxyWalletQueryStatusResp{
+    appcommon.ResultResp    result = 1;
+    ProxyPaymentStatus      status = 2;
+}
+
+message ProxyRelatedBill {
+    int64  billId      = 1;           // 账单id
+    string billType    = 2;           // 账单类型
+    string billNumber  = 3;           // PaymentNumber
+}
+
+message ProxyWalletTopUp {
+    string   stub                   = 1; // n_X; n部分为unix时间戳，是stub的过期时间；X部分是一串随机数
+    int64    amount                 = 2;
+    int32    payType                = 3; // 支付方式
+    string   billID                 = 4; // 帐单ID
+    int64    billAmount             = 5; // 帐单金额
+    string   oTPToken               = 6; // 对应stripe的3D secure source, 代表用户正在做的支付安全认证过程
+    string   cardToken              = 7; // 代表一张信用卡token
+    string   topUpNumber            = 8; // 为了兼容老系统，当该字段有值时，佟掌握不生成journalnum,直接使用这个值
+    string   fromBankName           = 9;
+    string   fromAccount            = 10;
+    string   rawSerial              = 11; // 银行的转帐流水号，仅在ATM和i-Banking两种转帐方式填写
+    int64    createTime             = 12;
+    string   note                   = 13;
+    int64    fee                    = 14; //手续费
+    string   toBank                 = 15; // ATM和i-Banking方式时填写收款的银行名称; 另外Molpay使用这个字段传入channel code参数
+    string   agentCode              = 16; // 泰国123支付方式时，填写线下收款代理代码，比如便利店名称
+    string   couponSN               = 17; // 支付时使用该优惠码，享受优惠价
+    string   phone                  = 18;
+    repeated ProxyRelatedBill bills = 19; // 关联订单信息
+}
+
+message ProxyWalletTopUpResp {
+    string journalNumber        = 1; // 钱包流水序列号
+    int64 amount                = 2;
+    string fromBankName         = 3;
+    string payProviderURL       = 4; // 不同支付方式下，引导用户跳转的URL或者是要提交的表单内容
+    string payProviderURL4App   = 5; // 不同支付方式下，APP端引导用户跳转的URL或者是要提交的表单内容
+    int32 syncCompleteFlag      = 6; // >0: 无需异步流程，支付已经成功
+    string rawSerial            = 7; // 支付平台流水号
+    appcommon.ResultResp result = 8;
+}
+
+//----------------------moxiaobei---------------------------- 
+
+message ProxyCoupon{
+    int32  payType       = 1;
+    string couponSN      = 2;
+    string cardToken     = 3; // 信用卡的token,代表一张信用卡
+    string cardFinger    = 4; // 卡的指纹
+    int64 billAmount     = 5;
+}
+
+message ProxyCouponResp {
+    appcommon.ResultResp result = 1;
+    int64 deductionAmount       = 2;
+}

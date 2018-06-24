@@ -1,0 +1,12 @@
+syntax = "proto3";
+package gernsback;
+import "common/ezbuy.proto";
+import "common/empty.proto";
+import "common/html.proto";
+
+service GSreport {
+    option (common.service).webapi = true;
+
+    // 查询后台
+    rpc ReportSubPackage(common.Empty) returns (common.Html);
+}

@@ -1,0 +1,87 @@
+syntax = "proto3";
+package chaplin;
+option java_multiple_files = true;
+option java_package = "com.daigou.sg.grpc";
+
+import "common/empty.proto";
+import "common/ezbuy.proto";
+
+//! ezbiz service
+service Ezbiz{
+    //! 大货扫描 - 入库号
+    rpc SwipeStockIn (SwipeStockInReq) returns (common.Empty);
+    //! 大货扫描 - 包裹号
+    rpc SwipePackage (SwipePackageReq) returns (SwipePackageResp);
+    //! 大货扫描 - 封箱号
+    rpc SwipeBox (SwipeBoxReq) returns (common.Empty);
+    //! 大货扫缺 - 包裹号
+    rpc SwipeAbsentPackage (SwipeAbsentPackageReq) returns (common.Empty);
+
+    // 扫描封箱
+    rpc ScanPackageToPackingBox(ScanPackageToPackingBoxReq) returns (ScanPackageToPackingBoxResp);
+    option (common.service) = {
+        webapi: true;
+    };
+    // 强制扫描封箱
+    rpc ScanPackageToPackingBoxForce(ScanPackageToPackingBoxReq) returns (ScanPackageToPackingBoxResp);
+
+    // 扫描出库
+    rpc ScanOut(ScanOutReq) returns (ScanOutResp);
+
+    //问题件扫描上架
+    rpc ScanProblemPackage(ProblemPackageReq) returns (ProblemPackageResp);
+}
+
+message SwipeStockInReq{
+    string stockInCode = 1;
+}
+
+message SwipePackageReq{
+    string packageCode = 1;
+    string stockInCode = 2;
+}
+
+message SwipePackageResp{
+    int32 code = 1;
+    string message = 2;
+    //! 包裹号是否包括入库号
+    bool included = 3;
+    //! 如果不包括, 实际包括的包裹号
+    string package_code = 4;
+}
+
+message SwipeBoxReq{
+    string boxCode = 1;
+}
+
+message SwipeAbsentPackageReq{
+    string packageCode = 1;
+}
+
+message ScanPackageToPackingBoxReq {
+    string packingBoxNo = 1;
+    string packageNo = 2;
+}
+
+message ScanPackageToPackingBoxResp {
+    string msg = 1;
+}
+
+message ScanOutReq {
+    string containerNo = 1;
+    string packingBoxNo = 2;
+    int32 code = 3; // 2222表示出库
+}
+message ScanOutResp {
+        int32 code =1;
+        string  msg = 2;
+}
+
+message ProblemPackageReq{
+    string locationCode = 1;//库位号
+    string packageCode = 2;//包裹号
+}
+
+message ProblemPackageResp{
+    string msg=1;//成功返回"",失败则返回错误信息msg。
+}

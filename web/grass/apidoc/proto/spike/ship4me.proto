@@ -1,0 +1,99 @@
+syntax = "proto3";
+package spike;
+
+import "common/ezbuy.proto";
+
+service Ship4Me {
+    option (common.service).webapi = true;
+
+    rpc MatchAddress(Ship4MeMatchAddress) returns (Ship4MeMatchAddressResp);
+    rpc GetAddress(Ship4MeGetAddress) returns (Ship4MeGetAddressResp);
+    rpc SetAddress(Ship4MeSetAddress) returns (Ship4MeSetAddressResp);
+    rpc AddressList(Ship4MeAddressList) returns (Ship4MeAddressListResp);
+    rpc RemoveAddress(Ship4MeRemoveAddress) returns (Ship4MeRemoveAddressResp);
+}
+
+// ----------------------------------------------------------------------------
+
+message Ship4MeMatchAddress {
+    int32 userId = 1;
+    string region = 2;
+    string catalog = 3;
+}
+
+message Ship4MeMatchAddressResp {
+    repeated Ship4MeAddressItem addresses = 1;
+}
+
+message Ship4MeAddressItem {
+    string title = 1;
+    string recipient = 2;
+    // 国内地址用
+    string region = 3;
+    // 国外地址用
+    string state = 4;
+    // 国外地址用
+    string city = 5;
+    string address = 6;
+    string zipCode = 7;
+    string phone = 8;
+}
+
+// ----------------------------------------------------------------------------
+message Ship4MeGetAddress {
+    string id = 1;
+}
+
+message Ship4MeGetAddressResp {
+    string id = 1;
+    string groupName = 2;
+    int32 userGroupId = 9;
+    string catalog = 3;
+    Ship4MeAddressItem warehouseCN1 = 4;
+    Ship4MeAddressItem warehouseCN2 = 5;
+    Ship4MeAddressItem warehouseUS = 6;
+    Ship4MeAddressItem warehouseTW = 7;
+}
+// ----------------------------------------------------------------------------
+
+message Ship4MeSetAddress {
+    // 传0时为默认分组
+    int32 userGroupId = 1;
+    string groupName = 2;
+    string catalog = 3;
+    Ship4MeAddressItem warehouseCN1 = 4;
+    Ship4MeAddressItem warehouseCN2 = 5;
+    Ship4MeAddressItem warehouseUS = 6;
+    Ship4MeAddressItem warehouseTW = 7;
+}
+
+message Ship4MeSetAddressResp {
+    string id = 1;
+}
+
+// ----------------------------------------------------------------------------
+
+message Ship4MeAddressList {
+}
+
+message Ship4MeAddressListResp {
+    repeated Ship4MeAddressListItem items = 1;
+}
+
+message Ship4MeAddressListItem {
+    string id = 1;
+    string Catalog = 2;
+    string groupName = 3;
+    string updateBy = 4;
+    int64 updateDate = 5;
+    int64 createDate = 6;
+}
+
+// ----------------------------------------------------------------------------
+
+message Ship4MeRemoveAddress {
+    string id = 1;
+}
+
+message Ship4MeRemoveAddressResp {
+}

@@ -1,0 +1,131 @@
+syntax = "proto3";
+package d2d;
+
+import "common/empty.proto";
+
+service D2D {
+    rpc GetDeliveryJob(DeliveryJobReq) returns(DeliveryJobResp);
+    rpc GetAllDeliveryJob(DeliveryJobReq) returns(DeliveryJobsResp);
+    rpc UpdateDriverCage(DriverCageReq) returns(common.Empty);
+    rpc AddDriverCage(DriverCageReq) returns(common.Empty);
+    rpc FindDriverCage(DriverCageReq) returns(DriverCageResp);
+    rpc FindAllDriverCage(DriverCageReq) returns(DriverCagesResp);
+    rpc RemoveAllDriverCage(DriverCageReq) returns(common.Empty);
+    rpc FindDriverByDriverNo(DriverReq)  returns(DriverResp);
+    rpc FindAllDriver(DriverReq) returns(DriversResp);
+    rpc FindAllDriverByDriverName(FindAllDriverByDriverNameReq) returns(DriversResp);
+    rpc GetAllQuotaConfig(Empty) returns(QuotaConfigs);
+    rpc GetSpecificQuotaConfig(GetSpecificQuotaConfigReq) returns(QuotaConfig);
+    rpc SetQuotaConfig(QuotaConfig) returns(CommonResult);
+
+}
+
+message DeliveryJobReq {
+	int32 shipmenId = 1;
+	int32 driverNo = 2;
+	string shift = 3;
+	int32 deliveryDate = 4;
+	string periodName = 5;
+	string sort = 6;
+	string status = 7;
+}
+
+message DeliveryJobResp {
+	string id = 1;
+	string shift = 2;
+	string periodName = 3;
+	string driverName = 4;
+	int32 driverNo = 5;
+	int32 deliveryDate = 6;
+	int32 priority = 7;
+	repeated Shipment shipments = 8;
+}
+
+message DeliveryJobsResp{
+	repeated DeliveryJobResp jobs = 1;
+}
+
+message DriverCageReq  {
+	string id  = 1;
+	int32 deliveryDate = 2;
+	int32 driverNo = 3;
+	string driverId = 4;
+	string driverName = 5;
+	string cageNo = 6;
+}
+
+message DriverCageResp {
+	string id = 1;
+	string cageNo = 2;
+	int32 driverNo = 3;
+}
+
+message DriverCagesResp {
+	repeated DriverCageResp cages = 1;
+}
+
+message Shipment {
+	string id = 1;
+	int32 shipmenId = 2;
+	string parcelNo = 3;
+	string memo = 4;
+	string remark = 5;
+	double weight = 6;
+}
+
+message DriverReq {
+	repeated int32 driverNos = 1;
+}
+
+message DriverResp {
+	string id  = 1;
+	string name = 2;
+	string telephone = 3;
+	int32 driverNo = 4;
+}
+
+message DriversResp {
+	repeated DriverResp drivers  = 1;
+}
+
+message FindAllDriverByDriverNameReq {
+	repeated string driverNames = 1;
+}
+
+message Empty {}
+
+enum DayOfWeek{
+	Sunday = 0;
+	Monday = 1;
+	Tuesday = 2;
+	Wednesday = 3;
+	Thursday = 4;
+	Friday = 5;
+	Saturday = 6;
+}
+
+enum TimePeriod {
+        day = 0;
+        night = 1;
+}
+
+message QuotaConfig {
+        string id = 1;
+        DayOfWeek dayOfWeek = 2;
+        TimePeriod timePeriod = 3;
+        int32 quota = 4;
+}
+
+message QuotaConfigs {
+        repeated QuotaConfig quotaConfigs = 1;
+}
+
+message CommonResult{
+        bool ok = 1;
+        string msg = 2;
+}
+
+message GetSpecificQuotaConfigReq {
+        DayOfWeek dayOfWeek = 2;
+        TimePeriod timePeriod = 3;
+}

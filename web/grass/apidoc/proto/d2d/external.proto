@@ -1,0 +1,36 @@
+syntax = "proto3";
+package d2d;
+
+import "common/ezbuy.proto";
+import "d2d/waybill.proto";
+
+service External {
+    //////// external 第三方查询
+    // ExternalSearch 第三方搜索
+    rpc ExternalSearch  (ExternalSearchFilter) returns (WayBills);
+    // ExternalExport 第三方导出(下载)
+    rpc ExternalExport (ExternalSearchFilter) returns (ExportFile){
+        option (common.webapi).download = true;
+    }
+    // ExternalPublicSearch 第三方搜索(不用校验)
+    rpc ExternalPublicSearch(SearchFilter) returns (WayBills);
+    // ExternalSearchHistroy 第三方历史搜索
+    rpc ExternalSearchHistroy(WayBillNo) returns (WayBillHistories);
+    // AuthenticateUser 第三方校验用户
+    rpc AuthenticateUser (AuthenticateUserReq) returns (AuthenticateUserResp);
+}
+
+
+message ExternalSearchFilter{
+    string token = 1;
+    SearchFilter filter = 2;
+}
+
+message AuthenticateUserReq{
+    string usr = 1;
+    string pwd = 2;
+}
+
+message AuthenticateUserResp{
+    string token = 1;
+}

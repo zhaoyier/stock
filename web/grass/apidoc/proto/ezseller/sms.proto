@@ -1,0 +1,40 @@
+syntax = "proto3";
+package ezseller;
+
+import "common/ezbuy.proto";
+import "ezseller/result.proto";
+
+service Sms {
+    option (common.service).webapi = true;
+	option (common.service).public = true;
+
+    // 发送验证码
+    rpc SendVerificationCode(SmsSendVerificationCode) returns (SmsSendVerificationCodeResp);
+
+    // 校验验证码
+    rpc VerifyCode(SmsVerifyCode) returns (SmsVerifyCodeResp);
+}
+
+enum SmsMessageType {
+    SmsMessageTypeVeriUnknown = 0;
+    SmsMessageTypeVeriCode = 1;
+}
+
+message SmsSendVerificationCode {
+    string Phone = 1;
+    int64 Expiration = 2;
+    string From = 3;
+}
+
+message SmsSendVerificationCodeResp {
+    Result result = 1;
+}
+
+message SmsVerifyCode {
+    string Phone = 1;
+    string Code = 2;
+}
+
+message SmsVerifyCodeResp {
+    Result result = 1;
+}

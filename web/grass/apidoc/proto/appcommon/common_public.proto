@@ -1,0 +1,74 @@
+syntax = "proto3";
+package appcommon;
+
+option swift_prefix = "GR";
+
+message ResultResp {
+	bool result = 1;
+	string msg = 2;
+}
+
+message SimpleProduct {
+	int64 gpid = 1;
+	string url = 2;
+	string name = 3;
+	string pictureUrl = 4;
+	int32 localUnitPrice = 5; // web 的int64会被转为string，故用int32代替
+	int32 originalLocalUnitPrice = 6;
+	string originCode = 7;
+	string discountRate = 8;
+	bool isCashOff = 9;
+	string cashOffColor = 10;// #123456
+	string vendorName = 11;// 卖家名
+	bool isBuyforme = 12; // 是否是buyforme的商品
+	string originName = 13; // 原始名称
+	ProductTag tag = 14; //图片右上角活动标识
+	repeated TitleIcon titleIcons = 15; // 左边图标
+}
+
+message TitleIcon {
+	string icon = 1;
+	string text = 2;
+	string link = 3;
+	string linkText = 4;
+}
+
+message ProductTag {
+	string text = 1; //要显示的文本,换行需要加\n
+	string color = 2; //为了使上面的text更加清晰
+	string img = 3;  //图片链接,如果传了,优先展示图片.上面的text和color不起作用
+}
+
+message TCommonOptionItemWithId {
+  int32 id = 1;
+  string name = 2;
+  string itemDescription = 3;
+}
+
+message SearchFilterField {
+	string name = 1;
+	int32 productCount = 2;
+}
+
+message SearchFilter {
+	string name = 1;
+	repeated SearchFilterField fields = 2;
+	bool emphasized = 3; // 是否需要强调，客户端可能有特殊表现形式
+}
+
+message SearchFilterCond {
+	string filterName = 1;
+	string fieldName = 2;
+}
+
+message SearchSortCond {
+	string sort = 1;
+	bool isDesc = 2;
+}
+
+message SortOption {
+	string code = 1; // 排序标识
+	string name = 2; // 排序名称，用户显示
+	string descTitle = 3; // 降序名称
+	string ascTitle = 4; // 升序名称 
+}

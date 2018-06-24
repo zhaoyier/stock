@@ -1,0 +1,34 @@
+syntax = "proto3";
+package account;
+
+option swift_prefix = "GR";
+
+message GetCustomerByCookieReq {
+	string cookie = 1;
+	string catalogCode = 2;
+}
+
+message GetCustomerByCookieResp {
+	bool isCookieValid =1;
+	int32 customerId = 2;
+	string nickName = 3;
+	string email = 4;
+	string telephone = 5;
+}
+
+message GetCustomerByCustomerIdReq {
+	int32 customerId = 1;
+}
+
+message GetCustomerByCustomerIdResp {
+	int32 customerId = 1;
+	string nickName = 2;
+	string email = 3;
+	string telephone = 4;	
+	string catalogCode = 5;
+}
+
+service Account {
+	rpc GetCustomerByCookie(GetCustomerByCookieReq) returns (GetCustomerByCookieResp);
+	rpc GetCustomerByCustomerId(GetCustomerByCustomerIdReq) returns (GetCustomerByCustomerIdResp);
+}

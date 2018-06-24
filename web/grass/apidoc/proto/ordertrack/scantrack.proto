@@ -1,0 +1,45 @@
+syntax = "proto3";
+package ordertrack;
+import "common/ezbuy.proto";
+import "ordertrack/ordertrack_public.proto";
+
+service ScanTrack {
+    //仓库扫描运单号
+    //查询运单号扫描记录
+    rpc FetchTrackLog(InspectionFetchTrackLog) returns (InspectionFetchTrackLogResp);
+    rpc ExportTrackLog(InspectionFetchTrackLog) returns (InspectionExportTrackLogResp) {
+          option (common.webapi).download = true;
+    }  
+}
+  
+  //----------------------------------------------------------------------------
+  message InspectionFetchTrackLog{
+    int64 ScanUserId = 1;
+    ordertrack.ScanResult ScanResultId = 2;
+    string TrackingNo = 3;
+    int64 StartDate = 4;
+    int64 EndDate = 5;
+    int32 Offset = 6;
+    int32 Limit = 7;
+  }
+  
+  message InspectionFetchTrackLogResp{
+    repeated TrackingNoinfo TrackingNos = 1;
+  }
+  
+  message TrackingNoinfo{
+    string TrackingNo = 1;
+    repeated string SkuNumber = 2;
+    int64 ScanDate = 3;
+    int64 WarehouseId = 4;
+    string ScanUser = 5;
+    ordertrack.ScanResult ScanResultId = 6;
+  }
+  
+  
+  message InspectionExportTrackLogResp {
+    string contentType = 1;
+    bytes data = 2;
+    string filename = 3;
+  }
+  

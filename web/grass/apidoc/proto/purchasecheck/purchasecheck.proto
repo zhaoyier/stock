@@ -1,0 +1,293 @@
+syntax = "proto3";
+package purchasecheck;
+
+service PurchaseCheck {
+	//获取当前登录用户是否今天设置了采购账号
+	rpc IsSetPurchase(IsSetPurchaseUser)returns(IsSetPurchaseResult);
+
+	//拍单账号设置
+	rpc SetTaobaoAccount(TaobaoAccount)returns(SetTaobaoAccountResult);
+
+	//获取账号流水top5
+	rpc GetAccountTop5(TaobaoAccountName)returns(TopTrade);
+
+	//编辑账号流水top5
+	rpc EditTop5(Top5trade)returns(EditTop5Result);
+
+	//删除账号流水top5
+	rpc DeleteTop5(Top5trade)returns(EditTop5Result);
+
+	//获取所有的TaobaoAccountName
+	rpc GetTaobaoAccountName(GetTaobaoAccount)returns(GetTaobaoAccountNameRep);
+
+	//erp下单输入采购单号接口
+	rpc Ordering (Order)returns(OrderingResult);
+
+	//修改采购单号
+	rpc EditPOnumber(POnumberInfo)returns(EditPOnumberResp);
+
+	//查询已匹配订单//查询亏损的流水//查询未备注亏损流水共用这个接口
+	rpc QueyMatchedOrder(QueryInfo)returns(MatchedOrderInfo);
+
+	//查询已匹配订单数量
+	rpc QueyMatchedCount(QueryInfo)returns(CountResp);
+
+	//查询累计采购订单数
+	rpc QueryOrderCount(QueryInfo)returns(CountResp);
+
+	//查询导入的支付宝流水数
+	rpc QueryToptradeCount(QueryInfo)returns(CountResp);
+
+	//批量备注
+	rpc BatchRemark(RemarkInfo)returns(RemarkResp);
+
+	//获取指定账号未匹配的订单
+	rpc QueryUnmatchOrder(QueryUnmatchInfo)returns(QueryUnmatchResp);
+
+	//获取指定账号未匹配的支付宝流水
+	rpc QueryUnmatchToptrade(QueryUnmatchInfo)returns(UnmatchToptradeResp);
+
+	//解除绑定
+	rpc Unbind(UnbindInfo)returns(UnbindResp);
+
+	//绑定订单和支付宝流水
+	rpc Binding(BindInfo)returns (BindResp);
+
+	// 下载csv
+	rpc DownloadFile(Addr)returns (Result);
+
+	//上传充值记录
+	rpc UploadRecharge(PurchaseCheckUploadRecharge) returns (PurchaseCheckUploadRechargeResp);
+	//从新匹配分摊
+	rpc ReCalculate(PoNumbers) returns (CalculateResp);
+
+	//对未匹配支付宝流水备注
+	rpc RemarkToptrade(RemarkInfo) returns (RemarkResp);
+
+	//更新订单的差额补齐 //更新订单退款金额
+	rpc UpdateOffset(PurchasecheckUpdateOffset) returns (PurchasecheckUpdateOffsetResp);
+	rpc UpdateRefund(PurchasecheckUpdateOffset) returns (PurchasecheckUpdateOffsetResp);
+}
+message PoNumbers{
+	repeated string poNumber = 1;
+}
+message CalculateResp {
+	bool IsCalculate =1;
+	string msg =2;
+}
+message IsSetPurchaseUser {
+}
+message IsSetPurchaseResult{
+	bool IsSetPurchaseResult =1;
+	TaobaoAccount msg =2;
+}
+//获取拍单账号的流水top5
+message TopTrade{
+	repeated TaobaoAccount toptrade = 1;
+}
+message TaobaoAccount{
+	string id =1;
+	string taobaoAccountName = 2;
+	float startMoney = 3;
+	float endMoney = 4;
+	string purchaseBy = 5;
+	int64 purchaseStartAt = 6;
+	int64 purchaseEndAt = 7;
+}
+message SetTaobaoAccountResult{
+	string msg =1;
+}
+message TaobaoAccountName{
+	string TaobaoAccountName = 1;
+}
+message Top5trade{
+	TaobaoAccount msg =1;
+	string id = 2;
+
+}
+message EditTop5Result{
+}
+
+message GetTaobaoAccount{}
+message GetTaobaoAccountNameRep{
+	repeated string taobaoaccount =1 ;
+}
+message Order{
+	int64 OrderId  =1;
+	string POnumber  =2;
+}
+message OrderingResult{
+	string msg =1;
+}
+
+message POnumberInfo{
+	int64 OrderId = 1;
+	string POnumber = 2;
+	bool IsReOrder =3;
+	string Remark =4;
+}
+
+message EditPOnumberResp{
+	string msg =1;
+}
+//如想查询亏损流水直接把差额的右标给0
+message QueryInfo{
+	string POnumber =1;//支持csv格式批量查询
+	string TaobaoAccountName =2;//支持csv格式批量查询
+	int64 PurchaseStartAt =3;
+	int64 PurchaseEndAt = 4;
+	string MoneyLeft =5;
+	string MoneyRight = 6;
+	string MoneyAt = 7;
+	int32 Limit =8;
+	int32 Offset = 9;
+	bool IsNotRemark = 10;
+	string MoneyNe = 11;
+	string ServiceType = 12;
+}
+message MatchedOrderInfo{
+	int32 Count = 1;
+	repeated MatchedOrder MatchedOrders = 2;
+	string msg =3;
+}
+message MatchedOrder{
+	string TopTradeId =2;
+	int64 PayTime =3;
+	string TaobaoAccountName =4;
+	string POnumber =5;
+	float EzbuyGet =6;
+	float MoneyOut =7;
+	float Balance =8;
+	string LossReason =9;
+	string Remark =10;
+	repeated OrderInfo Order =11;
+}
+
+message OrderInfo{
+	int64 OrderId  =1;
+	string OrderNumber =2;
+	string PurchaseType =3;
+	bool IsFlashSales=4;
+	string ProductName=5;
+	float InternalShipmentFee =6;
+	float UnitPrice =7;
+	int32	Qty =8;
+	float Offset = 9;
+	float	Total = 10;
+	string TaobaoAccountName =11;
+	repeated string POnumber =12;
+	int64 EventTime = 13;
+	float Refund =14;
+}
+message CountResp{
+	int32 Count =1;
+}
+
+message RemarkInfo{
+	repeated string TopTradeId =1;
+	string LossReason = 2;
+	string Remark =3;
+}
+message RemarkResp{}
+
+message UnmatchOrder{
+	int64 OrderId =1;
+	string OrderNumber =2;
+	string PurchaseType =3;
+	int64 PurchaseAt =4;
+	string POnumber =5;
+	string ProductName =6;
+	float Total =7;
+}
+//解除绑定
+message UnbindInfo{
+	int64 OrderId = 1;
+	string TopTradeId =2;
+}
+message UnbindResp{}
+
+message QueryUnmatchInfo{
+	string TaobaoAccountName =1;
+	int64 Start =2;
+	int64 End =3;
+	string Item =4;
+	int32 Limit =5;
+	int32 Offset = 6;
+}
+
+message QueryUnmatchResp{
+	int32 Count =1;
+	repeated OrderInfo Orders =2;
+}
+message UnmatchToptradeResp{
+	int32 Count =1;
+	repeated TopTradeInfo TopTrades =2;
+}
+message TopTradeInfo{
+	string TopTradeId =1;
+	int64 PayTime =2;
+	string CWLSNo =3;
+	string AlipayNo =4;
+	string PoNumber =5;
+	string ProductName =6;
+	string SellerNick =7;
+	float Payment =8;
+	float Income =9 ;
+	string BusinessType =10;
+	string Reason = 11;
+	string Remark = 12;
+}
+
+message BindInfo{
+	repeated int64 OrderId = 1;
+	repeated string TopTradeId =2;
+}
+message BindResp{
+	string msg =1;
+}
+
+message Addr{
+	repeated string Address =1;
+	string TaobaoAccount = 2;
+}
+
+message Result{
+	int64 Total =1;
+	int64 Matched =2;
+	int64 Unmatched =3;
+	int64 LastMatch = 4;
+	MatchInfo Match = 5;
+	repeated FaildInfo failed =6;
+}
+
+message FaildInfo{
+	string FileName = 1;
+	string Faild = 2;
+}
+
+message MatchInfo{
+	int64 Online =1;
+	int64 InternalTransfer=2;
+	int64 Reimburse = 3;
+	int64 BalanceTopup = 4;
+	int64 OtherTransfer= 5;
+}
+
+message PurchaseCheckUploadRecharge{
+	string Address =1;
+}
+
+message PurchaseCheckUploadRechargeResp{
+	int32 Total = 1;
+	string Failed = 2;
+}
+
+message PurchasecheckUpdateOffset{
+	int64 BillId = 1;
+	int64 OrderId = 2;
+	float Total = 3; // 退给客户钱为-，收取客户钱为+
+}
+
+message PurchasecheckUpdateOffsetResp{
+	bool BillNumUpdated = 1;
+}

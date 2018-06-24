@@ -1,0 +1,81 @@
+@import "../../scss/_base";
+.clearfix:after {
+  content: " ";
+  display: block;
+  clear: both;
+  height: 0;
+}
+.preview{
+  position:fixed;
+  top:0;
+  bottom:0;
+  left:0;
+  right:0;
+  z-index: 10000;
+  background-color: rgba(0,0,0,.5);
+  overflow: scroll;
+  > .contents{
+    position:relative;
+    margin:0 auto;
+    width:1200px;
+    background:#ebeced;
+    margin-top: 20px;
+    margin-bottom:20px;
+    > .topContent{
+      .params{
+        float: left;
+        width: 900px;
+        height: 460px;
+        padding: 10px;
+        background: white;
+        > .imgInfo{
+          float: left;
+          width: 280.5px;
+          h4{
+            white-space:nowrap;
+            margin-bottom:10px;
+          }
+        }
+        > .sku{
+          float: right;
+          padding-top: 25px;
+          width: 559.36px;
+          .title{
+            font-weight: bold;
+            font-size: 15px;
+          }
+          .label{
+            width:140px;
+            text-align:left;
+            color: #7a7a7a;
+          }
+          .value{
+            width: 391px;
+            color: #7a7a7a;
+          }
+        }
+      }
+      > .shoppingCart{
+        @include flexbox(row,center,center,null);
+        float:right;
+        width: 288px;
+        background: white;
+        padding: 5px;
+        height: 460px;
+      }
+    }
+    > .description{
+        margin-top: 10px;
+        background: white;
+        width:900px;
+        padding:10px;
+        img{
+          max-width:100%;
+        }
+      }
+    > .refer{
+      @include flexbox(row,center,center,null);
+      height:50px;
+    }
+  }
+}

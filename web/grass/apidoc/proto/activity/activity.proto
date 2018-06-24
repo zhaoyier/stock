@@ -1,0 +1,1118 @@
+syntax = "proto3";
+package activity;
+import "common/file.proto";
+import "common/ezbuy.proto";
+import "common/empty.proto";
+import "common/html.proto";
+
+service Activity {
+  option (common.service).cacheMemoryLimit = "1G";
+  rpc Ping(ActivityPing) returns (ActivityPingResp);
+  rpc GetActInfo(ActivityGetActInfo) returns (ActivityGetActInfoResp);
+  rpc MultiGetActInfo(ActivityMultiGetActInfo) returns (ActivityMultiGetActInfoResp) {
+	option (common.timeout) = "1s";
+  };
+  //走缓存，内部跟上面一样
+  rpc MultiGetActInfoByCache(ActivityMultiGetActInfo) returns (ActivityMultiGetActInfoResp){
+	option (common.timeout) = "1s";
+    option (common.cache).enableClientSideCache = false;
+    option (common.cache).enableServerSideCache = true;
+    option (common.cache).cacheExpired = "180s";
+  };
+  rpc ImportExcel(ActivityImportExcel) returns (ActivityImportExcelResp){
+      option (common.webapi).upload = true;
+  };
+  rpc ImportFile(ActivityImportExcel) returns (ActivityImportExcelResp){
+      option (common.webapi).upload = true;
+  };
+
+  rpc GetProducts(ActivityGetProducts) returns (ActivityGetProductsResp);
+  rpc GetConfByType(ActivityGetConfByType) returns (ActivityGetConfByTypeResp);
+  rpc GetFunConf(ActivityGetFunConf) returns (ActivityGetFunConfResp);
+  rpc List(ActivityList) returns (ActivityListResp);
+  rpc Update(ActivityUpdate) returns (ActivityUpdateResp);
+
+  rpc DeleteProducts(ActivityDeleteProducts) returns (ActivityDeleteProductsResp);
+  rpc DeleteProductsByExcel(ActivityDeleteProductsByExcel) returns (ActivityDeleteProductsByExcelResp){
+      option (common.webapi).upload = true;
+  };
+
+  rpc GetActByType(ActivityGetActByType) returns(ActivityGetActByTypeResp);
+  rpc Delete(ActivityDelete) returns (ActivityDeleteResp);
+  rpc Trigger(TriggerReq) returns (TriggerResp){
+    option (common.cache).enableClientSideCache = false;
+    option (common.cache).enableServerSideCache = true;
+    option (common.cache).cacheExpired = "180s";
+  };
+  //这个比较慢(使用mongo中的数据，Trigger使用redis中的数据)
+  rpc TriggerByTime(TriggerReq) returns (TriggerResp);
+  //不保证速度
+  rpc MultiTriggerByTime(ActivityMultiTriggerByTime) returns (ActivityMultiTriggerByTimeResp);
+
+  rpc Create(ActivityCreate) returns (ActivityCreateResp);
+  rpc GetActIdsByProduct(ActivityGetActIdsByProduct) returns (ActivityGetActIdsByProductResp);
+  rpc ReduceProductStock(ActivityReduceProductStock) returns (ActivityReduceProductStockResp);
+  rpc AddProductStock(ActivityAddProductStock) returns (ActivityAddProductStockResp);
+  rpc Import(ActivityImport) returns (ActivityImportResp);
+  //rule相关
+  rpc AddRule(ActivityAddRule) returns (ActivityAddRuleResp);
+  rpc GetRule(ActivityGetRule) returns (ActivityGetRuleResp);
+  rpc BindRule(ActivityBindRule) returns (ActivityBindRuleResp);
+  //特殊活动的配置
+  rpc ListSpecAct(ActivityListSpecAct) returns (ActivityListSpecActResp);
+  rpc UpdateSpecAct(ActivityUpdateSpecAct) returns (ActivityUpdateSpecActResp);
+  rpc GetShipmentBy(ActivityGetShipmentBy) returns (ActivityGetShipmentByResp);
+  //修改rule绑定的活动的时间
+  rpc ChangeRuleTime(ActivityChangeRuleTime) returns (ActivityChangeRuleTimeResp);
+  //满减活动特殊接口
+  rpc GetSpecActByZoneKey(ActivityGetSpecActByZoneKey) returns (ActivityGetSpecActByZoneKeyResp);  
+  rpc GetFullCutUrl(ActivityGetFullCutUrl) returns (ActivityGetFullCutUrlResp);
+  rpc ActChangeLog(ActivityActChangeLog) returns (ActivityActChangeLogResp);
+  rpc UsedActsByTime(ActivityUsedActsByTime) returns (ActivityUsedActsByTimeResp);
+  rpc Trace(ActivityTrace) returns (ActivityTraceResp);
+  // 得到trace结果
+  rpc TraceTrigger(common.Empty) returns (common.Html);
+  rpc DiscountTag(ActivityDiscountTag) returns (ActivityDiscountTagResp);
+  // 判断商品是否在活动商品池(缓存)中
+  rpc IsInPool(IsInPoolReq) returns (IsInPoolResp);
+  // activity 状态
+  rpc ActivityStatus(common.Empty) returns (common.Html);
+}
+
+message IsInPoolReq {
+  string poolId = 1;
+  repeated int64 gpids = 2;
+}
+
+message IsInPoolResp {
+  repeated bool exists = 1;
+}
+
+//=======================================================
+message ActivityDiscountTag {
+  string actId = 1;
+}
+
+message ActivityDiscountTagResp {
+}
+
+//=======================================================
+message ActivityDeleteProductsByExcel {
+  string actId = 1;
+  common.File file = 2;
+}
+
+message ActivityDeleteProductsByExcelResp {
+}
+
+
+
+//========================调试命令========================
+//目前活动调用链太深，使用settrace控制调试信息开关
+enum TraceOp {
+  TraceOpReset = 0;
+  TraceOpSet = 1;
+  TraceOpGet = 2;
+}
+
+message ActivityTrace {
+  TraceOp op = 1; // "get" 得到当前配置 "set" 设置配置 "reset" 重置配置
+  TraceInfo trace = 2;
+}
+
+message ActivityTraceResp {
+  TraceInfo trace = 2; 
+}
+
+message TraceInfo {
+  string logLevel = 1;
+  int64 customerId = 2;
+}
+
+//========================根据时间得到使用的活动===========
+message ActivityUsedActsByTime {
+  string actId = 1;
+  int64 time = 2;
+  string catalog = 3;
+}
+
+message ActivityUsedActsByTimeResp {
+  repeated string acts = 1;
+}
+
+
+//=========================活动更新记录=====================
+message ActivityActChangeLog {
+  string actId = 1;
+}
+
+message ActivityActChangeLogResp {
+  repeated ActChangeLog acts = 1;
+}
+
+message ActChangeLog {
+  string id = 8;
+  string name = 1;
+  string actId = 7;
+  string startTime = 2;
+  string endTime = 3;
+  
+  string createTime = 4;
+  string UpdateTime = 5;
+  string DeleteTime = 6;
+}
+
+//==========================满减的接口=======================
+message ActivityMultiTriggerByTime {
+  repeated TriggerReq triggers = 1;
+}
+
+message ActivityMultiTriggerByTimeResp {
+  repeated TriggerResp resp = 1;
+}
+
+//==========================满减特殊接口======================
+message ActivityGetFullCutUrl {
+  repeated int64 typeIds = 1;
+  repeated string ruleIds = 2;
+}
+message ActivityGetFullCutUrlResp {
+  repeated string urls = 1;
+}
+
+message ActivityGetSpecActByZoneKey {
+  string zoneKey = 1;
+}
+
+message ActivityGetSpecActByZoneKeyResp {
+  SpecAct act = 1;
+}
+
+//===========================修改rule绑定的活动的时间/用户中心专用=======
+message ActivityChangeRuleTime {
+  string ruleId = 1;
+  int64 startTime = 2;
+  int64 endTime = 3;
+}
+
+message ActivityChangeRuleTimeResp {
+}
+
+//==========================得到运输方式===============
+message ActivityGetShipmentBy {
+  string catalog = 1 ;
+  repeated ProductOriginCode originCode = 2;
+  repeated string catalogs = 3;
+}
+
+message ActivityGetShipmentByResp {
+  repeated Shipment shipments = 1;
+}
+
+message Shipment {
+  string name = 1;
+  string value = 2;
+}
+
+//==========================更新活动===================
+message ActivityUpdateSpecAct {
+  SpecAct act = 1;
+  string updateBy = 2;
+}
+
+message ActivityUpdateSpecActResp {
+  string actId = 1;
+  string ruleId = 2;
+}
+//==========================搜索活动====================
+message ActivityListSpecAct {
+  ActFilter filter = 1;
+  int32 limit = 2;
+  int32 offset = 3;
+}
+
+
+message ActivityListSpecActResp {
+  int32 total = 2;
+  repeated SpecAct acts = 1;
+}
+
+//特殊活动是一类跟规则绑定的活动
+message SpecAct {
+  ActDetail act = 1;
+  Rule rule = 2;
+}
+
+//===========================活动绑定规则================
+message ActivityBindRule {
+  string actId = 1; 
+  repeated string ruleIds = 2;
+}
+
+message ActivityBindRuleResp {
+  string actId = 1;
+}
+
+//===========================添加规则=====================
+message ActivityAddRule {
+  //不需要绑定活动不用传
+  string actId = 2;
+  Rule rule = 1;
+}
+
+message FullCutRule {
+  int64 fullAmount = 1; 
+  int64 cutAmount = 2;
+  string desc = 3;
+  repeated ServiceType serviceTypes = 4;
+}
+
+message AgentFeeVoucherRule {
+  //折扣百分比
+  int32 discount = 2;
+  string desc = 3;
+  repeated ServiceType serviceTypes = 4;
+  repeated string vendorNames = 5;
+  repeated ProductPlatform platforms = 6;
+  repeated ProductOriginCode originCodes = 7;
+}
+
+enum ReduceOp {
+  ReduceValue = 0;
+  ReducePercent = 1;
+}
+
+enum ServiceType {
+  ServiceTypeAll = 0;
+  ServiceTypeEzbuy = 1;
+  ServiceTypeBuyForMe = 2;
+  ServiceTypeShipForMe = 3;
+  ServiceTypePrime = 4;
+}
+
+enum ProductOriginCode {
+  OriginCodeAll = 0;
+  OriginCodeCN = 1;
+  OriginCodeUS = 2;
+  OriginCodeTW = 3;
+  OriginCodeKR = 4;
+}
+
+message CouponCodeRule {
+  string name = 1;
+  string desc = 2;
+  repeated ServiceType serviceType = 3;
+  repeated ProductOriginCode originCode = 4;
+  string catalog = 12;
+  repeated string shipments = 11;
+  int64 startTime = 5;
+  int64 endTime = 6;
+  ReduceOp reduceType = 7; 
+  //按百分比减免是百分比，其他是指
+  int64 reduce = 8;
+  int64 maxReduce = 9;
+  //是否启用
+  bool isAvailable = 10;
+  //每个用户使用次数0,表示无限制
+  int64 maxUseTimes = 13;
+}
+
+message WrapFullCutRule {
+  string zoneKey = 1;
+  string color = 2;
+  map<string, CatalogFullCut> rules = 3;
+}
+
+message CatalogFullCut {
+  repeated string ruleIds = 1;
+  repeated Rule rules = 2;
+  string desc = 3;
+  string link = 4;
+}
+
+message RedPacketRule {
+  string name = 1;
+  string desc = 2;
+  bool needFirstUse = 3;
+  repeated ServiceType serviceTypes = 4;
+  int64 minPrice = 5;
+  int64 redPrice = 6;
+}
+
+enum ClientType {
+  ClientTypeAll = 0;
+  ClientTypeWWW = 1;
+  ClientTypeApp = 2;
+  ClientTypeMobile = 3;
+}
+
+enum ProductPlatform {
+  PlatformAll = 0;     
+  PlatformUnknow = 1;
+  PlatformCNEzseller = 11;
+  PlatformTaobao = 12;
+  PlatformJD = 13;
+  PlatformMogujie = 14;
+  PlatformChuchujie = 15;
+  PlatformCNOther = 16;
+  PlatformJDLocal = 17;
+  PlatformJDNotLocal = 18;
+  PlatformVip = 19;
+
+
+  PlatformUSEzseller = 21;
+  PlatformAmazon = 22;
+  PlatformUSOther = 23;
+
+  PlatformTWAll = 30;
+
+  PlatformKRAll = 40;
+  PlatformKREzseller = 41;
+}
+
+enum DiscountKind {
+  DiscountKindShippingFee = 0;
+  DiscountKindAgentFee = 1;
+}
+
+
+message DiscountRuleDcid {
+  repeated int32 dcid = 1;
+}
+
+message DiscountRule {
+  DiscountKind kind = 10; 
+  string name = 1;
+  repeated ServiceType serviceTypes = 2;
+  repeated ClientType clients = 3; 
+  repeated ProductOriginCode originCodes = 4;
+  repeated string shipments = 5;
+  repeated string vendorNames = 12;
+  repeated ProductPlatform platforms = 11;
+  ReduceOp reduceType = 6;
+  bool isNew = 13;
+  int64 reduce = 7;
+  int64 maxReduce = 8;
+  bool isAvailable = 9;
+  //同层的放在一起
+  string data = 17;
+  repeated int32 allDcids = 16;
+  repeated int32 dcids = 14;
+  string tagImg = 15;
+  string appImg = 18;
+  string imgDesc = 19;
+  string desc = 20;
+  string link = 21;
+  int32 minLimit = 22;
+  string poolId = 23;
+  // 商品限购，0表示不限
+  int64 limitCount = 24;
+  string originPoolId = 25;
+}
+
+//满件减规则
+message MNCashOffRule {
+  string name = 1;
+  int64 startTime = 2;
+  int64 endTime = 3;
+  string desc = 6;
+  string descTH = 7;
+  string link = 5;
+  string tagImg = 8;
+  repeated MNCashOffStep steps = 4;  
+}
+
+message MNCashOffStep {
+  ReduceOp reduceType = 1;  
+  int64 reduce = 2;
+  int64 fullAmount = 3;
+}
+
+message ShippingFeeVoucherRule {
+  string name = 1;
+  string desc = 2;
+  repeated ServiceType serviceTypes = 3;
+  repeated ProductOriginCode originCodes = 4;
+  repeated string shipments = 5;
+  repeated string vendorNames = 8;
+  repeated ProductPlatform platforms = 9;
+  bool isNew = 10;
+  int64 reduce = 6;
+  int64 fullAmount = 7; 
+}
+
+message FreeShippingExtRule {
+  string desc = 1;
+  string img = 2;
+  int64 SG = 3;
+  string SGDesc = 7;
+  string SGDescLink = 8;
+  int64 MY = 4;
+  string MYDesc = 9;
+  string MYDescLink = 10;
+  int64 TH = 5;
+  string THDesc = 11;
+  string THDescLink = 12;
+  bool isSeaShipping = 6;
+}
+
+enum RuleType {
+  RuleTypeUnKnow = 0;
+  RuleTypeFullCut = 1;
+  RuleTypeDiscount = 2;
+  RuleTypeCouponCode = 3;
+  RuleTypeWrapFullCut = 4; 
+  RuleTypeRedPacket = 5;
+  RuleTypeAgentFeeVoucher = 6;
+  RuleTypeMNCashOff = 7;
+  RuleTypeShippingFeeVoucher = 8;
+  RuleTypeFreeShippingExt = 9;
+}
+
+
+message Rule {
+  //适用的活动类型
+  string RuleId = 4;
+  RuleType ruleType = 7;
+  //是什么类型就填什么类型的值
+  FullCutRule fullCutRule = 2;
+  //折扣参数
+  DiscountRule discountRule = 3;
+  //coupon code优惠
+  CouponCodeRule couponCodeRule = 5;
+  //满减封装活动,因为满减的配置比较特殊，所以使用特殊活动，而特殊活动只能跟一个rule绑定，
+  //所以这里使用一个新的rule来跟多个fullcutrule关联 
+  WrapFullCutRule wrapFullCut = 6;
+  //红包卷
+  RedPacketRule redPacket = 8;
+  //折扣卷
+  AgentFeeVoucherRule agentFee = 9;
+  //满件减
+  MNCashOffRule MNCashOff = 10;
+  //运费卷(shipping voucher)
+  ShippingFeeVoucherRule shippingFee = 11;
+  //ezbuy周年庆全场包邮
+  FreeShippingExtRule freeshippingExt = 12;
+  // 商品池ID
+  string poolId = 13;
+  // 商品限购，0表示不限
+  int64 limitCount = 14;
+  // 原来的poolId
+  string originPoolId = 15;
+}
+
+message ActivityAddRuleResp {
+  string ruleId = 1;
+}
+//=========================根据id获取规则=================
+message ActivityGetRule {
+  string ruleId = 1;
+}
+
+message ActivityGetRuleResp {
+  Rule rule = 1;
+}
+
+//===========================获取商品的活动信息============
+message ActivityGetActInfo {
+  int64 gpid = 1;
+  string client = 2;
+  string catalog = 3;
+  //可选,为空获取商品所有活动信息
+  string actId = 4;
+}
+
+message ActivityGetActInfoResp {
+  repeated ActInfo acts = 1;
+}
+
+//===========================批量获取商品活动信息==========
+message ProductId {
+  int64 gpid = 1;
+  repeated string actIds = 2;
+}
+message ActivityMultiGetActInfo {
+  //此字段废弃
+  repeated int64 gpids = 1;
+  //新字段(二选一，不支持一起使用)
+  repeated ProductId ids = 4;
+
+  string client = 2;
+  string catalog = 3;
+}
+
+message ActivityMultiGetActInfoResp {
+  repeated ProductActInfo prodActs = 1;
+}
+
+message ProductActInfo {
+  int64 gpid = 1;
+  repeated ActInfo acts = 2;
+}
+
+
+//===========================导入商品=======================
+message ActivityImportExcel {
+  string actId = 1;
+  common.File file = 2;
+}
+
+message ErrorGpid {
+  int64 gpid = 1;
+  string reason = 2;
+}
+
+message ActivityImportExcelResp {
+  repeated ErrorGpid errGpids = 1;
+  string url = 2;
+}
+//===========================得到商品列表====================
+message ActivityGetProducts {
+  string actId = 1;
+  int32 offset = 2;
+  int32 limit = 3;
+  //搜索条件(可选)
+  string productURL = 4;
+  string productName = 5;
+}
+
+message ActivityGetProductsResp {
+  int32 total = 1;
+  repeated ProductDetail products = 2;
+}
+
+message ProductDetail {
+  string image = 1;
+  string name = 2;
+  int64 gpid = 3;
+  string productURL = 4;
+}
+
+enum ProductType {
+  //商品有可能是一个条件(满足这个条件的都算入活动)
+  IsFun = 0;
+  //具体的商品
+  IsProduct= 1;
+}
+
+//===========================通过活动类型得到活动的配置信息=====
+message ActivityGetConfByType {
+  ActType type = 1;
+}
+
+message ActivityGetConfByTypeResp {
+  repeated string views = 1;
+  repeated string conds = 2;
+  repeated string actions = 3;
+}
+
+//=============================得到函数参数=====================
+message ActivityGetFunConf {
+  FunType type = 1;
+  string funName = 2;
+}
+
+message ActivityGetFunConfResp {
+  repeated FieldDesc fields = 1;
+}
+
+enum FunType {
+   ViewType = 0;
+   ConditionType = 1;
+   ActionType = 2;
+}
+
+//属性，用于控制前端是否可以编辑此字段
+enum FieldFlag {
+  Normal = 0; //正常编辑
+  ForBid = 1; //禁止编辑
+  Hidden = 2; //隐藏
+}
+
+message FieldDesc {
+  string name = 1;
+  string key = 2;
+  FieldType type = 3;
+  repeated FieldFlag flags = 4; 
+  repeated string defaults = 5;
+}
+
+enum FieldType {
+  Float64Type = 0;
+  StringType = 1;
+  BoolType = 3;
+  ArrayType = 4;
+}
+
+enum ActivitySortBy {
+  ActivitySortByEndTime = 0;
+  ActivitySortByStartTime = 1;
+  ActivitySortByCreateTime = 2;
+}
+
+//===========================活动列表============================
+message ActivityList {
+  int32 offset = 1;
+  int32 limit = 2;
+  ActFilter filter = 3;
+  string sort = 4;
+  ActivitySortBy sortBy = 5;
+}
+
+message ActivityListResp {
+  repeated ActDetail acts = 1;
+  int32 total = 2;
+}
+
+message ActFilter {
+  repeated string actIds = 1;
+  ActType actType = 2;
+  //设置为true，只返回活动状态为open或者unopen的活动
+  bool isAvaliable = 3;
+  //支持国家
+  repeated string catalogs = 4;
+  int32 ruleIdNum = 5;
+  //只返回当前有效的活动
+  bool isCurrent = 6;
+  //根据活动名字搜索
+  string name = 7;
+  bool isDelete = 8;
+}
+
+
+message ActDetail {
+  string actId = 1;
+  string actName = 2;
+  ActType actType = 3;
+  int32 startTime = 4;
+  int32 endTime = 5;
+  repeated string ruleIds = 10;
+  repeated string catalogs = 9;
+  Condition cond = 6;
+  repeated Action actions = 7;
+  View view = 8;
+  ActDesc desc = 11;  // 活动描述
+  string creator = 12;
+  int64 createrTime = 13;
+  int64 deleteTime = 14;
+}
+
+message ActDesc {
+  string goal = 1;  // 活动目的
+  string expectedResult = 2;  //  预期目标
+  string principal = 3;  // 活动负责人
+  string desc = 4;  // 具体描述,活动描述
+  string remark=5;  // 活动备注
+  string link=6;  // 推广链接
+}
+
+//===========================修改活动配置==========================
+message ActivityUpdate {
+  ActDetail act = 1;
+  bool isNew = 2;
+}
+
+message ActivityUpdateResp {
+  string actId = 1;
+}
+
+//============================重新加载活动信息========================
+message ActivityReload {
+  string actId = 1;
+  //是否需要重新加载商品
+  bool isReloadProduct = 2;
+}
+
+message ActivityReloadResp {
+}
+
+// ---------------------------------------------------------------------------
+//=============================从活动中删除商品========================
+message ActivityDeleteProducts {
+  string actId = 1;
+  //按gpid删除(删除此gpid所有skuId)
+  repeated int64 gpids = 2;
+  //按skuid
+  repeated Product pds = 3;
+  //不通知商品库
+  bool notNotify = 4;
+}
+
+message ActivityDeleteProductsResp {
+  repeated DeleteProductsError errInfo = 1;
+}
+
+message DeleteProductsError {
+  Product pd = 1;
+  string reason = 2;
+}
+
+//=============================根据活动类型得到活动=====================
+message ActivityGetActByType {
+  ActType actType = 1;
+}
+
+message ActivityGetActByTypeResp {
+  repeated ActInfo acts = 1;
+}
+
+
+//==============================添加商品==============================
+message ActivityAddProducts{
+  string actId = 1;
+  repeated Product products = 2;
+}
+
+message ActivityAddProductsResp{
+}
+
+//=============================删除活动=================================
+message ActivityDelete {
+  string actId = 1;
+}
+
+message ActivityDeleteResp {
+}
+
+//=========================通过gpid导入商品==================================
+message ActivityImport {
+  string actId = 1;
+  //可选
+  repeated int64 gpids = 2;
+  repeated string productURL = 3;
+}
+message ActivityImportResp {
+  repeated int64 errGpids = 1;
+  repeated string reason = 2;
+}
+
+//==========================减少库存========================================
+message ActivityReduceProductStock {
+  string actId = 1;
+  int64 gpid = 2;
+  string skuId = 3;
+  int32 value = 4;
+}
+
+message ActivityReduceProductStockResp{
+  bool isSucc = 1;
+  string msg = 2;
+}
+
+//=========================增加库存=========================================
+message ActivityAddProductStock {
+  string actId = 1;
+  int64 gpid = 2;
+  string skuId = 3;
+  int32 value = 4;
+}
+
+message ActivityAddProductStockResp{
+  bool isSucc = 1;
+  string msg = 2;
+}
+
+//==========================创建活动=======================================
+message ActivityCreate {
+  string actName = 1;
+  ActType actType = 7;
+  repeated ActTime times = 2;
+  repeated Action actions = 3;
+  Condition condition = 5;
+  View view = 6;
+}
+
+message ActivityCreateResp {
+  bool isSucc = 1;
+  string actId = 2;
+}
+
+//===========================得到商品的活动信息=============================
+message ActivityGetActIdsByProduct {
+  int64 gpid = 1;
+  repeated string skuIds = 2;
+}
+
+message ActivityGetActIdsByProductResp {
+  repeated ProductAct actInfos = 1;
+}
+
+
+//===========================触发活动====================================
+message TriggerReq {
+  CustomerInfo customer = 1;
+  repeated ProductInfo products = 2;
+  repeated Charge totalCharge = 3;
+  int64 time = 4;
+}
+
+message TriggerResp {
+  repeated DiscountInfo productDiscount = 1;
+  repeated Discount globalDiscount = 2;
+  CouponDetail couponInfo = 3;
+  string useCouponCode = 4; 
+  int64 time = 5;
+}
+
+message ActUseCoupon {
+  ActInfo actInfo = 1;
+  int32 idx = 2;
+}
+
+message CouponDetail {
+  repeated FullCutCoupon fullCuts = 1;
+  repeated ActUseCoupon fullCutUse = 2;
+  repeated CouponInfo coupons = 3;
+  repeated ActUseCoupon use = 4;
+}
+
+message Coupon {
+  repeated FullCutCoupon fullCuts = 1;
+  //用户当前选择的卷,或者最优卷
+  repeated int32 fullCutCur = 2;
+  repeated CouponInfo coupons = 3;
+  repeated int32 use = 4;
+}
+
+
+message FullCutCoupon {
+  int64 couponId = 1;
+  string ruleId = 6;
+  int64 voucherTypeId = 2;
+  int64 fullAmount = 3;
+  int64 cutAmount = 4;
+  bool isAvailable = 5;
+}
+
+enum CouponKind {
+  CouponKindUnKnow = 0;
+  //满减卷
+  CouponKindFullCut = 1;
+  //折扣卷
+  CouponKindDiscount = 2;
+  //红包卷
+  CouponKindRedPacket = 3;
+  //运费卷
+  CouponKindShipping = 4;
+}
+
+message CouponInfo {
+  string ruleId = 1;
+  CouponKind kind = 4;
+  bool isAvailable = 2;
+  int32 useTimes = 3;
+}
+
+//=========================PING========================================
+message ActivityPing {
+  string Msg = 1;
+}
+
+message ActivityPingResp {
+  string Msg = 1;
+}
+
+//==========================END=========================================
+
+enum ActType {
+  Other = 0;
+  //满减
+  FullCutType = 1; 
+  //包邮
+  FreeShipping = 2;
+  //coupon code
+  CouponType = 3;
+  //折扣
+  DiscountType = 4;
+  //红包
+  RedPacketType = 5;
+  //折扣卷
+  AgentFeeVoucherType = 6;
+  //满件减
+  MNCashOffType = 7;
+  //运费卷
+  ShippingFeeVoucherType = 8;
+  //急速达商品
+  FastDeliveryType = 9;
+  //新的包邮类型
+  FreeShippingExt = 10;
+}
+
+message Action {
+  string type = 2;
+  string value = 3;
+}
+
+message Trigger {
+  string name = 1;
+  string combineType = 2;
+  Trigger leftNode = 3;
+  Trigger rightNode = 4;
+  Condition condition = 5;
+}
+
+message Condition {
+  string name = 1;
+  string type = 2;
+  string value = 3;
+}
+
+message View {
+  string name = 1;
+  string type = 2;
+  string value = 3;
+}
+
+enum ActStatus {
+  Unknow = 0;
+  UnOpen = 1;
+  Prepare = 2;
+  Opening = 3;
+  Closed = 4;
+}
+
+message ActTime {
+  int64 startTime = 1;
+  int64 endTime = 2;
+  ActStatus status = 3;
+}
+
+message Product {
+  int64 gpid = 1;
+  repeated Sku sku = 2;
+}
+
+message Sku {
+  string skuId = 1;
+  int32 stock = 2;
+}
+
+
+message ProductAct {
+  string actId = 1;
+  ActStatus status = 2;
+  repeated Sku skus = 3;
+}
+
+
+message ProductSku {
+  int64 gpid = 1;
+  string skuId = 2;
+}
+
+message CustomerInfo {
+  int64 customerId = 1;
+  string catalog = 2;
+  Coupon coupon = 3;
+  string client = 4;
+  string gradeCode = 5;
+  CouponCode couponCode = 6;
+}
+
+message CouponCode {
+  string code = 1;
+  int32 useTimes = 2;
+}
+
+
+message ProductInfo {
+  ProductSku productSku = 1;
+  int64 quantity = 4;
+  string originCode = 5;
+  string shipmentType = 6;
+  ServiceType serviceType = 7;
+  repeated Charge charge = 2;
+  //不需要传递
+  map<int64, int64> chargeMap= 3;
+}
+
+message Charge {
+  ChargeType chargeType = 1;
+  int64 chargePrice = 2;
+}
+
+enum ChargeType {
+  ChargeUnknow = 0;
+  //重量
+  Weight = 1;
+  //总重量
+  TotalWeight = 8;
+  // 此处不应是商品价格, 应该商品小计, 包含国内运费和handling fee -> https://www.tapd.cn/20583171/prong/stories/view/1120583171001006984
+  ProductPrice = 2;
+  //总价格
+  TotalPrice = 3;
+  //商品运费
+  ProductShippingFee = 4;
+  //商品代理费
+  ProductAgentFee = 5;
+  //总的运费
+  TotalShippingFee = 6;
+  //总代理费
+  TotalAgentFee = 7;
+}
+
+
+message DiscountInfo {
+  ProductSku product = 1;
+  repeated Discount discount = 2;
+}
+
+message Discount {
+  ActInfo actInfo = 1;
+  bool isAvaliable = 4;
+  ChargeType chargeType = 2;
+  int64 price = 3;
+}
+
+message ExtraData {
+  CashOffExt cashoff = 1;
+  MNCashOffExt MNCashoff = 2;
+  FastDeliveryExt fastDelivery = 3;
+  DiscountExt discount = 4;
+  FreeShippingViewExt freeShippingExt = 5;
+}
+
+message CashOffExt {
+  string cashOffKey = 1;
+  string color = 2;
+}
+
+message MNCashOffExt {
+  string tagImg = 1;
+  //第几层满足优惠
+  string BITag = 2;
+}
+
+message FastDeliveryExt {
+  string icon = 1;
+  string desc = 2;
+  string banner = 3;
+}
+
+message DiscountExt {
+  string img = 1;
+  string desc = 2;
+  string poolId = 3;
+}
+
+message FreeShippingViewExt {
+  string img = 1;
+  string desc = 2;
+  bool isSeaShipping = 3;
+}
+
+message ActInfo {
+  string actId = 1;
+  string actName = 2;
+  ActType actType = 3;
+  //活动描述信息
+  string desc = 6;
+  string descLink = 7;
+  //额外数据，根据活动类型不同可能有不同的格式的值
+  ExtraData extraData = 9;
+
+  int64 startTime = 4;
+  int64 endTime = 5;
+  //活动满足的国家
+  repeated string catalogs = 8;
+}

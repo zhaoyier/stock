@@ -1,0 +1,53 @@
+syntax = "proto3";
+package spk;
+
+import "common/ezbuy.proto";
+import "common/time.proto";
+import "common/html.proto";
+
+service Stat {
+  option (common.service).webapi = true;
+  rpc ExportProductsStat(StatExportProductsStat) returns (common.GzipStream) {
+	option (common.webapi).download = true;
+  };
+  rpc ExportNonIndexed(StatExportNonIndexed) returns (common.GzipStream) {
+	option (common.webapi).download = true;
+  };
+}
+
+// ---------------------------------------------------------------------------
+
+message StatExportProductsStat {
+  common.Time DateEnd = 1;
+}
+
+message StatExportProductsStatResp {
+  string ContentType = 1;
+  bytes data = 2;
+  string filename = 3;
+}
+
+// ---------------------------------------------------------------------------
+
+message StatExportNonIndexed {
+    string vendor = 1;
+}
+
+message StatExportNonIndexedResp {
+  string ContentType = 1;
+  bytes data = 2;
+  string filename = 3;
+}
+
+message XNonIndexedInfo {
+    string url = 1;
+    string origin = 2;
+    repeated string pcatPath = 3;
+    int64 createDate = 4;
+    double price  = 5;
+    int32 weight = 6;
+    repeated string nonIndexedReason = 11;
+    string comment = 8;
+    string name = 9;
+    string vendor = 10;
+}

@@ -1,0 +1,321 @@
+syntax = "proto3";
+package primewishlist;
+
+import "primewishlist/primewishlist_customer.proto";
+import "common/ezbuy.proto";
+
+service PrimeWishlistAdmin {
+    option (common.service).webapi = true;
+    option (common.service).public = true;
+
+    // 申请列表
+    rpc SubmissionList(SubmissionListReq) returns (SubmissionListResp);
+
+    // 申请审核
+    rpc SubmissionApprove(SubmissionApproveReq) returns (SubmissionApproveResp);
+
+    // 商品入库操作列表
+    rpc ProductList(ProductListReq) returns (ProductListResp);
+
+    // 商品入库操作
+    rpc ProductUpdate(ProductUpdateReq) returns (ProductUpdateResp);
+
+    // 配额详情
+    rpc Quota(QuotaReq) returns (QuotaResp);
+
+    // 修改配额
+    rpc QuotaUpdate(QuotaUpdateReq) returns (QuotaUpdateResp);
+
+    // 修改配额记录
+    rpc QuotaUpdateHistory(QuotaUpdateHistoryReq) returns (QuotaUpdateHistoryResp);
+
+    // 增加配额赠送规划
+    rpc QuotaPlanAdd(QuotaPlanAddReq) returns (QuotaPlanAddResp);
+
+    // 导入赠送配额计划
+    rpc QuotaPlanImport(QuotaPlanImportReq) returns (QuotaPlanImportResp);
+
+    // 配额赠送规划记录
+    rpc QuotaPlanList(QuotaPlanListReq) returns (QuotaPlanListResp);
+
+    // 触发配额发放
+    rpc QuotaAssign(QuotaAssignReq) returns (CommonResult);
+
+    // 验证用户 PrimeWishList 请求有效
+    rpc PrimeAvailable(PrimeAvailableReq) returns (PrimeAvailableResp);
+
+    // 条款
+    rpc TermsAndConditions(TermsAndConditionsReq) returns (TermsAndConditionsContent);
+
+    // 编辑条款
+    rpc TermsAndConditionsUpdate(TermsAndConditionsUpdateReq) returns (TermsAndConditionsUpdateResp);
+}
+
+// ----------------------------------------------------------------
+
+message SubmissionListFilter {
+    string catalogCode = 1;
+    repeated SubmissionState state = 2;                 // optional
+    repeated string username = 4;                       // optional
+    repeated string productUrl = 5;                     // optional
+    repeated string productName = 6;                    // optional
+}
+
+message SubmissionItem {
+    int64 submissionId = 1;
+    string catalogCode = 2;
+    string username = 3;
+    string productName = 4;
+    string image = 5;
+    string url = 6;
+    double price = 7;
+    int64 cid = 8;
+    int64 createdAt = 9;
+    int64 approvedAt = 10;
+    SubmissionState state = 11;
+    ProductExtra extra = 13;
+    int64 gpid = 14;
+    string remark = 15;
+}
+
+message SubmissionListReq {
+    int32 offset = 1;
+    int32 limit = 2;
+    SubmissionListFilter filter = 3;
+}
+
+message SubmissionListResp {
+    int32 total = 1;
+    repeated SubmissionItem items = 2;
+}
+
+message ProductListFilter {
+    repeated ApprovementType approvementType = 1;       // optional
+    repeated string productUrl = 2;                     // optional
+    repeated string productName = 3;                    // optional
+}
+
+message ProductItem {
+    int64 gpid = 1;
+    string productName = 2;
+    string image = 3;
+    string url = 4;
+    double price = 5;
+    int64 cid = 6;
+    int64 createdAt = 7;
+    int64 updatedAt = 8;
+    ApprovementType approvementType = 9;
+    ProductExtra extra = 10;
+}
+
+message ProductListReq {
+    int32 offset = 1;
+    int32 limit = 2;
+    ProductListFilter filter = 3;
+}
+
+message ProductListResp {
+    int32 total = 1;
+    repeated ProductItem items = 2;
+}
+
+enum PrimeShipmentType {
+    PrimeShipmentTypeUnknown = 0;
+    PrimeShipmentTypeAir = 1;                           // 空运
+    PrimeShipmentTypeSea = 2;                           // 海运
+    PrimeShipmentTypeMaxLimit = 3;
+}
+
+enum EzbuyShipmentType {
+    EzbuyShipmentTypeUnknown = 0;
+    EzbuyShipmentTypeNormal = 1;                        // 普通
+    EzbuyShipmentTypeSensitive = 2;                     // 敏感
+    EzbuyShipmentTypeSea = 3;                           // 海运
+    EzbuyShipmentTypeMaxLimit = 4;
+}
+
+enum ApprovementType {
+    ApprovementTypeUnknown = 0;
+    ApprovementTypeForCurrent = 1;                     // 仅对当前用户有效
+    ApprovementTypeForAll = 2;                         // 对所有用户有效
+    ApprovementTypeMaxLimit = 3;
+}
+
+message ProductExtra {
+    PrimeShipmentType primeShipmentType = 1;
+    EzbuyShipmentType ezbuyShipmentType = 2;
+    double weight = 3;
+}
+
+message Approvement {
+    int64 submissionId = 1;
+    bool approved = 2;
+    ProductExtra extra = 3;
+    string remark = 4; //审核备注（拒绝原因）
+}
+
+message CommonResult {
+    int32 code = 1;
+    string errorMessage = 2;
+}
+
+message SubmissionApproveReq {
+    repeated Approvement approvements = 1;
+}
+
+message SubmissionApproveResp {
+    repeated CommonResult results = 1;
+}
+
+message ProductUpdate {
+    int64 gpid = 1;
+    ApprovementType approvementType = 2;
+    ProductExtra extra = 3;
+}
+
+message ProductUpdateReq {
+    repeated ProductUpdate updates = 1;
+}
+
+message ProductUpdateResp {
+    repeated CommonResult results = 1;
+}
+
+enum CustomerGroup {
+    CustomerGroupUnknown = 0;
+    CustomerGroupPrimeYearly = 1;                       // prime 年会员
+    CustomerGroupPrimeMonthly = 2;                      // prime 月会员
+    CustomerGroupAll = 3;                               // 所有用户
+    CustomerGroupNormal = 4;                            // 非会员
+    CustomerGroupSpecified = 5;                         // 指定用户
+    CustomerGroupMaxLimit = 6;
+}
+
+message Quota {
+    CustomerGroup group = 1;
+    repeated QuotaItem items = 2;
+}
+
+message QuotaItem {
+    int32 amount = 1;
+    QuotaAssignEvent event = 2;
+    repeated int32 duration = 3;
+    int64 itemId = 4;
+    string catalogCode = 5;
+}
+
+message QuotaReq {
+    string catalogCode = 1;
+}
+
+message QuotaResp {
+    repeated Quota quotas = 1;
+}
+
+message QuotaUpdateReq {
+    repeated Quota quotas = 1;
+    string catalogCode = 2;
+}
+
+message QuotaUpdateResp {
+    CommonResult result = 1;
+    repeated Quota updated = 2;
+}
+
+message QuotaUpdateHistoryItem {
+    int64 itemId = 1;
+    string catalogCode = 2;
+    CustomerGroup group = 3;
+    QuotaAssignEvent event = 4;
+    int32 amount = 5;
+    repeated int32 duration = 6;
+    string operator = 7;
+    int64 operatedAt = 8;
+}
+
+message QuotaUpdateHistoryReq {
+    int32 offset = 1;
+    int32 limit = 2;
+    string catalogCode = 3;
+}
+
+message QuotaUpdateHistoryResp {
+    int32 total = 1;
+    repeated QuotaUpdateHistoryItem items = 2;
+}
+
+message QuotaPlan {
+    int64 planId = 1;
+    CustomerGroup group = 2;
+    int32 amount = 3;
+    int64 activateAt = 4;
+    int64 periodStartAt = 5;
+    int64 periodEndAt = 6;
+    bool disabled = 7;
+    QuotaAssignEvent event = 8;
+    string description = 9;
+    string catalogCode = 10;
+    repeated string nicknames = 11;
+}
+
+message QuotaPlanAddReq {
+    QuotaPlan plan = 1;
+    string catalogCode = 2;
+}
+
+message QuotaPlanAddResp {
+    CommonResult result = 1;
+    QuotaPlan added = 2;
+}
+
+message QuotaPlanImportReq {
+    QuotaPlan plan = 1;
+    string catalogCode = 2;
+    string importFileUrl = 3;
+}
+
+message QuotaPlanImportResp {
+    CommonResult result = 1;
+}
+
+message QuotaPlanListReq {
+    int32 limit = 1;
+    int32 offset = 2;
+    string catalogCode = 3;
+  int32 planId = 4;
+}
+
+message QuotaPlanListResp {
+    int32 total = 1;
+    repeated QuotaPlan plans = 2;
+}
+
+message QuotaAssignReq {
+    int32 customerId = 1;
+    QuotaAssignEvent event = 2;
+}
+
+message PrimeAvailableReq {
+    int32 CustomerId = 1;
+    repeated int64 Gpid = 2;
+}
+
+message PrimeAvailableResp {
+    int32 Matched = 1;
+    repeated int64 Unmatched = 2;
+}
+
+
+message TermsAndConditionsReq {
+    string catalogCode = 1;
+}
+
+message TermsAndConditionsUpdateReq {
+    string catalogCode = 1;
+    TermsAndConditionsContent content = 2;
+}
+
+message TermsAndConditionsUpdateResp {
+    bool updated = 1;
+    TermsAndConditionsContent updatedContent = 2;
+}

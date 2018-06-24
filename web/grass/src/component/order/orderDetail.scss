@@ -1,0 +1,37 @@
+@import "../../scss/_base";
+
+.order-detail {
+  border: 1px solid #CCC;
+  background-color: #FFF;
+  box-shadow:0 0 5px #888;
+  padding: 8px;
+
+  p, label {
+    font-size: 15px;
+  }
+
+  label {
+    text-align: left;
+    padding-left: 10px;
+    color: #888;
+  }
+
+  h1 {
+    padding: 5px 10px;
+    border-bottom: 1px solid #CCC;
+  }
+
+  h2 {
+    padding: 5px 10px;
+    margin-top: 50px;
+  }
+
+  .order-footer {
+    text-align: right;
+    color: #345678;
+  }
+
+  .ant-form-item-control {
+    line-height: 34px;
+  }
+}

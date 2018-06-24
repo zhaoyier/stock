@@ -1,0 +1,578 @@
+syntax = "proto3";
+package metamorphosis;
+import "common/ezbuy.proto";
+import "ezOrder/order.proto";
+
+service CartOrder {
+	rpc GenerateMsSqlOrder(ReqForGenMsSqlOrder) returns (RespForGenMsSqlOrder) {
+		option (common.timeout) = "60s";
+	}
+
+	rpc RpcAfterNewBillPaid(RpcAfterNewBillPaidReq) returns (RpcAfterNewBillPaidResp) {
+		option (common.timeout) = "60s";
+	}
+
+	rpc RpcGetNewBillIdsViaOldPaymentBillIds(RpcGetNewBillIdsViaOldPaymentBillIdsReq) returns (RpcGetNewBillIdsViaOldPaymentBillIdsResp) {
+	}
+
+	// 根据部分id获取mapping表数据
+	rpc RpcGetOrderOldNewMapping(RpcGetOrderOldNewMappingReq) returns (RpcGetOrderOldNewMappingResp){
+	}
+
+	// 修改订单基本信息，不发起差额补齐
+	rpc RpcModifyOldOrderBasicInfo(RpcModifyOldOrderBasicInfoReq) returns (RpcModifyOldOrderBasicInfoResp){
+		option (common.timeout) = "60s";
+	}
+
+	// 取消账单
+	rpc RpcCancelPayment(RpcCancelPaymentReq) returns (RpcCancelPaymentResp) {
+		option (common.timeout) = "60s";
+	}
+
+	// 获取取消订单信息
+	rpc RpcGetCancelOrder(RpcGetCancelOrderReq) returns (RpcGetCancelOrderResp) {
+	}
+
+	// 取消订单
+	rpc RpcCancelOrder(RpcCancelOrderReq) returns (RpcCancelOrderResp) {
+		option (common.timeout) = "60s";
+	}
+
+	// 订单差额补齐
+	rpc RpcAddOrderBalance(RpcAddOrderBalanceReq) returns (RpcAddOrderBalanceResp) {
+		option (common.timeout) = "60s";
+	}
+
+	// 取消订单差额补齐
+	rpc RpcCancelOrderBalance(RpcCancelOrderBalanceReq) returns (RpcCancelOrderBalanceResp) {
+		option (common.timeout) = "60s";
+	}
+
+	// 支付订单差额补齐
+	rpc RpcPayOrderBalance(RpcPayOrderBalanceReq) returns (RpcPayOrderBalanceResp) {
+		option (common.timeout) = "60s";
+	}
+
+	// 修改运输方式拆包裹
+	rpc RpcModifyShipmentType(RpcModifyShipmentTypeReq) returns (RpcModifyShipmentTypeResp) {
+		option (common.timeout) = "60s";
+	}
+
+	// 修改仓库，目前只有buyforme，不拆包裹，仅更新
+	rpc RpcModifyWarehouse(RpcModifyWarehouseReq) returns (RpcModifyWarehouseResp) {
+		option (common.timeout) = "60s";
+	}
+
+	// buyforme 二次提交生成账单包裹等
+	rpc GenerateB4MSubmitMsSqlPayment(ReqForGenMsSqlOrder) returns (RespForGenMsSqlOrder) {
+		option (common.timeout) = "60s";
+	}
+
+	// buyforme 二次提交支付成功后更新各表状态
+	rpc RpcAfterNewBillPaidForB4Msubmit(RpcAfterNewBillPaidForB4MsubmitReq) returns (RpcAfterNewBillPaidResp) {
+		option (common.timeout) = "60s";
+	}
+
+	// buyforme 二次提交获取通过newbilid 获取mapping 以及oldOrderId
+	rpc RpcGetB4MmappingByNewBillId(RpcGetB4MmappingAndOldOrderIdReq) returns (RpcGetB4MmappingAndOldOrderIdResp);
+
+	// buyforme 二次提交记录通知新封箱系统日志
+	rpc RpcRecordNotifyPickupSystem(RpcRecordNotifyPickupSystemReq) returns (RpcRecordNotifyPickupSystemResp);
+
+	// 处理那些还没有被重构的老账单支付
+	rpc RpcPayOldPayments(RpcPayOldPaymentsReq) returns (RpcPayOldPaymentsResp) {
+		option (common.timeout) = "60s";
+	}
+
+	// 轻量级接口，预生成老账单id，提供兼容，从而将下单生成订单的繁杂操作异步
+	rpc RpcGenOldPaymentBill(RpcGenOldPaymentBillReq) returns (RpcGenOldPaymentBillResp) {}
+
+	// 处理那些老旧的差额补齐支付
+	rpc RpcPayOldOffset(RpcPayOldOffsetReq) returns (RpcPayOldOffsetResp) {}
+
+	// sku级别的拆订单，将拆出来的sku作为新的order存在
+	rpc RpcSplitOrderByItems(RpcSplitOrderByItemsReq) returns (RpcSplitOrderByItemsResp) {}
+
+	//修复数据接口
+	rpc RpcCheckOrderComplete(RpcCheckOrderCompleteReq) returns (RpcCheckOrderCompleteResp) {}
+
+	// 根据新的billId获取老的paymentNumber
+	rpc GetSecondPaymentNumber(GetSecondPaymentNumberReq) returns (GetSecondPaymentNumberResp) {}
+}
+
+// ----------------------------------------------------------------
+
+message GetSecondPaymentNumberReq {
+	int64 BillId = 1;
+}
+
+message GetSecondPaymentNumberResp {
+	string PaymentNumber = 1;
+}
+
+message RpcCheckOrderCompleteReq{
+	int64 OrderId = 1;
+	int64 ItemId = 2;
+}
+
+message RpcCheckOrderCompleteResp{
+	int64 StatusId = 1;
+	int64 CompleteDate = 2;
+	int64 CancelDate = 3;
+}
+
+message RpcPayOldOffsetReq {
+	string Catalog = 1;
+	int32 OldOrderId = 2;
+}
+
+message RpcPayOldOffsetResp {
+	Result_Order Result = 1;
+}
+
+message RpcSplitOrderByItemsReq {
+	string Catalog = 1;
+	OrderIdItemId OrderIdItemId = 2;
+}
+
+message RpcSplitOrderByItemsResp {
+	Result_Order Result = 1;
+	string BeforeOrderNumber = 2;
+	string AfterOrderNumber = 3;
+	repeated OldOrderIdItemIdMap OldOrderIdItemIdMaps = 4;
+
+}
+message OldOrderIdItemIdMap {
+	int32 BeforeOrderId = 1; // 需要拆开的老订单id
+	int32 BeforeOrderItemId = 2;// 需要拆开的老订单item id
+	int32 AfterOrderId = 3;// 被拆开的订单id
+	int32 AfterOrderItemId = 4;// 被拆开的订单item id
+	int64 OrderId = 5;// 需要拆开的新订单id
+	int64 OrderItemId = 6;// 需要拆开的新订单item id
+}
+message OrderIdItemId {
+	int64 OrderId = 1;
+	repeated int64 OrderItemIds = 2;
+}
+
+message RpcGenOldPaymentBillReq {
+	string Catalog = 1;
+	int64 CustomerId = 2;
+	repeated OriginPaymentBillMap OriginPaymentBillMaps = 3;
+	bool IsPrime = 4;
+}
+
+message RpcGenOldPaymentBillResp {
+	Result_Order Result = 1;
+	repeated OriginPaymentMap OriginPaymentMaps = 2;
+}
+
+message OriginPaymentBillMap {
+	string OriginCode = 1;
+	int64 Total = 2;
+	string Operator = 3;
+	int64 ActualPay = 4;
+	int32 PlatformId = 6;
+	string PaymentType = 7;
+	int64 AuthorizeBalance = 9;
+	bool AuthorizeForBalance = 10;
+	string CreditCardCouponCode = 11;
+}
+
+message OriginPaymentMap {
+	string OriginCode = 1;
+	int32 PaymentBillId = 2;
+	string PaymentNumber = 3;
+}
+
+message RpcPayOldPaymentsReq {
+	int64 CustomerId = 1;
+	repeated int32 PaymentBillIds = 2;
+	string Paymethod = 3;
+}
+
+message RpcPayOldPaymentsResp {
+	Result_Order Result = 1;
+}
+
+message RpcModifyWarehouseReq {
+	string Catalog = 1;
+	int32 UserId = 2;
+	repeated int32 OldOrderIds = 4;
+	ezOrder.ServiceType ServiceType = 5;
+	int32 WarehouseId = 6;
+	string Remark = 7;
+}
+
+message RpcModifyWarehouseResp {
+	Result_Order Result = 1;
+}
+
+message RpcModifyShipmentTypeReq {
+	string Catalog = 1;
+	int32 UserId = 2;
+	repeated int32 OldOrderIds = 4;
+	ezOrder.ServiceType ServiceType = 5;
+	int32 ShipmentTypeId = 6;
+	string Remark = 7;
+}
+
+message RpcModifyShipmentTypeResp {
+	Result_Order Result = 1;
+}
+
+message RpcPayOrderBalanceReq {
+	int64 CustomerId = 1;
+	int32 OldOrderId = 2;
+}
+
+message RpcPayOrderBalanceResp {
+	Result_Order Result = 1;
+}
+
+message RpcCancelOrderBalanceReq {
+	string Catalog = 1;
+	int32 UserId = 2;
+	int32 OldOrderId = 3;
+}
+
+message RpcCancelOrderBalanceResp {
+	Result_Order Result = 1;
+}
+
+message RpcAddOrderBalanceReq {
+	string Catalog = 1;
+	int32 OldOrderId = 2;
+	int32 OldOrderItemId = 3;
+	int64 CustomerId = 4;
+	int32 UserId = 5;
+	repeated ezOrder.AddBalanceInfo AddBalanceInfos = 6;
+}
+
+message RpcAddOrderBalanceResp {
+	Result_Order Result = 1;
+}
+
+message RpcCancelOrderReq {
+	string Catalog = 1;
+	int64 CustomerId = 2;
+	int32 OldOrderId = 3;
+	int32 UserId = 4;
+	int64 BillAmount = 5;
+	repeated ezOrder.FeeInfo FeeInfos = 6;
+	string CancelRemark = 7; // 退单备注
+	string CancelReason = 8; // 退单原因
+	int64 NewOrderId = 9;
+	int64 NewOrderItemId = 10;
+}
+
+message RpcCancelOrderResp {
+	Result_Order Result = 1;
+}
+
+message RpcGetCancelOrderReq {
+	int32 OldOrderId = 1;
+	string OldOrderNumber = 2;
+}
+
+message RpcGetCancelOrderResp {
+	Result_Order Result = 1;
+	int32 OldOrderId = 2;
+	string ServiceTypeName = 3;
+	string ShipmentTypeName = 4;
+	string ShipmentPerFee = 5;
+	string ProductName = 6;
+
+	repeated OrderOldNewMapping OrderOldNewMappings = 7;
+
+	string OldOrderNumber = 8;
+}
+
+message RpcCancelPaymentReq {
+	string Catalog = 1;
+	string Client = 2;
+	int64 CustomerId = 3;
+	repeated int32 PaymentBillIds = 4;
+	int64 NewBillId = 5;
+}
+
+message RpcCancelPaymentResp {
+	Result_Order result = 1;
+	repeated int32 FailedPaymentBillIds = 2;
+}
+
+message RpcModifyOldOrderBasicInfoReq {
+	string Catalog = 1;
+	string Client = 2;
+	int64 CustomerId = 3;
+	repeated OldOrderInfo OldOrderInfos = 4;
+}
+
+message OldOrderInfo {
+	int32 OldOrderId = 1;
+	int32 OldOrderItemId = 2;
+	int32 PaymentBillId = 3;
+	int32 WarehouseId = 4;
+	int32 ShipmentTypeId = 5;
+	string Remark = 6;
+	bool IsInsured = 7;
+}
+
+message RpcModifyOldOrderBasicInfoResp {
+	Result_Order result = 1;
+}
+
+message RpcGetOrderOldNewMappingReq {
+	repeated int32 OldOrderIds = 1;
+	repeated int32 OldOrderItemIds = 2;
+	repeated int32 PaymentBillIds = 3;
+	repeated int64 NewOrderIds = 4;
+	repeated int64 NewOrderItemIds = 5;
+	repeated int64 NewBillIds = 6;
+}
+
+message RpcGetOrderOldNewMappingResp {
+	Result_Order result = 1;
+	repeated OrderOldNewMapping OrderOldNewMappings = 2;
+}
+
+message OrderOldNewMapping {
+	int32 OldOrderId = 1;
+	int32 PaymentBillId = 2;
+	int32 OldOrderItemId = 3;
+	int64 NewOrderId = 4;
+	int64 NewOrderItemId = 5;// 必须配合newOrderId使用
+	int64 NewBillId = 6;
+
+	OldOrderInfoEx OldOrderInfoEx = 7;
+}
+
+message OldOrderInfoEx {
+	string SkuName = 1;
+}
+
+
+message RpcGetNewBillIdsViaOldPaymentBillIdsReq {
+	repeated int32 PaymentBillIds = 1;
+}
+
+message RpcGetNewBillIdsViaOldPaymentBillIdsResp {
+	Result_Order Result = 1;
+	repeated int64 NewBillIds = 2;
+	repeated int32 UnknowPaymentBillIds = 3;
+	repeated int32 MissingPaymentBillIds = 4;
+	repeated NewBillIdPaymentNosMap NewBillIdPaymentNosMap = 5;
+}
+
+message NewBillIdPaymentNosMap {
+	int64 NewBillId = 1;
+	repeated string PaymentNumbers = 2;
+	repeated int32 PaymentBillIds = 3;
+}
+
+
+message Result_Order{
+	int64 code = 1;
+	string message = 2;
+}
+
+message RpcAfterNewBillPaidReq {
+	int64 CustomerId = 1;
+	int64 NewBillId = 2;
+	string Paymethod = 3;
+	repeated int32 PaymentBillIds = 4;// 和newBillId二选一
+}
+
+message RpcAfterNewBillPaidForB4MsubmitReq {
+	int64 CustomerId = 1;
+	int64 NewBillId = 2; // 预留
+	string Paymethod = 3;
+	string OldPaymentNo = 4;
+}
+
+message RpcAfterNewBillPaidResp {
+	Result_Order result = 1;
+}
+
+message OrderItemInfo {
+	int64 order_id = 1;
+	int64 order_item_id = 2;
+	int64 gpid = 3;
+	string sku_id = 4;
+	string remark = 5;
+	int64 qty = 6;
+	int64 unit_price = 7;								//int64(float * 100)
+	int64 HandlingFee = 8;								//int64(float * 100)
+	int64 HandlingFeeRatio = 9;							//int64(float * 100)
+	int64 ShipmentFee = 10;								//int64(float * 100)	国内运费
+	double currency_exchange = 11;		//汇率
+	string url = 12;
+	int64 shipment_type_id = 13;
+	string warehouse_code = 14;
+	int64 gst = 15;										//int64(float * 100)
+	bool insured = 16;
+	int64 discount = 17;								//int64(float * 100)
+	int64 purchaseSourceId = 18;
+	string AlternativeColor = 19;
+	bool IsFlashSales = 20;
+	string refId = 21;
+	repeated int64 DiscountTypeIds = 22;
+	bool IsPreSale = 23;					//是否预售，true为预售，false为现货【ReadyForArrangement true为现货】
+	string SkuImg = 24;
+
+	int64 NewOrderItemId = 25;
+	int32 ShipmentId = 26;
+	bool IsFriendsDeal = 27; // 拼团
+	int64 GpidVersion = 28; // gpid 版本号
+    int64 OldOrderId = 29; // b4m 二次提交发货的老系统id
+    string MongoCartId = 30; // 为老订单和BI服务
+}
+
+message PaymentDiscountDetail {
+	string DiscountName = 1;
+	string AltDiscountName = 2;
+	int64 DiscountFee = 3;							//int64(float * 100)		折扣费用
+}
+
+message PaymentInfo {
+	int64 Total = 1;											//int64(float * 100)		账单总额
+	int64 ActualPay = 2;										//int64(float * 100)		账单真实付款额
+	bool IsDeferPay = 3;										//是否延迟支付
+	string CreditCardCouponCode = 4;
+	int64 ProductTotal = 5;										//int64(float * 100)
+	int64 ShipmentFee = 6;										//int64(float * 100)		国际运费
+	int64 AgentFee = 7;											//int64(float * 100)
+	int64 InsuranceFee = 8;										//int64(float * 100)
+	int64 DeliveryFee = 9;										//int64(float * 100)
+	repeated PaymentDiscountDetail ShipmentDiscounts = 10;
+	repeated PaymentDiscountDetail AgentDiscounts = 11;
+	int64 Gst = 12;												//int64(float * 100)
+	int64 Coupon = 13;											//int64(float * 100)		优惠劵
+	int64 CreditCardShipmentDiscount = 14;						//int64(float * 100)		信用卡用户折扣
+	int64 Voucher = 15;											//int64(float * 100)		积分抵扣
+	repeated PaymentDiscountDetail VoucherRebates = 16;			//int64(float * 100)		满减活动
+	repeated PaymentDiscountDetail VoucherRedpackets = 17;		//int64(float * 100)		红包活动
+	repeated PaymentDiscountDetail VoucherFreeAgentFees = 18;	//int64(float * 100)		免代购费券
+	int64 HandlingFee = 19;										//int64(float * 100)		Handling Fee
+	repeated int64 VoucherIds = 20;
+	int64 CreditValue = 21;
+	int64 PromotionCouponId = 22;
+	repeated PaymentDiscountDetail ProductDiscounts = 23;
+
+	// 下单预生成账单id
+	int32 PreGenPaymentBillId = 24;
+	string PreGenPaymentNumber = 25;
+
+	repeated PaymentDiscountDetail VoucherShippingFees = 26;	//int64(float * 100)		免运费券
+}
+
+message UserShipmentDelivery {
+	int64 DeliveryTypeId = 1;
+	int64 StationTypeId = 2;
+	int64 DeliveryStationId = 3;
+	int64 PickupPeriodId = 4;
+}
+
+message ShipmentInfo {
+	int64 CustomerAddressId = 1;
+	string LocalDeliveryMethod = 2;
+	string StationName = 3;
+	int64 DeliveryDate = 4;
+	string PeriodName = 5;
+	string ShipToPhone = 6;
+	string ShipToName = 7;
+	string ShipToZip = 8;
+	int64 DeliveryDistrictTypeId = 9;
+	int64 SelfStationId = 10;
+	int64 NeighbourhoodStationItemId = 11;
+	int64 MrtStationItemId = 12;
+	string ShipToAddress1 = 13;
+	string ShipToState = 14;
+	string LicenseNumber = 15;
+	UserShipmentDelivery UserShipmentDelivery = 16;
+}
+
+message OrderInfo {
+	int64 order_id = 1;
+	int64 eta_date = 2;
+	int64 eta_start_date = 3;
+	int64 eta_end_date = 4;
+	int64 order_date = 5;
+	bool authorizeForBalance = 6;
+	string originCode = 7;
+	string Platform = 8;
+	PaymentInfo PaymentInfo = 9;
+	repeated OrderItemInfo orderItems = 10;
+	ShipmentInfo ShipmentInfo = 11;
+
+	int64 NewBillId = 12;
+    bool isB4MSubmit = 13;
+}
+
+message BasketOrderMapping{
+	int64 Gpid = 1;
+	int64 OrderId = 2;
+	int64 SkuId = 3;
+}
+
+message RespPaymentInfo {
+	int64 order_id = 1;
+	string MsPaymentNumber = 2;
+	repeated RespPackageInfo MsPackageInfos = 3;
+	repeated string MsAgentOrderNumbers = 4;
+	repeated BasketOrderMapping BasketOrderMappings = 5;
+}
+
+message RespPackageInfo{
+	string MsPackageNumber = 1;
+	repeated string MsOrderNumbers = 2;
+}
+
+message ReqForGenMsSqlOrder {
+	repeated OrderInfo Orders = 1;
+	int64 customer_id = 2;
+	string catalog_code = 3;
+	int64 service_type_id = 4;
+	string dest_code = 5;
+	// 用户结账时选择的派送组类型
+	int64 deliveryGroupType = 6;
+}
+
+message RespForGenMsSqlOrder {
+	int32 code = 1;
+	string message = 2;
+	repeated RespPaymentInfo MsPaymentInfos = 3;
+}
+
+message RpcGetB4MmappingAndOldOrderIdReq {
+	int64 newBillId = 1;
+}
+
+message RpcGetB4MmappingAndOldOrderIdResp {
+	B4Mmapping b4mMapping = 1;
+	repeated int32 oldOrderIds = 2;
+}
+
+message B4Mmapping {
+	int32 paymentBillId = 1;
+	int32 packageId = 2;
+	int64 newOrderId = 3;
+	int64 newBillId = 4;
+}
+
+message RpcRecordNotifyPickupSystemReq {
+	B4Mmapping b4mMap = 1; // 参数任选其一,以其为条件更新
+	OrderHistory history = 2; // 不传入orderId,使用map中的条件查询orderids
+}
+
+message OrderHistory {
+	int32 orderId = 1; // 若缺省,则需要有其他方式获取orderids
+	string notes = 2;
+	string createBy = 3;
+	string newOrderStatusName = 4;
+	string oldOrderStatusName = 5;
+}
+
+message RpcRecordNotifyPickupSystemResp {
+	Result_Order result = 1;
+}

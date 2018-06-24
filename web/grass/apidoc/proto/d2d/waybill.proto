@@ -1,0 +1,200 @@
+syntax = "proto3";
+package d2d;
+
+import "common/ezbuy.proto";
+import "common/file.proto";
+import "common/empty.proto";
+import "d2d/d2d.proto";
+
+service WayBill {
+    option (common.service).webapi = true;
+
+    rpc Import(ImportFile) returns (common.Empty) {
+        option (common.webapi).upload = true;
+    }
+
+    rpc Delete(WayBillIds) returns (common.Empty);
+
+    // Export 导出搜索结果
+    rpc Export(SearchFilter) returns (ExportFile){
+        option (common.webapi).download = true;
+    }
+
+    rpc GetStatuses(common.Empty) returns (Statuses);
+
+    // Search 搜索导入的外包数据
+    rpc Search(SearchFilter) returns (WayBills);
+
+    rpc GetWayBillHistories(WayBillNo) returns (WayBillHistories);
+
+    rpc ScanToShelf(ScanToShelfReq) returns (common.Empty);
+
+    rpc SetDeliveryDate(SetDeliveryDateReq) returns (common.Empty);
+
+    rpc HasWayBill(HasWayBillReq) returns(HasWayBillResp);
+
+    rpc GetWayBills(GetWayBillsReq) returns(WayBills);
+
+    rpc SaveWayBillBoxNo(SaveWayBillBoxNoReq) returns(SaveWayBillBoxNoResp);
+
+    // 装车扫描，从结果集中得到属于外包的包裹
+    rpc ScanSubPackageBeforeLoading(ScanSubPackageBeforeLoadingReq) returns(common.Empty);
+
+    // AddUser 添加用户
+    rpc AddUser (ExternalUser) returns (common.Empty);
+    // DeleteUser 删除用户
+    rpc DeleteUser (DeleteUserReq) returns (common.Empty);
+    // GetUsers 获取所有用户
+    rpc GetUsers (common.Empty)  returns (ExternalUsers);
+}
+
+// NewTimePeriod change the default value to all
+// TimePeriod's default value is 'day'
+enum NewTimePeriod {
+     NewTimePeriodAll = 0;
+     NewTimePeriodDay = 1;
+     NewTimePeriodNight = 2;
+}
+
+message ExternalUsers{
+    repeated ExternalUser users = 1;
+}
+
+message ExternalUser{
+    string usr = 1;
+    string pwd = 2;
+    string remark = 3;
+    string id = 4;
+}
+
+message DeleteUserReq{
+    string id = 1;
+}
+
+
+message WayBillIds{
+    repeated string ids = 1;
+}
+
+message ImportFile {
+    common.File file = 1;
+}
+
+message WayBillNo {
+    string no = 1;
+}
+
+message Status {
+    int64 id = 1;
+    string name = 2;
+}
+
+message Statuses {
+    repeated Status statuses = 1;
+}
+
+message SearchFilter {
+    string wayBillNo = 1;
+    string recipientName = 2;
+    string telephone = 3;
+    int64 createTimeStart = 4;
+    int64 createTimeEnd = 5;
+    repeated int64 statusIDs = 6;
+
+    string clientName = 7;
+    NewTimePeriod timePeriod = 8;
+    // weight min unit: kg
+    double weightStart = 9;
+    double weightEnd = 10;
+    string postCodeStart = 11;
+    string postCodeEnd = 12;
+}
+
+message MWayBill {
+    string id = 1;
+    string wayBillNo = 2;
+    string clientName = 3;
+    double weight = 4;
+    string recipientName = 5;
+    string telephone = 6;
+    string postCode = 7;
+    string deliveryAddress = 8;
+    TimePeriod timePeriod = 9;
+    string clientRemark = 10;
+    Status status = 11;
+    int64 createDate = 12;
+    string driverID = 13;
+    string driverName = 14;
+    string locationLabel = 15;
+    string signatureImage = 16;
+    string BoxNo = 17;
+    int64 updateDate = 18;
+    int64 deliveryDate = 19;
+}
+
+message WayBills {
+    repeated MWayBill wayBills = 1;
+}
+
+
+message WayBillHistory {
+    string id = 1;
+    string wayBillNo = 2;
+    int64 createDate = 3;
+    string createBy = 4;
+    string before = 5;
+    string after = 6;
+    string content = 7;
+}
+
+message WayBillHistories {
+    repeated WayBillHistory items = 1;
+}
+
+message ExportFile {
+  string contentType = 1;
+  bytes data = 2;
+  string filename = 3;
+}
+
+message ScanToShelfReq {
+  string wayBillNo = 1;
+  string locationLabel = 2;
+  string updateBy = 3;
+}
+
+message SetDeliveryDateReq {
+    repeated string ids = 1;
+    int64 deliveryDate = 2;
+    bool shouldNotify = 3;
+}
+
+message HasWayBillReq {
+    string wayBillNo = 1;
+}
+
+message HasWayBillResp {
+    bool has = 1;
+}
+
+message GetWayBillsReq {
+    int64 deliveryDate = 1;
+    bool isPicked = 2;
+    string shift = 3;
+    string driverName = 4;
+}
+
+message SaveWayBillBoxNoReq {
+    string boxNo = 1;
+    string wayBillNo = 2;
+    string updateBy = 3;
+}
+
+message SaveWayBillBoxNoResp {
+    bool success = 1;
+}
+
+message ScanSubPackageBeforeLoadingReq {
+    repeated string subPkgNos = 1;
+    string updateBy = 2;
+}

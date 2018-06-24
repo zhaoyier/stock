@@ -1,0 +1,19 @@
+syntax = "proto3";
+package spk;
+
+import "common/ezbuy.proto";
+
+
+service Erp {
+  option (common.service).webapi = true;
+
+  rpc Get(ErpGet) returns (ErpGetResp);
+}
+
+message ErpGet {
+  
+}
+
+
+message ErpGetResp {
+}

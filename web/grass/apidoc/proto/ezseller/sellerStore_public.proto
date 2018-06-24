@@ -1,0 +1,186 @@
+syntax	= "proto3";
+package ezseller;
+option swift_prefix = "GR";
+option java_multiple_files = true;
+option java_package = "com.daigou.sg.grpc";
+option go_package = "ezseller";
+
+import "appcommon/common_public.proto";
+import "common/ezbuy.proto";
+import "ezseller/result.proto";
+
+service SellerStore {
+
+	option (common.service).webapi = true;
+	option (common.service).public = true;
+
+	// 根据关键词和店铺id, 搜索全店铺商品
+	rpc SearchByKeywords (SearchByKeywordsReq) returns (SearchByKeywordsResp);
+
+	// 根据类目id和店铺id + filterOptions, 获取店铺商品列表
+	rpc SearchCategoryProducts (SearchCategoryProductsReq) returns (SearchCategoryProductsResp);
+
+	// 获取首页的filterOptions列表, Home, AllProduct 等, Home可以本地写死, 其他由服务器返回
+	// 它们下面的商品用SearchCategoryProducts接口获取, categoryid = 0, SearchSortCond = 这个接口反回的SortOption
+	rpc GetHomePageSortOptions (GetHomePageSortOptionsReq) returns (GetHomePageSortOptionsResp);
+
+	// 获取卖家店铺类目树
+	rpc GetSellerCategorys (GetSellerCategorysReq) returns (GetSellerCategorysResp);
+
+	// 获取首页配置
+	rpc GetHomeAreas (GetHomeAreasReq) returns (GetHomeAreasResp);
+
+	// shopId批量获得店铺名称
+	rpc BatchGetShopName (BatchGetShopNameReq) returns (BatchGetShopNameResp);
+
+	// 获取店铺评分
+	rpc BatchGetShopScore(BatchGetShopScoreReq) returns (BatchGetShopScoreResp);
+
+	// 更新店铺评分
+	rpc UpsertShopScore(UpsertShopScoreReq) returns (UpsertShopScoreResp);
+
+}
+
+enum LayoutType {
+	LayoutTypeTop = 0; // 店招
+	LayoutTypeCarousel = 1; // 轮播图
+	LayoutTypeBanner = 2; // banner
+	LayoutTypeGrid = 3; // 2, 4, 6, 8张图的grid组件
+	LayoutTypeFlow = 4; // 3张图的组件
+}
+
+message GroupLayoutInfo {
+	LayoutType layoutType = 1; // 布局模式，可用值[Top,Grid,Banner, Carousel, Flow]
+	int32 columnCount = 2; //基本上是Grid模式专用, 根据entranceList个数以及columnCount绘制UI
+	double cellRatio = 3; // 单元格长宽比例：width : height
+	string titleColor = 4; // #123456，缺省使用默认颜色
+	int32 bottomGap = 5; // Area间距, 单位pt
+}
+
+message HomePageEntrance {
+
+	string name = 1;
+	string imageURL = 2;
+	string link = 3; //支持http ezbuyapp协议
+	string desc = 4;
+}
+
+message HomePageArea {
+	string name = 2;  // 组件title, 如果有的话
+	repeated HomePageEntrance entranceList = 3; // 模块内元素列表
+	GroupLayoutInfo groupLayoutInfo = 4;
+	string link = 5; // 支持http ezbuyapp 协议
+}
+
+message GetHomeAreasReq {
+	string sellerName = 1; //卖家店铺名
+	bool isPreview = 2;
+}
+
+message GetHomeAreasResp {
+	appcommon.ResultResp result = 1;
+	repeated HomePageArea areas = 2;
+}
+
+message GetSellerCategorysReq {
+	string sellerName = 1;
+}
+
+message GetSellerCategorysResp {
+	appcommon.ResultResp result = 1;
+	repeated SellerCategory categorys = 2;
+}
+
+message GetHomePageSortOptionsReq {
+	string sellerName = 1;
+}
+
+message GetHomePageSortOptionsResp {
+	appcommon.ResultResp result = 1;
+	repeated appcommon.SortOption sortOptions = 2;
+}
+
+message SearchCategoryProductsReq {
+	string sellerName = 1;
+	int32 categoryId = 2;
+	repeated appcommon.SearchSortCond  sortConds = 3;
+	repeated appcommon.SearchFilterCond filterConds = 4;
+	int32 limit = 5;
+	int32 offset = 6;
+}
+
+message SearchCategoryProductsResp {
+	appcommon.ResultResp result = 1;
+	repeated appcommon.SimpleProduct products = 2;
+	repeated string sorts = 3;
+	repeated appcommon.SearchFilter filters = 4;
+	repeated appcommon.SortOption sortOptions = 5; // 可用排序选项
+	int32 total = 6;  // 商品总数
+}
+
+message SearchByKeywordsReq {
+	string sellerName = 1;
+	string keywords = 2;
+	repeated appcommon.SearchSortCond sortConds = 3;
+	repeated appcommon.SearchFilterCond filterConds = 4;
+	int32 limit = 5;
+	int32 offset = 6;
+}
+
+message SearchByKeywordsResp {
+	appcommon.ResultResp result = 1;
+	repeated appcommon.SimpleProduct products = 2;
+	repeated string sorts = 3;
+	repeated appcommon.SearchFilter filters = 4;
+	repeated appcommon.SortOption sortOptions = 5; // 可用排序选项
+	int32 total = 6;  // 商品总数
+}
+
+message SellerCategory {
+	int32 categoryId = 1;
+	string name = 2;
+	repeated SellerCategory subCategorys = 3;
+}
+
+message BatchGetShopNameReq {
+	repeated int32 shopIds = 1;
+}
+
+message BatchGetShopNameItem {
+	bool isNotFound = 1;
+	int32 shopId = 2;
+	string shopName = 3;
+}
+
+message BatchGetShopNameResp {
+	repeated BatchGetShopNameItem items = 1;
+}
+
+message BatchGetShopScoreReq {
+	repeated GetShopScore shops = 1;
+}
+
+message GetShopScore {
+	int32 shopId = 1;
+	string shopName = 2;
+}
+
+message BatchGetShopScoreResp {
+	repeated ShopScoreItem items = 1;
+}
+
+message ShopScoreItem {
+	bool isNoScore = 1;
+	int32 shopId = 2;
+	string shopName = 3;
+	float score = 4;
+}
+
+message UpsertShopScoreReq {
+	string shopName = 1;
+	float score = 2;
+}
+
+message UpsertShopScoreResp {
+	Result result = 1;
+}

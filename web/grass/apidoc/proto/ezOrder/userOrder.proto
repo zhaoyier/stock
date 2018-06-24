@@ -1,0 +1,63 @@
+syntax = "proto3";
+package ezOrder;
+
+message UserOrderAll {
+    UserOrder userOrder = 1;
+    repeated UserOrderItem userOrderItem = 2;
+    repeated UserOrderVoucher userOrderVoucher = 3;
+    repeated UserOrderDiscount userOrderDiscount = 4;
+    string catalog = 5; // 国家地区
+}
+
+message UserOrder {
+    int64 id = 1; // 订单号
+    int64 customerId = 2; //用户id
+    int64 serviceTypeId = 3; //业务类型id
+    int32 shipmentTypeId = 4; //运输方式id
+    int64 prosourceRegionId = 5; //采购来源地id
+    int64 etaDate = 6; //eta时间（天）
+    int64 orderDate = 7; //下单日期
+    int64 totalPrice = 8; //订单总价
+    int64 totalProductPrice = 9; // 商品费用
+    int64 shippingFee = 10; // 国际运费
+    int64 handlingFee = 11; // 手续费
+    int64 expressFee = 12; // 本地派送费
+    int64 agentFee = 13; // 代购费
+    int64 insureFee = 14; // 保险费
+    int64 gst = 15; // gst
+    bool isAuthorizeBalance = 16; // 是否差额补齐预授权
+}
+
+message UserOrderItem {
+    int64 orderId = 1; //订单编号
+    int64 id = 2; // orderItemId
+    int64 gpid = 3; //商品id
+    string skuId = 4; //skuid
+    string remark = 5; //sku备注
+    double currencyExchange = 6; //汇率
+    int64 qty = 7; //sku数量
+    int64 unitPrice = 8; //sku单价
+    int64 totalProductPrice = 9; //sku总价
+}
+
+message UserOrderVoucher {
+    int64 orderId = 1;
+    int64 orderItemId = 2;
+    int64 voucherId = 3;
+    int64 voucherTypeId = 4;
+    int64 voucherFee = 5;
+}
+
+message UserOrderDiscount {
+    int64 orderId = 1;
+    int64 orderItemId = 2;
+    int64 discountId = 3;
+    int64 totalPriceDiscount = 4;
+    int64 totalProductPriceDiscount = 5;
+    int64 shippingFeeDiscount = 6;
+    int64 handlingFeeDiscount = 7;
+    int64 expressFeeDiscount = 8;
+    int64 agentFeeDiscount = 9;
+    int64 insureFeeDiscount = 10;
+    int64 gstDiscount = 11;
+}

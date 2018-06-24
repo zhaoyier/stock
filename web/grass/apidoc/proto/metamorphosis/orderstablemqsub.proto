@@ -1,0 +1,15 @@
+syntax = "proto3";
+package metamorphosis;
+
+import "common/empty.proto";
+
+
+service OrderStableMqSub {
+	//测试
+	rpc Test(common.Empty) returns (common.Empty);
+}
+
+// ----------------------------------------------------------------
+
+
+

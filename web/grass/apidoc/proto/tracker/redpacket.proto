@@ -1,0 +1,36 @@
+syntax = "proto3";
+package tracker;
+
+import "common/ezbuy.proto";
+
+service RedPacket {
+    rpc UserRegistered(UserRegisteredReq) returns (UserRegisteredRsp);
+
+    rpc ViewPage(ViewPageReq) returns (ViewPageRsp) {
+        option (common.webapi).get = true ;
+    };
+}
+
+//
+message UserRegisteredReq {
+    int32 uid = 1;
+    string username = 2;
+    string catalog = 3;
+    string identityId = 4;
+    bool isGivenVoucher = 5;
+    bool isGivenGift = 6;
+    bool isFromApp = 7;
+}
+
+message UserRegisteredRsp {
+    bool ret = 1;
+}
+
+//
+message ViewPageReq {
+    string identityId = 1; // 分配给网红的id
+}
+
+message ViewPageRsp {
+    bool ret = 1;
+}

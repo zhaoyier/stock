@@ -1,0 +1,181 @@
+syntax = "proto3";
+package ordertrack;
+import "ordertrack/ordertrack.proto";
+
+
+
+//抓单神器统计信息
+service Statis {
+	rpc Inc(StatisInc) returns (StatisIncResp);
+	rpc Search(StatisSearch) returns (StatisSearchResp);
+        rpc Find(StatisFind) returns (StatisFindResp);
+	rpc List(StatisList) returns (StatisListResp);
+        rpc FindRepeateOrder(StatisFindRepeateOrder) returns (StatisFindRepeateOrderResp);
+	rpc Fetch(StatisFetch) returns (StatisFetchResp);
+  	rpc Insert(StatisInsert) returns (StatisInsertResp);
+	rpc Tick(StatisTick) returns (StatisTickResp);
+	rpc StatusSearch(StatisStatusSearch) returns (StatisStatusSearchResp);
+}
+
+//------------------------------------------
+message StatisInc {
+	string tbName = 1;
+    string poNumber = 2;
+    repeated TrackInfo trackInfos = 5;
+	string version = 3;
+	string address = 6;
+}
+
+message StatisIncResp {
+}
+
+
+//-------------------------------------------
+message StatisSearch {
+	repeated string poNumber = 1;
+}
+
+message StatisSearchResp {
+	repeated SearchItem item = 1;
+}
+
+message SearchItem {
+	string poNumber = 1;
+	bool isNeedFetch = 2;
+}
+
+//--------------------------------------------
+message StatisFind {
+  	string tbName = 1;
+	//形如: 20170101
+	string day = 2;
+}
+
+message StatisFindResp {
+	string TBName = 2;
+	string version = 1;
+	repeated FindItem items = 3;	
+}
+
+message FindItem {
+	string poNumber = 3;
+ 	string address = 7;
+	int64 count = 1;
+  	repeated TrackInfo trackInfos = 5;
+	int64 updateTime = 2;
+	int64 createTime = 4;
+    int64 firstTime = 6;
+}
+
+//-----------------------------------------
+message StatisList {
+	int32 limit = 1;	
+	int32 offset = 2;
+        bool isDesc = 4;
+	ListFilter filter = 3;
+
+}
+
+message ListFilter {
+	string tbName = 1;
+	string day = 2;
+	string poNumber = 3;
+  //最长限制时间为10天
+  string startDate = 4;
+  string endDate = 5;
+  string trackingNo = 6;
+}
+
+message StatisListResp {
+	int32 total = 1;	
+	repeated ListItem items = 2;
+}
+
+message ListItem {
+	string tbName = 1;
+	string version = 2;
+        string day = 4;
+	repeated FindItem items = 3;	
+}
+
+//----------------------------------------
+message StatisFindRepeateOrder {
+  	string trackNo = 1;
+	string ponumber = 2;
+}
+
+message StatisFindRepeateOrderResp {
+	bool have = 1;
+	string trackNo = 2;
+	string ponumber = 3;
+  string orderNnumber = 4;
+  string placeName = 5;
+}
+
+//------------------------------------------
+message FetchItem {
+	string poNumber = 1;
+	string vendorName = 2;
+}
+
+message StatisFetch {
+	repeated FetchItem items = 1;	
+	int32 work = 2;
+	bool useMgo = 3;
+}
+
+message StatisFetchResp {
+}
+
+//-------------------------------------------
+message InsertItem {
+  string ordernumber = 1;
+  string ponumber = 2;
+  string vendorname = 3;
+  string placeName = 4;
+}
+message StatisInsert {
+  repeated InsertItem items = 1;
+}
+
+message StatisInsertResp{
+}
+
+
+//------------------------------------------
+message StatisTick {
+  string name = 1;
+  string source = 2;
+  string version = 3;
+}
+
+message StatisTickResp {
+}
+
+//----------------------------------------
+message StatisStatusSearch {
+  string day = 1;
+  string name = 2;
+  string source = 3;
+  string start = 4;
+  string end = 5;
+}
+
+message StatisStatusSearchResp {
+  repeated UserDayTime users = 1; 
+}
+
+message UserDayTime {
+  string name = 1;
+  string source = 2;
+  string day = 3;
+  repeated TimeRange times = 4;
+}
+
+message TimeRange {
+  int64 start = 1;
+  int64 end =  2;
+  string version = 3;
+}
+
+

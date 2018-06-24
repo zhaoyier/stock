@@ -1,0 +1,293 @@
+syntax = "proto3";
+package assassin;
+import "common/ezbuy.proto";
+import "common/price.proto";
+import "common/time.proto";
+import "assassin/assassin.proto";
+import "assassin/taobao_baichuan.proto";
+
+service Taobao {
+  option (common.service).webapi = true;
+  rpc Item(TaobaoItem) returns (TaobaoItemResp) {
+	option (common.timeout) = "20s";
+  }
+  rpc Detail(TaobaoDetail) returns (TaobaoDetailResp) {
+	option (common.timeout) = "20s";
+  }
+  rpc DetailNew(TaobaoDetailNew) returns (TaobaoDetailNewResp) {
+	option (common.timeout) = "20s";
+  }
+  rpc Get(TaobaoGet) returns (TaobaoGetResp) {
+	option (common.timeout) = "20s";
+  }
+  rpc Promotion(TaobaoPromotion) returns (TaobaoPromotionResp) {
+	option (common.timeout) = "20s";
+  }
+  rpc PromotionFromApi(TaobaoPromotionFromApi) returns(TaobaoPromotionFromApiResp) {
+	option (common.timeout) = "20s";
+  }
+  rpc Fetch(TaobaoFetch) returns (TaobaoFetchResp) {
+	option (common.timeout) = "30s";
+  }
+  rpc Baichuan(TaobaoBaichuan) returns (TaobaoBaichuanResp) {
+	option (common.timeout) = "30s";
+  }
+  rpc AppKeyStatus(TaobaoAppKeyStatus) returns (TaobaoAppKeyStatusResp);
+  rpc NextKey(TaobaoNextKey) returns (TaobaoNextKeyResp);
+  rpc RemoveCache(TaobaoRemoveCache) returns(TaobaoRemoveCacheResp);
+}
+
+// ---------------------------------------------------------------------------
+
+message TaobaoPromotionFromApi {
+	string id = 1;
+}
+
+message TaobaoPromotionFromApiResp {
+	string id = 1;
+	map<string,PromotionPrice> skuPromotionPrice = 2;
+}
+
+message TaobaoFetch {
+	string id = 1;
+}
+
+message TaobaoFetchResp {
+	assassin.Product item = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message TaobaoRemoveCache {
+	string id = 1;
+}
+
+message TaobaoRemoveCacheResp {
+	bool isSuccess = 1;
+}
+
+message TaobaoPromotion {
+	string id = 1;
+  Source source = 2;
+  bool isTmall = 3;
+}
+
+message TaobaoPromotionResp {
+    string itemId = 1;
+    map<string, PromotionPrice> prices = 2;
+    bool isPreSale = 3;
+    int64 fetchTime = 4;
+}
+
+message PromotionPrice {
+    int64 normalPrice = 1;
+    int64 promotionPrice = 2;
+	int64 quantity = 3;
+}
+
+message TaobaoGet {
+  string id = 1;
+  Source source = 2;
+  bool isTmall = 7;
+  bool noAPI = 3;
+  bool simple = 4;
+  bool notRealtime = 6;
+}
+
+message TaobaoGetResp {
+	Product item = 1;
+}
+
+message TaobaoItem {
+  repeated string id = 1;
+  string key = 2;
+}
+
+message TaobaoItemInfo {
+	bool isNotFound = 17;
+	string id = 16; // refId
+	int64 postFee = 1; // 平邮价格
+	bool istk = 2; // 是否是淘宝客
+	string title = 3;
+	int64 stock = 4; // 库存
+	string vendorName = 5; // 卖家昵称
+	string shopName = 6;
+	TaobaoItemPromotePrice price = 7; // 价格
+	TaobaoItemPromotePrice wapPrice = 8; // 价格
+	string picUrl = 9; // 图片
+	int64 cid = 10;
+	common.Price reservePrice = 11; // 商品的一口价
+	string openIid = 12; // open_iid
+	bool isTmall = 13; // 是否是天猫
+	bool isJuItem = 14; // 是否是聚划算
+	common.Time juStart = 19;
+	common.Time juEnd = 20;
+	common.Price juPrice = 21;
+	string tkRate = 18;
+}
+
+message TaobaoItemPromotePrice {
+	common.Price price = 1;
+	common.Time start = 2;
+	common.Time end = 3;
+}
+
+message TaobaoItemLocation {
+	string state = 1;
+	string city = 2;
+}
+
+message TaobaoItemResp {
+	string appKey = 2;
+	repeated TaobaoItemInfo items = 1;
+}
+
+message TaobaoAppKeyStatus {
+}
+
+message TaobaoAppKeyStatusResp {
+	int32 idx = 2;
+	repeated TaobaoAppKeyItem items = 1;
+	string startTime = 3;
+}
+
+message TaobaoAppKeyItem {
+	string AppKey = 1;
+	bool isUsing = 2;
+}
+
+message TaobaoNextKey {
+}
+
+message TaobaoNextKeyResp {
+}
+
+// ---------------------------------------------------------------------------
+
+message TaobaoDetail {
+	string id = 1;
+	bool fetchPromotion = 2;
+}
+
+message TaobaoDetailInfo {
+	TaobaoDetailInfoItem item = 1;
+    TaobaoDetailInfoDesc desc = 2;
+	TaobaoDetailInfoMobDesc modDesc = 6;
+	TaobaoDetailSkuInfo sku = 3;
+	repeated TaobaoDetailDeliveryInfo delivery = 4; // 我们有多个仓库
+	TaobaoDetailSellerInfo seller = 5;
+}
+
+message TaobaoDetailSellerInfo {
+	string name = 1;
+	string shopName = 2;
+	bool isTmall = 3;
+}
+
+message TaobaoDetailCarriage {
+	string name = 1;
+	int64 price = 2;
+}
+
+message TaobaoDetailDeliveryInfo {
+	string location = 1;
+	string destination = 2;
+	repeated TaobaoDetailCarriage carriage = 3;
+}
+
+message TaobaoDetailPriceUnit {
+	int64 price = 1;
+	int64 maxPrice = 4;
+	string name = 2;
+	string tips = 3;
+}
+
+message TaobaoDetailSkuPropValue {
+	string img = 1;
+	string name = 2;
+	string valueId = 3;
+}
+
+message TaobaoDetailSkuProp {
+	string propId = 1;
+	string propName = 2;
+	repeated TaobaoDetailSkuPropValue values = 3;
+}
+
+message TaobaoDetailSkuInfo {
+	repeated TaobaoDetailSkuProp skuProps = 2;
+	repeated TaobaoDetailSkuDetail detail = 3;
+}
+
+message TaobaoDetailSkuDetail {
+	string skuId = 1;
+	string pv = 2;
+	int32 quantity = 3;
+	TaobaoDetailPriceUnit price = 4;
+	TaobaoDetailPriceUnit promotionPrice = 5;
+}
+
+message TaobaoDetailInfoItem {
+	bool isOnSale = 1;
+	string title = 2;
+	string subTitle = 3;
+	repeated string pics = 4;
+	// sku商品买家购买是否需要选择sku
+	bool needSku = 5;
+	// 开售日期
+	common.Time startSale = 6;
+	repeated TaobaoDetailProp props = 7;
+	// 普通价格
+	TaobaoDetailPriceUnit price = 8; 
+	// 促销价
+	TaobaoDetailPriceUnit promotionPrice = 9;
+	int32 quantity = 10; // 库存
+	bool cartSupport = 11; // 是否支持加入购物车
+	string location = 12; // 所在地
+}
+
+message TaobaoDetailProp {
+	string name = 1;  // 属性名
+	string value = 2; // 属性值
+}
+
+message TaobaoDetailInfoMobDesc {
+	repeated TaobaoDetailInfoDescFragment fragment = 1;
+}
+
+message TaobaoDetailInfoDescFragment {
+	string content = 1;
+	string label = 2;
+}
+
+message TaobaoDetailInfoDesc {
+	// 卖家发布的商品图文详情信息内容
+	string content = 1;
+	// 卖家发布的商品图文详情来源平台
+	string type = 2;
+}
+
+message TaobaoDetailResp {
+	TaobaoDetailInfo item = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message TaobaoBaichuan {
+  string id = 1;
+}
+
+message TaobaoBaichuanResp {
+	XTaobaoDetail item = 1;
+    XTaobaoDetailDelivery deviver = 2;
+}
+
+message TaobaoDetailNew {
+	string id = 1;
+	bool notRealtime = 2;
+}
+
+message TaobaoDetailNewResp {
+	Product item = 1;
+}
+

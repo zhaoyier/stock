@@ -1,0 +1,118 @@
+syntax = "proto3";
+package oplogger;
+
+import "common/empty.proto";
+
+enum OperateObject {
+    ObjectNone = 0;
+    // 订单
+    ObjectOrder = 1;
+    // SKU
+    ObjectSKU = 2;
+    // 入库号
+    ObjectStockIn = 3;
+    // 包裹
+    ObjectPackage = 4;
+    // 封箱号
+    ObjectBox = 5;
+    // 老订单
+    ObjectOrderMssql = 6;
+}
+
+enum OperateStatus {
+    StatusNone = 0;
+    // 订单状态 (100-200)
+    // SKU状态  (200-300)
+    // 入库号状态(300-400)
+    StatusStockinWaveGened = 304;
+    StatusStockinWaveReleased = 305;
+    StatusStockinPicking = 306;
+    StatusStockinPicked = 307;
+    StatusStockinPacked = 309;
+    StatusStockinPickFailed = 310;
+    StatusStockinStatus = 311;
+    // 包裹状态(400-500)
+    StatusPackagePacked = 401;
+    StatusPackageCancel = 402;
+    StatusPackagePartiallyPacked = 403;
+    // 封箱号状态(500-600)
+    StatusPackingBox = 501;
+    StatusPackingBoxOut = 502;
+}
+
+// Caller defines call srcs
+enum Caller{
+  None = 0;
+  EltreumPurchase = 1;
+  ErpnewTrackingOrder = 2;
+  GarencieresInspection = 3;
+  GarencieresWaveService = 4;
+  ChaplinErp = 5;
+  ChaplinPackingBox = 6;
+}
+
+enum OperateStep {
+    StepNone = 0;
+    // 订单步骤(100-200)
+    StepOrderOffset = 105;
+    StepOrderCancel = 106;
+    // SKU步骤  (200-300)
+    // 入库号步骤(300-400)
+    StepStockinWaveGened = 304;
+    StepStockinWaveReleased = 305;
+    StepStockinPicking = 306;
+    StepStockinPicked = 307;
+    StepStockinPacked = 309;
+    StepStockinPickFailed = 310;
+    StepStockinStatus = 311;
+    StepStockinCommit = 312;
+    // 包裹步骤(400-500)
+    StepPackagePacked = 401;
+    StepPackageCancel = 402;
+    StepPackagePartiallyPacked = 403;
+    // 封箱号步骤(500-600)
+    StepPackingBox = 501;
+    StepPackingxBoxScanOut = 502;
+}
+
+
+message Operation{
+    int64 id = 8;
+    OperateObject object = 1;
+    //code 可以是一个 两个部件组成的字符串 ,aka orderID:orderItemID
+    string code = 2;
+    // 如果code是由多个部件组成,需要提供一个组合方式字符串.
+    //e.g. code == "orderID:orderItemID"
+    //     combineStr == ":"
+    string combineStr = 9;
+    OperateStatus status = 3;
+    OperateStep step = 4;
+    string description = 5;
+    int64  create_date =  6;
+    string operator = 7;
+    Caller caller = 10;
+}
+
+message SearchLogReq{
+    OperateObject object = 1;
+    string code = 2;
+    int32 limit = 3;
+    int32 offset = 4;
+}
+
+message SearchLogResp{
+    int32 total = 1;
+    repeated Operation items = 2;
+}
+
+message Operations {
+    repeated Operation ops = 1;
+}
+
+//! 本地物流服务
+service Logger {
+    rpc Operate(Operation) returns (common.Empty);
+    //MultiOperate 批量插入操作日志
+    rpc MultiOperate(Operations) returns (common.Empty);
+    rpc SearchLog(SearchLogReq) returns (SearchLogResp);
+}

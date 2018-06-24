@@ -1,0 +1,20 @@
+syntax = "proto3";
+package spike;
+
+enum EventType {
+    EventTypeUnknown = 0;
+    EventTypeCashOff = 1;
+    EventTypeBulma = 2; 
+	EventTypeFlashSale = 3;
+	EventTypeTights = 4; 
+}
+
+message ProductEventItem {
+    EventType eventType = 1;
+    int64 start = 2;
+    int64 expire = 3;
+    string eventId = 4;
+
+    repeated string catalogs = 5;
+}
+

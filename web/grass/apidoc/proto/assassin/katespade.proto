@@ -1,0 +1,20 @@
+syntax = "proto3";
+package assassin;
+import "assassin/assassin.proto";
+import "common/ezbuy.proto";
+
+service Katespade {
+  option (common.service).webapi = true;
+  rpc Get(KatespadeGet) returns (KatespadeGetResp);
+}
+
+// ---------------------------------------------------------------------------
+
+message KatespadeGet {	
+  string id = 1;
+  bool notRealtime = 2;
+}
+
+message KatespadeGetResp {
+	Product product = 1;
+}

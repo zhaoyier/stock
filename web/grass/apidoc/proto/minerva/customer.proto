@@ -1,0 +1,133 @@
+syntax = "proto3";
+package minerva;
+
+service Customer {
+    rpc PrimeInfo(PrimeInfoReq) returns (PrimeInfoResp);
+    rpc PrimeInfoBatch (PrimeInfoBatchReq) returns (PrimeInfoBatchResp);
+    rpc Notification(NotificationReq) returns (NotificationResp);
+    rpc LoadCustomerGrades(ReqWithCustomerIds) returns (RespWithCustomerGrades);
+    rpc LoadCustomerCredits(ReqWithCustomerIds) returns (RespWithCustomerCredits);
+    rpc LoadPromotionCouponHistory(ReqLoadPromotionCouponHistory) returns (RespWithPromotionCouponHistory);
+    rpc CreditUseByPayment(ReqWithCreditUseByPayment) returns (RespWithCodeAndMessage);
+    rpc CreditReturnByPayment(ReqWithCreditReturnByPayment) returns (RespWithCodeAndMessage);
+}
+
+// ----------------------------------------------------------------
+
+message PrimeInfo {
+    int32 customerId = 1;
+    string nickname = 2;
+    string customerName = 3;
+    string catalogCode = 4;
+    bool isPrime = 5;
+    bool isPrimeMonthlyBought = 6;
+    int64 primeStartAt = 7;
+    int64 primeEndAt = 8;
+}
+
+message PrimeInfoReq {
+    int32 customerId = 1;
+    string catalogCode = 2;
+    string nickname = 3;
+}
+
+message PrimeInfoResp {
+    PrimeInfo info = 1;
+}
+
+message PrimeInfoBatchReq {
+    repeated int32 CustomerIds = 1;
+}
+
+message PrimeInfoItem {
+    bool IsNotFound = 1;
+    PrimeInfo Info = 2;
+}
+
+message PrimeInfoBatchResp {
+    repeated PrimeInfoItem Infos = 1;
+}
+
+message NotiKV {
+    string key = 1;
+    string value = 2;
+}
+
+message NotificationResp {
+    int32 code = 1;
+    string message = 2;
+}
+
+message NotificationReq {
+    string key = 1;
+    string serverType = 2;
+    string messageType = 3;
+    int64 customerId = 4;
+    repeated NotiKV msg = 5;
+}
+
+message ReqWithCreditUseByPayment {
+    int64 CustomerId = 1;                                   //CustomerId
+    int64 Credit = 2;                                       //需要使用多少积分
+    int64 PaymentBillId = 3;                                //账单使用积分
+}
+
+message ReqWithCreditReturnByPayment {
+    int64 CustomerId = 1;                                   //CustomerId
+    int64 PaymentBillId = 2;                                //需要回退的账单Id
+}
+
+message RespWithCodeAndMessage {
+    int64 Code = 1;                                         //1:成功，-1:失败
+    string Message = 2;                                     //返回的信息提示，原则上只有失败的时候才有内容，否则为空
+}
+
+message ReqWithCustomerIds {
+    repeated int64 CustomerIds = 1;                         //CustomerId列表
+}
+
+message CustomerCredit {
+    int64 CustomerId = 1;                                   //CustomerId
+    int64 Credit = 2;                                       //当前总共剩余积分
+}
+
+message CustomerGrade {
+    int64 CustomerId = 1;                                   //CustomerId
+    int64 CustomerGradeId = 2;                              //等级Id
+    string GradeCode = 3;                                   //等级Code
+    string GradeName = 4;                                   //等级名称
+    double AgentPriceRate = 5;                               //代购费比例
+    double Discount = 6;                                     //折扣比例
+    int64 Level = 7;                                        //等级Level
+}
+
+message PromotionCouponHistory {
+    int64 PromotionCouponHistoryId = 1;
+    int64 PromotionCouponId = 2;
+    int64 CustomerId = 3;
+    int64 PaymentId = 4;
+    int64 Total = 5;
+    string Remark = 6;
+    string CreateBy = 7;
+    string UpdateBy = 8;
+    int64 CreateDate = 9;
+    int64 UpdateDate = 10;
+}
+
+
+message RespWithCustomerGrades {
+    repeated CustomerGrade CustomerGrades = 1;              //用户等级列表
+}
+
+message RespWithCustomerCredits {
+    repeated CustomerCredit CustomerCredits = 1;            //用户积分列表
+}
+
+message ReqLoadPromotionCouponHistory {
+    int64 customerId = 1;                         //CustomerId
+    string couponCode = 2;                        //couponCode
+}
+
+message RespWithPromotionCouponHistory {
+    repeated PromotionCouponHistory promotionCouponHistorys = 1;            //用户coupon使用历史列表
+}

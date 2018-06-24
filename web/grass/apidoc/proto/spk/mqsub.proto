@@ -1,0 +1,11 @@
+syntax = "proto3";
+package spk;
+
+import "common/empty.proto";
+import "spk/spk_item.proto";
+
+
+service MqSub {
+	//验货向商品库同步重量
+	rpc SetSpkWeight(spk.ItemWeightSet) returns (common.Empty);
+}

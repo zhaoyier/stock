@@ -1,0 +1,23 @@
+syntax = "proto3";
+package usermsgcenter;
+
+import "common/ezbuy.proto";
+
+service UserMsgCenter {
+    option (common.service).webapi = true;
+
+    rpc UserAppNotificationHandled(UserAppNotificationHandledReq) returns (UserAppNotificationHandledResp);
+}
+
+// ------
+
+message UserAppNotificationHandledReq {
+    int32 userId = 1;
+    string title = 2; // 不可为空
+    string content = 3;
+    string url = 4;
+}
+
+message UserAppNotificationHandledResp {
+    bool ok = 1;
+}

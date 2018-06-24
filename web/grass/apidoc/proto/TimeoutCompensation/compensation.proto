@@ -1,0 +1,175 @@
+syntax = "proto3";
+package TimeoutCompensation;
+import "common/empty.proto";
+import "common/ezbuy.proto";
+
+service Compensation {
+    option (common.service).webapi = true;
+    // 根据条件获取赔付记录
+    rpc GetCompensationRecords(Condition) returns (CompensationRecords);
+
+    rpc GetHoliday(Nations) returns (CompensationHolidays);
+
+    rpc UpdateHoliday(CompensationHoliday) returns (CompensationResult);
+
+    rpc AddHoliday(CompensationHoliday) returns (CompensationResult);
+
+    rpc GetRules(Nations) returns (CompensationRules);
+
+    rpc UpdateRule(CompensationRule) returns (CompensationResult);
+
+    rpc AddRule(CompensationRule) returns (CompensationResult);
+
+    rpc GetTaskLogs(common.Empty) returns (CompensationLogs);
+    
+    // 促销后台接口
+    rpc GetCustomRules(OffsetAndLimit) returns (CustomCompemsationRules);
+    rpc AddCustomRule(CustomCompemsationRule)  returns (CompensationResult);
+    rpc UpdateCustomRule(CustomCompemsationRule) returns (CompensationResult);
+    rpc GetCustomRule(QueryId) returns (CustomCompemsationRule);
+    rpc DeleteCustomRule(QueryId) returns (CompensationResult);
+
+    rpc ReCalculateCompensation(ReCalculateCompensationReq) returns (ReCalculateCompensationResp);
+}
+
+message Condition {
+    string nation = 1;
+    bool isCompensated = 2;
+    string purchaseType = 3;
+    bool needCompensated =4;
+}
+
+message CompensationRecords {
+    repeated CompensationRecord records = 1;
+}
+
+message CompensationRecord {
+    int32 orderId = 1; 
+    string purchaseType =2;
+    int32 customerId = 3;
+    string catalogCode = 4;
+    string originCode = 5;
+    int64 createDate = 6;
+    int64 updateDate = 7;
+    bool isCompensated = 8;
+    bool isPurchasingTimeout = 9;
+    int64 purchasingStartAt = 10;
+    int64 purchasingEndAt = 11;
+    int64 purchasingDuration = 12;
+    bool isCheckAndWarehouseTimeout =13;
+    int64 checkAndWarehouseStartAt =14;
+    int64 checkAndWarehouseEndAt =15;
+    int64 checkAndWarehouseDuration =16;
+    bool isParcelTimeout =17;
+    int64 parcelStartAt =18;
+    int64 parcelEndAt =19;
+    int64 parcelDuration =20;
+    double compensation =21;
+    repeated string log =22;
+    bool needCompensated =23;
+}
+
+message Nations {
+    repeated string nations = 1;
+}
+
+message CompensationHolidays {
+    repeated CompensationHoliday holidays= 1;
+}
+
+message CompensationHoliday {
+    string originCode =1;
+    repeated string holiday =2;
+    int64 createDate = 3;
+    int64 updateDate = 4;
+}
+
+message CompensationResult {
+    bool result = 1;
+    string msg = 2; 
+}
+
+message CompensationRules {
+    repeated CompensationRule rules= 1;
+}
+
+message CompensationRule {
+    int64 compensationTimeout = 1;
+    double compensationMoney = 2;
+    string catalogCode = 3;
+    int64 createDate = 4;
+    int64 updateDate = 5;
+    repeated string serviceType =6;
+}
+
+message CompensationLogs {
+    repeated CompensationLog logs=1;
+}
+
+message CompensationLog {
+    int64 createDateTimestamp = 1;
+    string createDate =2;    
+}
+
+//catalogCode单选
+//serviceType可选类型
+//promotionStartTime促销开始时间
+//promotionEndTime促销结束时间
+//purchasingTimeOut下单超时时间
+//checkAndWarehouseTimeOut验货超时间
+//parcelTimeOut发货超时时间
+//compensationMoney赔付金额（预留）
+//Id规则对用的id
+message CustomCompemsationRule {
+    string catalogCode =1;    
+    repeated string serviceType =2;
+    repeated string originCode =3;
+    int32 promotionStartTime =4;
+    int32 promotionEndTime =5;
+    int32 purchasingTimeOut =6;
+    int32 checkAndWarehouseTimeOut =7;
+    int32 parcelTimeOut =8;
+    double compensationMoney =9;
+    string Id = 10;
+    bool  isDelete = 11;
+    int32 createDate = 12;
+    int32 updateDate = 13;
+}
+
+message CustomCompemsationRules{
+    repeated CustomCompemsationRule rules =1;
+    int32 total =2;
+    int32 offset =3;
+    int32 limit =4;    
+}
+
+message QueryId{
+    string Id =1;
+}
+
+message OffsetAndLimit{
+    int32 offset =1;
+    int32 limit =2;
+}
+
+message ReCalculateCompensationReq {
+    repeated int32 orderIds = 1;
+    ReOps ops = 2;
+    bool useHistory = 3;// 使用归档数据
+}
+
+message ReCalculateCompensationResp {
+    ErrorCode code = 1;
+    string msg = 2;
+}
+
+enum ReOps {
+    StepAndComp = 0;  // 阶段数据和总赔付数据都重新统计
+    CompensationOnly = 1;  // 只通过阶段数据重新计算总赔付数据 
+    ForceReplace = 2; // 强制覆盖旧数据,已赔付的除外
+}
+
+enum ErrorCode {
+    ErrOK = 0;
+    ErrUnknown = 1;
+}

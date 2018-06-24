@@ -1,0 +1,33 @@
+syntax = "proto3";
+package chaplin;
+
+import "common/empty.proto";
+
+//! ezbiz service
+service Currency{
+    //! 获取汇率配置
+    rpc FetchCurrency(FetchCurrencyReq) returns (FetchCurrencyResp);
+    //! 创建汇率配置
+    rpc CreateCurrency(CreateCurrencyReq) returns (common.Empty);
+    //! 更新汇率配置
+    rpc UpdateCurrency(UpdateCurrencyReq) returns (common.Empty);
+}
+
+message FetchCurrencyReq{
+    int64 warehouse_id = 1;
+}
+
+message FetchCurrencyResp{
+    int64 warehouse_id = 1;
+    float currency = 2;
+}
+
+message CreateCurrencyReq{
+    int64 warehouse_id = 1;
+    float currency = 2;    
+}
+
+message UpdateCurrencyReq{
+    int64 warehouse_id = 1;
+    float currency = 2;    
+}

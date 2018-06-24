@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package ezOrder;
+
+option swift_prefix = "GR";
+
+import "appcommon/common_public.proto";
+
+service Shopback {
+	// 记录返利订单信息
+	rpc RecordShopbackOrder(RecordShopbackOrderReq) returns (RecordShopbackOrderResp) {}
+
+	// 通知订单完成支付
+	rpc OnOrderPaid(OnOrderPaidReq) returns (OnOrderPaidResp) {}
+}
+
+message RecordShopbackOrderReq {
+	// 新系统订单ID
+	int64 orderID = 1;
+	// 返利订单来源
+	string source = 2;
+	// 返利链接
+	string link = 3;
+	// 用户通过返利网跳转到我们站内的时间
+	int64 date = 4;
+}
+
+message RecordShopbackOrderResp {
+	// 通用响应
+	appcommon.ResultResp result = 1;
+}
+
+message OnOrderPaidReq {
+	// 用户所在国家/地区
+	string catalog = 1;
+	// 新系统订单ID
+	int64 orderID = 2;
+}
+
+message OnOrderPaidResp {
+	// 通用响应
+	appcommon.ResultResp result = 1;
+}

@@ -1,0 +1,20 @@
+syntax = "proto3";
+package biz;
+option go_package = "gitlab.1dmy.com/ezbuy/base/dist/proto/biz";
+
+option swift_prefix = "GR";
+
+enum Region {
+  RegionInvalid = 0;
+  RegionCN = 1;
+  RegionTW = 2;
+  RegionUS = 3;
+  RegionKR = 4;
+  RegionJP = 5;
+  RegionSG = 100000000;
+  RegionMY = 200000000;
+  RegionTH = 300000000;
+  RegionID = 400000000;
+  RegionPK = 600000000;
+  RegionTWC = 700000000;
+}

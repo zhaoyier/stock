@@ -1,0 +1,226 @@
+syntax = "proto3";
+package spike;
+
+service Ban {
+	rpc Keyword(BanKeyword) returns (BanKeywordResp);
+
+    // 屏蔽规则 (添加删除都是这个接口)
+    rpc Rule(BanRule) returns (BanRuleResp);
+
+    //  屏蔽词列表
+    rpc ListWords(BanListWords) returns (BanListWordsResp);
+
+    // 屏蔽tcid 列表
+    rpc ListTcids(BanListTcids) returns (BanListTcidsResp);
+
+    // 屏蔽买家列表
+    rpc ListVendors(BanListVendors) returns (BanListVendorsResp);
+
+    // 屏蔽单品列表
+    rpc ListProducts(BanListProducts) returns (BanListProductsResp);
+
+    // 缓存通知
+    rpc ModifyNotice(BanModifyNotice) returns (BanModifyNoticeResp);
+
+    // 查询屏蔽(admin使用)
+    rpc Search(BanSearch) returns (BanSearchResp);
+
+    // 检查商品屏蔽信息
+    rpc Check(BanCheck) returns (BanCheckResp);
+}
+
+// ---------------------------------------------------------------------------
+
+
+// 屏蔽的类型
+enum BanType {
+    BanTypeUnknown = 0;
+    BanTypeWords = 1;
+    BanTypeVendor = 2;
+    BanTypeTaoBaoCid = 3;
+    BanTypeProduct = 4;
+    BanTypePcat = 5;
+}
+
+// 屏蔽范围
+enum BanScope {
+    BanScopeUnknown = 0;
+    BanScopeListing = 1;
+    BanScopeDetail = 2;
+	BanScopeEzbuy = 4;  // 不允许Ezbuy
+	BanScopePrime = 8;  // 不允许Prime
+}
+
+// 屏蔽规则 操作选项
+enum BanRuleOp {
+    BanRuleOpUnknown = 0;
+    BanRuleOpAdd = 1;
+    BanRuleOpRemove = 2;
+}
+
+message BanCatalog {
+    string catalog = 1;
+    BanScope banScope = 2;
+}
+
+message BanWords {
+    string words = 1;
+    repeated BanCatalog banCatalogs = 2;
+    string updateBy = 3;
+    string remark = 4;
+    int64 updateTime = 5;
+}
+
+message BanTcid {
+    int64 tcid = 1;
+    repeated BanCatalog banCatalogs = 2;
+    string updateBy = 3;
+    string remark = 4;
+    int64 updateTime= 5;
+}
+
+message BanVendor {
+    string vendor = 1;
+    repeated BanCatalog banCatalogs = 2;
+    string updateBy = 3;
+    string remark = 4;
+    int64 updateTime = 5;
+}
+
+message BanProduct {
+    int64 gpid = 1;
+    repeated BanCatalog banCatalogs = 2;
+    string updateBy = 3;
+    string remark = 4;
+    int64 updateTime = 5;
+}
+
+message BanPcat {
+    int32 pcid = 1;
+    repeated BanCatalog banCatalogs = 2;
+    string updateBy = 3;
+    string remark = 4;
+}
+
+message BanListWords {
+    int32 limit = 1;
+    int32 offset = 2;
+    BanCatalog banCatalog = 3;
+}
+
+message BanListWordsResp {
+    int32 total = 1;
+    repeated BanWords banWords = 2;
+}
+
+message BanListTcids {
+    int32 limit = 1;
+    int32 offset = 2;
+    BanCatalog banCatalog = 3; 
+}
+
+message BanListTcidsResp {
+    int32 total = 1;
+    repeated BanTcid banTcids = 2;
+}
+
+message BanListVendors {
+    int32 limit = 1;
+    int32 offset = 2;
+    BanCatalog banCatalog = 3; 
+}
+
+message BanListVendorsResp {
+    int32 total = 1;
+    repeated BanVendor banVendors = 2;
+}
+
+message BanListProducts {
+    int32 limit = 1;
+    int32 offset = 2;
+    BanCatalog banCatalog = 3; 
+}
+
+message BanListProductsResp {
+    int32 total = 1;
+    repeated BanProduct banProducts = 2;
+}
+
+message BanRule {
+    BanType banType = 1;
+    repeated BanCatalog banCatalogs = 2;
+    string updateBy = 3;
+    string remark = 4;
+
+    // add, remove
+    BanRuleOp ruleOp = 5;
+
+    // 根据屏蔽类型选填
+    string words = 6;
+    string vendor = 7;
+    int64 tcid = 8;
+    int64 gpid = 9;
+    int32 pcid = 10;
+}
+
+message BanRuleResp {
+}
+
+message BanCheck {
+    int64 gpid = 1;
+    string name = 2;
+    // 传递英文名
+    string altName = 3;
+    int64 tcid = 4;
+    string vendor = 5;
+    int32 pcid = 6;
+}
+
+message BanCheckResp {
+    map<string, BanScope> scopes = 1;
+
+    // 给出命中的类型和值  eg: "tcid:1234,words:qqq"
+    repeated string banHit = 3;
+}
+
+message BanModifyNotice {
+}
+
+message BanModifyNoticeResp {
+}
+
+message BanSearch {
+    BanType banType = 1;
+    BanCatalog banCatalog = 2;
+
+    int32 limit = 3;
+    int32 offset = 4;
+
+    // 根据bantype 选填
+    string words = 5;
+    string vendor = 6;
+    int64 tcid = 7;
+    int64 gpid = 8;
+    int32 pcid = 9;
+}
+
+message BanSearchResp {
+    int32 total = 1;
+
+    repeated BanWords banWrods = 2;
+    repeated BanTcid banTcids = 3;
+    repeated BanVendor banVendors = 4;
+    repeated BanProduct banProducts = 5;
+    repeated BanPcat banPcats = 6;
+}
+
+// ---------------------------------------------------------------------------
+
+message BanKeyword {
+	string catalog = 1;
+	repeated string keyword = 2;
+}
+
+message BanKeywordResp {
+	repeated string match = 1;
+}

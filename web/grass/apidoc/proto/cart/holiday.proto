@@ -1,0 +1,71 @@
+syntax = "proto3";
+package cart;
+
+import "cart/common.proto";
+
+//! 假期设置
+
+message GetHolidayReq {
+	int64 	startDate = 1;   //开始
+	int64 	endDate = 2;      //结束
+	string   catalogCode = 3;   //国家地区
+}
+
+message GetHolidayResp {
+	Result result = 1;
+	repeated HolidayItem item = 2;
+}
+
+message GetMultiHolidayReq {
+	int64 	startDate = 1;   //开始
+	int64 	endDate = 2;      //结束
+	repeated string catalogCode = 3;   //国家地区
+}
+
+message GetMultiHolidayResp {
+	Result result = 1;
+	repeated HolidayItem item = 2;
+}
+
+message AddHolidayReq {
+	int64 	startDate = 1; //开始
+	int64 	endDate = 2;   //结束
+	bool    isSingle = 3;  //是否跨日
+	int64   regionId = 4;   //国家地区
+	int64   holidayType = 5; //type
+}
+
+message AddHolidayResp {
+	Result result = 1;
+}
+
+
+message ModifyHolidayReq {
+	int64 	startDate = 1; //开始
+	int64 	endDate = 2;   //结束
+	bool    isSingle = 3;  //是否跨日
+	bool    isActive = 4;  //是否启用
+	int64   regionId = 5;   //国家地区
+	int64   holidayType = 6; //type
+}
+
+message ModifyHolidayResp {
+	Result result = 1;
+}
+
+
+service HolidayService {
+	
+	//! 查询节假日
+	rpc GetHoliday(GetHolidayReq) returns (GetHolidayResp) {}
+	
+	//! 查询节假日
+	rpc GetMultiHoliday(GetMultiHolidayReq) returns (GetMultiHolidayResp) {}
+
+	//! 新增节假日
+	rpc AddHoliday(AddHolidayReq) returns (AddHolidayResp) {}
+
+	//! 修改节假日
+	rpc ModifyHoliday(ModifyHolidayReq) returns (ModifyHolidayResp) {}
+
+}

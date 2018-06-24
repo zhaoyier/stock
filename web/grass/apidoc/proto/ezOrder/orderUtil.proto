@@ -1,0 +1,194 @@
+syntax = "proto3";
+package ezOrder;
+import "common/empty.proto";
+import "common/html.proto";
+import "ezOrder/order.proto";
+service OrderUtilService {
+	//! 测试
+	rpc Test(common.Empty) returns (TestResp) {};
+
+	// 基于razor的订单详情
+	rpc RazorOrderDetail(common.Empty) returns (common.Html);
+
+	// 缓存数量控制页面
+	rpc RazorCacheCountCMS(common.Empty) returns (common.Html);
+
+	// 设置计数缓存停止计数
+	rpc ErpSetCacheCountStopCount(ErpSetCacheCountStopCountReq) returns (ErpSetCacheCountStopCountResp);
+
+	// 设置每日最大上限
+	rpc ErpSetMaxOrderSkuCount(ErpSetMaxOrderSkuCountReq) returns (ErpSetMaxOrderSkuCountResp);
+
+	// 根据订单id查询订单sku详情
+	rpc RpcGetOrderSkuDetailByOrderIdItemId(RpcGetOrderSkuDetailByOrderIdItemIdReq) returns (RpcGetOrderSkuDetailByOrderIdItemIdResp);
+
+	// 根据订单id itemsId查询订单状态
+	rpc RpcGetOrderItemsStatus(RpcGetOrderItemsStatusReq) returns (RpcGetOrderItemsStatusResp);
+
+	// 根据用户id获取未支付账单数目
+	rpc RpcGetUnPaidBillCount(RpcGetUnPaidBillCountReq) returns (RpcGetUnPaidBillCountResp);
+
+	// 根据用户id获取未支付账单信息列表
+	rpc RpcGetUnPaidBillsInfo(RpcGetUnPaidBillsInfoReq) returns (RpcGetUnPaidBillsInfoResp);
+
+	// 根据账单id获取账单详情
+	rpc RpcGetBillDetail(RpcGetBillDetailReq) returns (RpcGetBillDetailResp);
+
+	//判断是否存在闪购
+	rpc RpcIsExistFlashSaleOrder(RpcIsExistFlashSaleOrderReq) returns (RpcIsExistFlashSaleOrderResp);
+
+	//判断是否存在未支付的差额补齐
+	rpc RpcIsExistUnPaidOffsetBill(RpcIsExistUnPaidOffsetBillReq) returns (RpcIsExistUnPaidOffsetBillResp);
+
+	//获取未支付的差额补齐offsetid
+	rpc RpcGetUnpaidOffsetId(RpcGetUnpaidOffsetIdReq) returns (RpcGetUnpaidOffsetIdResp);
+
+	//获取账单状态
+	rpc RpcGetBillStatus(RpcGetBillStatusReq) returns (RpcGetBillStatusResp);
+}
+
+message RpcGetBillStatusReq{
+	string Catalog = 1;
+	int64 BillId = 2;
+}
+
+message RpcGetBillStatusResp{
+	ezOrder.BillStatus BillStatus = 1;
+}
+
+message RpcGetUnpaidOffsetIdReq{
+	string Catalog = 1;
+	int64 OrderId = 2;
+	int64 OrderItemId = 3;
+}
+
+message RpcGetUnpaidOffsetIdResp{
+	int64 offsetId = 1;
+}
+
+message RpcIsExistUnPaidOffsetBillReq{
+	string Catalog = 1;
+	int64 OrderId = 2;
+	int64 OrderItemId = 3;
+}
+
+message RpcIsExistUnPaidOffsetBillResp{
+	bool IsExist = 1;
+}
+
+message RpcIsExistFlashSaleOrderReq{
+	string Catalog = 1;
+	repeated int64 BillIds = 2;
+	repeated int32 PaymentBillIds = 3;
+}
+
+message RpcIsExistFlashSaleOrderResp{
+	bool IsExist = 1;
+}
+
+message RpcGetOrderItemsStatusReq {
+	string Catalog = 1;
+	int64 OrderId = 2;
+	repeated int64 OrderItemIds = 3;
+}
+
+message RpcGetOrderItemsStatusResp {
+	repeated OrderItemStatus OrderItemsStatus = 1;
+}
+
+message OrderItemStatus {
+	int64 OrderItemId = 1;
+	int32 Status = 2;
+}
+
+message RpcGetBillDetailReq {
+	string Catalog = 1;
+	int64 BillId = 2;
+}
+
+message RpcGetBillDetailResp {
+	int64 BillId = 1;
+	int64 BillAmount = 2;
+	ServiceType ServiceType = 3;
+	BillStatus BillStatus = 4;
+    int64 CreateDate = 5;
+	repeated FeeInfo FeeInfos = 6;
+	ezOrder.Result result = 7;
+}
+
+message RpcGetUnPaidBillsInfoReq {
+	string Catalog = 1;
+	int64 CustomerId = 2;
+}
+
+message RpcGetUnPaidBillsInfoResp {
+	repeated UnPaidBillInfo UnPaidBillInfos = 1;
+	ezOrder.Result result = 2;
+}
+
+message UnPaidBillInfo{
+	int64 BillId = 1;
+	int64 BillAmount = 2;
+	ServiceType ServiceType = 3;
+	BillStatus BillStatus = 4;
+	int64 CreateDate = 5;
+	int32 PaymentBillId = 6;
+	repeated OrderItemSkuInfo OrderItemSkuInfos =7;
+}
+
+message OrderItemSkuInfo{
+	int64 OrderItemId = 1;
+	int64 Gpid = 2;
+	string SkuId = 3;
+	int64 GpidVersion = 4;
+}
+
+message RpcGetUnPaidBillCountReq {
+	string Catalog = 1;
+	int64 CustomerId = 2;
+}
+
+message RpcGetUnPaidBillCountResp {
+	int64 UnPaidBillCount = 1;
+	ezOrder.Result result = 2;
+}
+
+message ErpSetMaxOrderSkuCountReq {
+	string cacheKey = 1;
+	string catalog = 2;
+	int32 maxCount = 3;
+}
+
+message ErpSetMaxOrderSkuCountResp {
+	ezOrder.Result result = 1;
+}
+
+
+message RpcGetOrderSkuDetailByOrderIdItemIdReq {
+	string Catalog = 1;
+	int64 NewOrderId = 2;
+	int64 NewOrderItemId = 3;
+
+}
+
+message RpcGetOrderSkuDetailByOrderIdItemIdResp {
+	int64 CustomerId = 1;
+	int64 Gpid = 2;
+	string SkuId = 3;
+	int64 GpidVersion = 4;
+	ezOrder.Result result = 5;
+
+}
+
+message TestResp {
+	string msg = 1;
+}
+
+message ErpSetCacheCountStopCountReq {
+	string cacheKey = 1;
+	bool isStopCount = 2;
+}
+
+message ErpSetCacheCountStopCountResp {
+	ezOrder.Result result = 1;
+}

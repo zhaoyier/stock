@@ -1,0 +1,129 @@
+syntax = "proto3";
+package eltreum;
+
+import "common/empty.proto";
+import "spk/spk_item.proto";
+
+service Cronjob {
+	// Ping
+	rpc Ping(ReqPing) returns (RespPing);
+	// 定时任务信息
+	rpc Stats (common.Empty) returns (RespStats);
+	// 仓库分配
+	rpc WarehouseAllocate (common.Empty) returns (common.Empty);
+	// 仓库分配测试
+	rpc WarehouseAllocateTest (ReqWarehouseAllocateTest) returns (RespWarehouseAllocateTest);
+	// 采购单分类过滤
+	rpc Filter (common.Empty) returns (common.Empty);
+	// 采购单返回SqlServer老库
+	rpc ReturnMsSql (common.Empty) returns (common.Empty);
+	// 检查差额补齐支付状态
+	rpc RunCheckOffset (common.Empty) returns (common.Empty);
+	// 同步卖家测试
+	rpc SyncSeller (ReqSyncSeller) returns (RespSyncSeller);
+	// 京东返回
+	rpc JdReturn (ReqJdReturn) returns (RespJdReturn);
+
+	// ---------------------------------------------------------------------------
+
+	// 从商品库获取商品信息，缓存到本地
+	rpc ProductInfoGet(spk.ItemErps) returns (spk.ItemErpsResp);
+}
+
+// ---------------------------------------------------------------------------
+
+
+message ReqPing {
+	string Msg = 1;
+}
+
+message RespPing {
+	string Msg = 1;
+}
+
+message JobStatus {
+	string JobName = 1;
+	string PrevRunTime = 2;
+	string NextRunTime = 3;
+}
+
+message RespStats {
+	repeated JobStatus Stats = 1;
+}
+
+//测试分配仓库的请求实体
+message ReqEntityForWarehouseAllocateTest {
+	//采购单主键Id
+	int64 PurchaseOrderId = 1;
+	//账单Id
+	int64 PaymentId = 2;
+	//服务类型Id
+	int64 ServiceTypeId = 3;
+	//采购地Id
+	int64 ProSourceRegionId = 4;
+	//目的地Id
+	int64 RegionId = 5;
+	//运输方式Id
+	int64 ShipmentTypeId = 6;
+	//Gpid
+	int64 Gpid = 7;
+	//SkuId
+	string SkuId = 8;
+}
+
+//测试分配仓库的请求
+message ReqWarehouseAllocateTest {
+	//待分配仓库的采购单列表
+	repeated ReqEntityForWarehouseAllocateTest PurchaseOrders = 1;
+}
+
+//测试分配仓库的响应实体
+message RespEntityForWarehouseAllocateTest {
+	//分配的仓库Id
+	int64 WarehouseId = 1;
+	//账单Id
+	int64 PaymentId = 2;
+	//运输方式Id
+	int64 ShipmentTypeId = 3;
+	//来源地Id
+	int64 OriginId = 4;
+}
+
+//测试分配仓库响应
+message RespWarehouseAllocateTest{
+	//分配仓库的结果
+	repeated RespEntityForWarehouseAllocateTest Results = 1;
+}
+
+message ReqSyncSeller {
+
+}
+
+message RespSyncSeller {
+	string Req = 1;
+}
+
+message JdReturnEntity {
+	int64 OrderIdMysql = 1;
+	int64 OrderItemIdMysql = 2;
+	//是否能够被京东自动下单，返回true，采购系统更新状态为【已下单】，返回false，采购系统更新为【已过滤】
+	bool IsCanAutoPlaceByJd = 3;
+	//采购单号，如果IsCanAutoPlaceByJd为true，那么PoNumber必须要有值
+	string PoNumber = 4;
+}
+
+message JdReturnResultEntity {
+	//0表示成功，非0表示失败
+	int64 Code = 1;
+	//返回的消息，只有Code为非0，也就是失败时，Message才需要写值
+	string Message = 2;
+}
+
+message ReqJdReturn {
+	repeated JdReturnEntity Entities = 1;
+}
+
+message RespJdReturn {
+	//与传入的Item数目及顺序一致
+	repeated JdReturnResultEntity Entities = 1;
+}

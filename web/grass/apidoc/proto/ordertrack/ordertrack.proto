@@ -1,0 +1,129 @@
+syntax = "proto3";
+package ordertrack;
+import "common/ezbuy.proto";
+
+service OrderTrack {
+  rpc RePlaceOrder(RePlaceOrderReq) returns (RePlaceOrderResp);
+  rpc Add(OrderTrackAdd) returns (OrderTrackAddResp);
+  rpc MultiAdd(OrderTrackMultiAdd) returns (OrderTrackMultiAddResp){
+	option (common.timeout) = "60s";
+  };
+  //同步物流信息
+  rpc SyncWayBill(OrderTrackSyncWayBill) returns (OrderTrackSyncWayBillResp);
+  rpc FixData(OrderTrackFixData) returns (OrderTrackFixDataResp);
+  rpc GetTrackInfo(OrderTrackGetTrackInfo) returns (OrderTrackGetTrackInfoResp);
+}
+
+//----------------------------------------------------
+message OrderTrackGetTrackInfo {
+  repeated string poNumbers = 1;
+}
+
+
+message OrderTrackGetTrackInfoResp {
+  repeated TrackInfoEx details = 1;
+}
+
+message TrackInfoEx {
+  string poNumber = 1;
+  repeated TrackInfo trackInfos = 2;
+}
+
+
+//-----------------------------------------------------
+message OrderTrackFixData {
+  int64 orderId = 1;
+  string poNumber = 2;
+  repeated string track = 3; 
+}
+
+message OrderTrackFixDataResp {
+}
+
+//---------------------------------------------------------------------------
+message OrderTrackSyncWayBill {
+  string poNumber = 1;
+  string vendorName = 6;
+  repeated TrackInfo trackInfo = 2;
+  OrderSource source = 5;
+}
+
+message TrackInfo {
+  string trackingNo  = 1;
+  string trackingStatus = 2;
+  string shipperName = 3;
+  string status = 5;
+  int64 createTime = 4;
+  int64 syncDate = 6;
+}
+
+message OrderTrackSyncWayBillResp {
+}
+
+
+// ---------------------------------------------------------------------------
+
+message RePlaceOrderReq {
+  // 老的orderId
+  int32 oldOrderId = 1;
+}
+
+message RePlaceOrderResp {
+  bool isSucc = 1;
+  string msg = 2;
+}
+
+
+//---------------------------------------------------------------------------
+enum OrderSource{
+  Unknow = 0;
+  //淘宝或天猫
+  Taobao = 1;
+  //卖家 
+  Seller = 2;
+  //京东
+  JD  = 3;
+  //楚楚街
+  ChuChuJie = 4;
+  //蘑菇街
+  MoGuJie = 5;
+  // 环球易购
+  ChinaBrand= 6;
+}
+
+//添加运单号
+message OrderTrackAdd {
+  int64 orderId = 1;
+  int64 orderItemId = 2;
+  //采购单号
+  string poNumber = 3;
+  //新的orderid，orderitemid 
+  int64 newOrderId = 11;
+  int64 newOrderItemId = 12;
+  //卖家账号
+  string vendorName = 8;
+  //物流公司
+  string shipperName = 4;
+  //运单号
+  string trackingNo = 5;
+  //物流状态
+  string trackingStatus= 6;
+  //物流状态code, 0 未抓取运单号, 1 已抓取运单号, 2 仓库已签收
+  int32 statusCode = 10;
+  //来源
+  OrderSource source = 9;
+  //同步时间
+  int64 syncDate = 7;
+  string updateBy = 13;
+}
+
+message OrderTrackAddResp {
+}
+
+//---------------------------------------------------------------------------
+message OrderTrackMultiAdd {
+  repeated OrderTrackAdd tracks = 1;
+}
+
+message OrderTrackMultiAddResp {
+}

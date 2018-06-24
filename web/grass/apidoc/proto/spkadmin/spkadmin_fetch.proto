@@ -1,0 +1,32 @@
+syntax = "proto3";
+package spkadmin;
+
+import "common/ezbuy.proto";
+
+service Fetch {
+    option (common.service).webapi = true;
+    
+    //按taobao店铺名生成抓取店铺url的job，最终通过店铺url抓取店内商品
+    rpc ImportTaobaoShop (FetchImportTaobaoShop) returns (FetchImportTaobaoShopResp);
+}
+
+
+message FetchImportTaobaoShop{
+    repeated string shopName = 1; 
+}
+
+message FetchImportTaobaoShopResp{
+    string jobId = 1;
+}
+
+message FetchJobImportTaobaoShopURLByName {
+    repeated string shopName = 1;
+}
+
+message FetchJobImportTaobaoShopItemURLByShopURL{
+    string poolId = 1;
+}
+
+message FetchJobImportTaobaoShopItemByURL{
+    string poolId = 1;
+}

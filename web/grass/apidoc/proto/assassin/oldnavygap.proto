@@ -1,0 +1,18 @@
+syntax = "proto3";
+package assassin;
+import "assassin/assassin.proto";
+import "common/ezbuy.proto";
+
+service OldNavyGap {
+    option (common.service).webapi = true;
+    rpc Get(OldNavyGapGet) returns (OldNavyGapGetResp);
+}
+
+message OldNavyGapGet {
+    string id = 1;
+    bool notRealtime = 2;
+}
+
+message OldNavyGapGetResp {
+    Product product = 1;
+}

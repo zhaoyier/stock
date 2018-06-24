@@ -1,0 +1,15 @@
+syntax = "proto3";
+package biz;
+option go_package = "gitlab.1dmy.com/ezbuy/base/dist/proto/biz";
+
+enum Warehouse {
+  WarehouseInvalid = 0;
+  WarehouseGuangzhou = 1;
+  WarehouseShanghai = 2;
+  WarehouseAmerican = 3;
+  WarehouseTaiwan = 4;
+  WarehouseSingapore = 5;
+  WarehouseMalaysia = 6;
+  WarehouseINCHEON = 7;
+  WarehouseJapan = 8;
+}

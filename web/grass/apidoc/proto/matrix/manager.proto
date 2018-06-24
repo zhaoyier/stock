@@ -1,0 +1,234 @@
+syntax = "proto3";
+package matrix;
+import "matrix/exchange.proto";
+
+service Manager {
+	// 获取基础汇率
+	rpc GetBase(ManagerGetBase) returns (ManagerGetBaseResp);
+
+	// 修改基础汇率
+	rpc UpdateBase(ManagerUpdateBase) returns (ManagerUpdateBaseResp);
+
+	// 获取基础汇率变动记录
+	rpc GetBaseLog(ManagerGetBaseLog) returns (ManagerGetBaseLogResp);
+
+	// 获取现有的价格区间
+	rpc GetPriceRange(ManagerGetPriceRange) returns (ManagerGetPriceRangeResp);
+
+	// 增加价格区间
+	rpc AddPriceRange(ManagerAddPriceRange) returns (ManagerAddPriceRangeResp);
+
+	// 更新价格区间
+	rpc UpdatePriceRange(ManagerUpdatePriceRange) returns (ManagerUpdatePriceRangeResp);
+
+	// 批量修改价格区间
+	rpc UpsertPriceRange(ManagerUpsertPriceRange) returns (ManagerUpsertPriceRangeResp);
+
+	// 获取动态汇率配置
+	rpc GetMatrix(ManagerGetMatrix) returns (ManagerGetMatrixResp);
+
+	// 更新或增加动态汇率配置
+	rpc UpsertMatrix(ManagerUpsertMatrix) returns (ManagerUpsertMatrixResp);
+
+	// 获取动态汇率配置变动记录
+	rpc GetMatrixLog(ManagerGetMatrixLog) returns (ManagerGetMatrixLogResp);
+
+	// 获取动态汇率配置变动记录详情
+	rpc GetMatrixLogDetail(ManagerGetMatrixLogDetail) returns (ManagerGetMatrixLogDetailResp);
+
+	// 获取完整的汇率规则, 内部使用
+	rpc GetExchangeRules(ManagerGetExchangeRules) returns (ManagerGetExchangeRulesResp);
+}
+
+message Result {
+	int32 code = 1;
+	string message = 2;
+}
+
+message ManagerBase {
+	ExchangeBaseType baseType = 1;
+	double base = 2;
+}
+
+message ManagerRateChange {
+	double before = 1;
+	double after = 2;
+}
+
+message ManagerBaseLogItem {
+	ExchangeBaseType baseType = 1;
+	ManagerRateChange change = 2;
+}
+
+message ManagerBaseLog {
+	repeated ManagerBaseLogItem item = 1;
+	int64 createAt = 2;
+	string createBy = 3;
+}
+
+message ManagerGetBase {
+	ExchangeRegion region = 1;
+}
+
+message ManagerGetBaseResp {
+	repeated ManagerBase base = 1;
+}
+
+message ManagerUpdateBase {
+	ExchangeRegion region = 1;
+	repeated ManagerBase base = 2;
+}
+
+message ManagerUpdateBaseResp {
+	repeated Result result = 1;
+}
+
+message ManagerGetBaseLog {
+	ExchangeRegion region = 1;
+	int32 limit = 2;
+	int32 offset = 3;
+}
+
+message ManagerGetBaseLogResp {
+	repeated ManagerBaseLog log = 1;
+}
+
+message ManagerPriceRange {
+	int64 rangeId = 1;
+	double rangeStart = 2;
+	double rangeEnd = 3;
+	bool disabled = 4;
+}
+
+message ManagerGetPriceRange {
+	ExchangeRegion region = 1;
+}
+
+message ManagerGetPriceRangeResp {
+	repeated ManagerPriceRange range = 1;
+}
+
+message	ManagerAddPriceRange {
+	ExchangeRegion region = 1;
+	double rangeStart = 2;
+	double rangeEnd = 3;
+	bool disabled = 4;
+}
+
+message	ManagerAddPriceRangeResp {
+	Result result = 1;
+	ManagerPriceRange added = 2;
+}
+
+message ManagerUpdatePriceRange {
+	ExchangeRegion region = 1;
+	repeated ManagerPriceRange range = 2;
+}
+
+message	ManagerUpdatePriceRangeResp {
+	repeated Result result = 1;
+}
+
+message ManagerUpsertPriceRange {
+	ExchangeRegion region = 1;
+	repeated ManagerPriceRange range = 2;
+}
+
+message ManagerUpsertPriceRangeResp {
+	Result result = 1;
+	repeated ManagerPriceRange updated = 2;
+}
+
+message ManagerMatrix {
+	int64 categoryId = 1;
+	repeated string categoryNames = 2;
+	repeated ManagerMatrixCell cell = 3;
+}
+
+message ManagerMatrixCell {
+	ManagerPriceRange range = 1;
+	double base = 2;
+	double delta = 3;
+	double final = 4;
+	double plus = 5;
+}
+
+message ManagerGetMatrix {
+	ExchangeRegion region = 1;
+}
+
+message ManagerGetMatrixResp {
+	repeated ManagerMatrix matrix = 1;
+}
+
+message ManagerUpsertMatrix {
+	ExchangeRegion region = 1;
+	repeated ManagerMatrix updated = 2;
+}
+
+message ManagerUpsertMatrixResp {
+	repeated Result result = 1;
+}
+
+message ManagerMatrixLog {
+	int64 logId = 1;
+	int64 createAt = 2;
+	string createBy = 3;
+}
+
+message ManagerMatrixLogDetail {
+	int64 categoryId = 1;
+	repeated string categoryNames = 2;
+	repeated ManagerMatrixLogItem item = 3;
+}
+
+message ManagerMatrixLogItem {
+	ManagerPriceRange range = 1;
+	ManagerRateChange change = 2;
+	ManagerRateChange plusChange = 3;
+}
+
+message ManagerGetMatrixLog {
+	ExchangeRegion region = 1;
+	int32 limit = 2;
+	int32 offset = 3;
+}
+
+message ManagerGetMatrixLogResp {
+	repeated ManagerMatrixLog log = 1;
+}
+
+message ManagerGetMatrixLogDetail {
+	ExchangeRegion region = 1;
+	int64 logId = 2;
+}
+
+message ManagerGetMatrixLogDetailResp {
+	repeated ManagerMatrixLogDetail detail = 1;
+}
+
+message ManagerGetExchangeRules {
+	string catalogCode = 1;
+}
+
+message ManagerBaseMatrix {
+	ExchangeBaseType baseType = 1;
+	repeated ManagerMatrix matrix = 2;
+}
+
+message ManagerGetExchangeRulesItem {
+	string catalogCode = 1;
+	string originCode = 2;
+	repeated ManagerBase base = 3;
+	repeated ManagerSource source = 4;
+	repeated ManagerBaseMatrix matrix = 5;
+}
+
+message ManagerSource {
+	ExchangeSource source = 1;
+	ExchangeBaseType baseType = 2;
+}
+
+message ManagerGetExchangeRulesResp {
+	repeated ManagerGetExchangeRulesItem items = 1;
+}

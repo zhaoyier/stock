@@ -1,0 +1,18 @@
+.HomeLogoWrap {
+  display: flex;
+  align-items: center;
+  width: 250px;
+  height: 70px;
+  background-image: url(../image/left_bg@2x.png);
+
+  img {
+    margin: 0 7px 0 30px;
+    width: 88px;
+  }
+
+  span {
+    font-size: 16px;
+    font-weight: 500;
+    color: #fff;
+  }
+}

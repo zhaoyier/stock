@@ -1,0 +1,17 @@
+syntax = "proto3";
+package spk;
+
+import "common/ezbuy.proto";
+
+service Image {
+  option (common.service).webapi = true;
+  rpc Get(ImageGet) returns (ImageGetResp);
+}
+
+message ImageGet {
+  string url = 1;
+}
+
+message ImageGetResp {
+  string url = 2;
+}

@@ -1,0 +1,376 @@
+syntax = "proto3";
+package mithril;
+
+import "mithril/common.proto";
+import "common/ezbuy.proto";
+
+//! warehourse crud messages
+message FetchWarehouseReq{
+	int64 warehouse_id = 1;
+}
+
+message FetchWarehouseResp{
+	Result result = 1;
+	Warehouse data = 2;
+}
+
+message CreateWarehouseReq{
+	Warehouse warehouse = 1;
+}
+
+message CreateWarehouseResp{
+	Result result = 1;
+}
+
+message UpdateWarehouseReq{
+	Warehouse warehouse = 1;
+}
+
+message UpdateWarehouseResp{
+	Result result = 1;
+}
+
+message DeleteWarehouseReq{
+	int64 warehouse_id = 1;
+}
+
+message DeleteWarehouseResp{
+	Result result = 1;
+}
+
+message DisableWarehouseReq{
+	int64 warehouse_id = 1;
+}
+
+message DisableWarehouseResp{
+	Result result = 1;
+}
+
+message EnableWarehouseReq{
+	int64 warehouse_id = 1;
+}
+
+message EnableWarehouseResp{
+	Result result = 1;
+}
+
+message SearchWarehouseReq{
+	string warehouse_name = 1;
+	int32  warehouse_type_id = 2;
+	bool   ignore_is_active = 3;
+	int32  offset = 4;
+	int32  limit = 5;
+}
+
+message SearchWarehouseResp{
+	Result result = 1;
+	int64 total = 2;
+	repeated Warehouse items = 3;
+}
+//! warehouse area crud messages
+message FetchWarehouseAreaReq{
+	int64 warehouse_area_id = 1;
+}
+
+message FetchWarehouseAreaResp{
+	Result result = 1;
+	WarehouseArea data = 2;
+}
+
+message CreateWarehouseAreaReq{
+	WarehouseArea warehouse_area = 1;
+}
+
+message CreateWarehouseAreaResp{
+	Result result = 1;
+	WarehouseArea data = 2;
+}
+
+message UpdateWarehouseAreaReq{
+	WarehouseArea warehouse_area = 1;
+}
+
+message UpdateWarehouseAreaResp{
+	Result result = 1;
+}
+
+message DeleteWarehouseAreaReq{
+	int64 warehouse_area_id = 1;
+}
+
+message DeleteWarehouseAreaResp{
+	Result result = 1;
+}
+
+message DisableWarehouseAreaReq{
+	repeated int64 warehouse_area_ids = 1;
+}
+
+message DisableWarehouseAreaResp{
+	Result result = 1;
+}
+
+message EnableWarehouseAreaReq{
+	repeated int64 warehouse_area_ids = 1;
+}
+
+message EnableWarehouseAreaResp{
+	Result result = 1;
+}
+
+message SearchWarehouseAreaReq{
+	int64 	warehouse_id = 1;
+	int64   region_id = 2;
+	int32  	floor = 3;
+	int32   shipment_type_id = 4;
+	int32   delivery_type_id = 5;
+	bool   ignore_is_active = 6;
+	int32  offset = 7;
+	int32  limit = 8;
+}
+message SearchWarehouseAreaResp{
+	Result result = 1;
+	int64 total = 2;
+	repeated WarehouseAreaView items = 3;
+}
+//! shelf crud messages
+message FetchShelfReq{
+	int64 shelf_id = 1;
+}
+
+message FetchShelfResp{
+	Result result = 1;
+	Shelf data = 2;
+}
+
+message CreateShelfReq{
+	Shelf shelf = 1;
+	int32 scope_x = 2;
+	int32 scope_y = 3;
+	int32 scope_z = 4;
+	bool  default_is_active = 5;
+	int32 group_from = 6;
+	int32 group_to = 7;
+}
+
+message CreateShelfResp{
+	Result result = 1;
+}
+
+message UpdateShelfReq{
+	Shelf shelf = 1;
+}
+
+message UpdateShelfResp{
+	Result result = 1;
+}
+
+message DeleteShelfReq{
+	int64 shelf_id = 1;
+}
+
+message DeleteShelfResp{
+	Result result = 1;
+}
+
+message DisableShelfReq{
+	repeated int64 shelf_ids = 1;
+}
+
+message DisableShelfResp{
+	Result result = 1;
+}
+
+message EnableShelfReq{
+	repeated int64 shelf_ids = 1;
+}
+
+message EnableShelfResp{
+	Result result = 1;
+}
+
+message SearchShelfReq{
+	int64  warehouse_id = 1;
+	int64  warehouse_area_id = 2;
+	int32  shelf_type_id = 3;
+	int32  product_category_id = 4;
+	int32  package_type_id = 5;
+	string shelf_code = 6;
+	bool   ignore_is_active = 7;
+	int32  offset = 8;
+	int32  limit = 9;
+}
+
+message SearchShelfResp{
+	Result result = 1;
+	int64 total = 2;
+	repeated ShelfView items = 3;
+}
+
+//! shelf type crud messages
+message FetchShelfTypeReq{
+	int64 shelf_type_id = 1;
+}
+
+message FetchShelfTypeResp{
+	Result result = 1;
+	ShelfType data = 2;
+}
+
+message CreateShelfTypeReq{
+	ShelfType shelf_type = 1;
+}
+
+message CreateShelfTypeResp{
+	Result result = 1;
+}
+
+message UpdateShelfTypeReq{
+	ShelfType shelf_type = 1;
+}
+
+message UpdateShelfTypeResp{
+	Result result = 1;
+}
+
+message DeleteShelfTypeReq{
+	int64 shelf_type_id = 1;
+}
+
+message DeleteShelfTypeResp{
+	Result result = 1;
+}
+
+message DisableShelfTypeReq{
+	repeated int64 shelf_type_ids = 1;
+}
+
+message DisableShelfTypeResp{
+	Result result = 1;
+}
+
+message EnableShelfTypeReq{
+	repeated int64 shelf_type_ids = 1;
+}
+
+message EnableShelfTypeResp{
+	Result result = 1;
+}
+
+message SearchShelfTypeReq{
+	bool   ignore_is_active = 1;
+	int32  offset = 2;
+	int32  limit = 3;
+}
+
+message SearchShelfTypeResp{
+	Result result = 1;
+	int64 total = 2;
+	repeated ShelfType items = 3;
+}
+
+//============= customer address =================
+message ShipmentCustomerAddress{
+  string shipToAddress = 1;
+  string shipToPhone = 2;
+  string shipToZip = 3;
+  string shipToName = 4;
+  string shipToAddress1 = 5;
+  string shipToAddress2 = 6;
+  string shipToCity = 7;
+  string shipToState = 8;
+  string block = 9;
+  string street = 10;
+  string unitStart = 11;
+  string unitEnd = 12;
+  string buildingType = 13;
+  string buildingName = 14;
+  int64  customerAddressId = 15;
+  string catalogCode = 16;
+}
+
+message ERPFetchShipmentCustomerAddressReq{
+    int64 customerAddressId = 1;
+    string catalogCode = 2;
+    string deliveryTypeCode = 3;
+}
+
+message ERPFetchShipmentCustomerAddressResp{
+    ShipmentCustomerAddress customerAddress = 1;
+}
+
+message ERPFetchCustomerAddressReq{
+    int64 customerAddressId = 1;
+}
+
+message ERPFetchCustomerAddressResp{
+    CustomerAddress customerAddress = 1;
+}
+
+message ERPUpdateCustomerAddressReq{
+    CustomerAddress customerAddress = 1;
+}
+message ERPUpdateCustomerAddressResp{
+    CustomerAddress customerAddress = 1;
+}
+message ERPSearchCustomerAddressReq{
+    int64 customerId = 1;
+}
+message ERPSearchCustomerAddressResp{
+    repeated CustomerAddress customerAddresses = 1;
+}
+
+message ERPDeleteCustomerAddressReq{
+    int64 customerAddressId = 1;
+}
+message ERPDeleteCustomerAddressResp{}
+
+message ERPSetMajorCustomerAddressReq{
+    int64 customerAddressId = 1;
+    bool isMajor = 2;
+}
+message ERPSetMajorCustomerAddressResp{}
+
+//! erp 2.0 服务接口
+service Erp {
+	//! 仓库管理
+	rpc FetchWarehouse(FetchWarehouseReq) returns (FetchWarehouseResp);
+	rpc CreateWarehouse(CreateWarehouseReq) returns (CreateWarehouseResp);
+	rpc UpdateWarehouse(UpdateWarehouseReq) returns (UpdateWarehouseResp);
+	rpc DeleteWarehouse(DeleteWarehouseReq) returns (DeleteWarehouseResp);
+	rpc DisableWarehouse(DisableWarehouseReq) returns (DisableWarehouseResp);
+	rpc EnableWarehouse(EnableWarehouseReq) returns (EnableWarehouseResp);
+	rpc SearchWarehouse(SearchWarehouseReq) returns (SearchWarehouseResp);
+	//! 库区管理
+	rpc FetchWarehouseArea(FetchWarehouseAreaReq) returns (FetchWarehouseAreaResp);
+	rpc CreateWarehouseArea(CreateWarehouseAreaReq) returns (CreateWarehouseAreaResp);
+	rpc UpdateWarehouseArea(UpdateWarehouseAreaReq) returns (UpdateWarehouseAreaResp);
+	rpc DeleteWarehouseArea(DeleteWarehouseAreaReq) returns (DeleteWarehouseAreaResp);
+	rpc DisableWarehouseArea(DisableWarehouseAreaReq) returns (DisableWarehouseAreaResp);
+	rpc EnableWarehouseArea(EnableWarehouseAreaReq) returns (EnableWarehouseAreaResp);
+	rpc SearchWarehouseArea(SearchWarehouseAreaReq) returns (SearchWarehouseAreaResp);
+	//! 货架管理
+	rpc FetchShelf(FetchShelfReq) returns (FetchShelfResp);
+	rpc CreateShelf(CreateShelfReq) returns (CreateShelfResp);
+	rpc UpdateShelf(UpdateShelfReq) returns (UpdateShelfResp);
+	rpc DeleteShelf(DeleteShelfReq) returns (DeleteShelfResp);
+	rpc DisableShelf(DisableShelfReq) returns (DisableShelfResp);
+	rpc EnableShelf(EnableShelfReq) returns (EnableShelfResp);
+	rpc SearchShelf(SearchShelfReq) returns (SearchShelfResp);
+	//! 货架类型管理
+	rpc FetchShelfType(FetchShelfTypeReq) returns (FetchShelfTypeResp);
+	rpc CreateShelfType(CreateShelfTypeReq) returns (CreateShelfTypeResp);
+	rpc UpdateShelfType(UpdateShelfTypeReq) returns (UpdateShelfTypeResp);
+	rpc DeleteShelfType(DeleteShelfTypeReq) returns (DeleteShelfTypeResp);
+	rpc DisableShelfType(DisableShelfTypeReq) returns (DisableShelfTypeResp);
+	rpc EnableShelfType(EnableShelfTypeReq) returns (EnableShelfTypeResp);
+	rpc SearchShelfType(SearchShelfTypeReq) returns (SearchShelfTypeResp);
+	//! 用户地址簿
+	rpc ERPFetchShipmentCustomerAddress(ERPFetchShipmentCustomerAddressReq) returns (ERPFetchShipmentCustomerAddressResp);
+	rpc ERPFetchCustomerAddress(ERPFetchCustomerAddressReq) returns (ERPFetchCustomerAddressResp);
+	rpc ERPUpdateCustomerAddress(ERPUpdateCustomerAddressReq) returns (ERPUpdateCustomerAddressResp);
+	rpc ERPSearchCustomerAddress(ERPSearchCustomerAddressReq) returns (ERPSearchCustomerAddressResp);
+	rpc ERPDeleteCustomerAddress(ERPDeleteCustomerAddressReq) returns (ERPDeleteCustomerAddressResp);
+	rpc ERPSetMajorCustomerAddress(ERPSetMajorCustomerAddressReq) returns (ERPSetMajorCustomerAddressResp);
+	// rpc ERPSearchCustomerAddress(ERPSearchCustomerAddressReq) returns (ERPSearchCustomerAddressResp);
+}

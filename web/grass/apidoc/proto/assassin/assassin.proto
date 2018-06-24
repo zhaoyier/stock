@@ -1,0 +1,240 @@
+syntax="proto3";
+package assassin;
+import "common/ezbuy.proto";
+import "spk/spk_public.proto";
+import "biz/region.proto";
+import "biz/warehouse.proto";
+
+service Assassin {
+  option (common.service).webapi = true;
+  rpc Get(AssassinGet) returns (AssassinGetResp);
+  rpc MGet(AssassinMGet) returns (AssassinMGetResp);
+
+  rpc CrabtreeEvelyn(AssassinFetch) returns (AssassinFetchResp);
+  rpc VictoriasSecret(AssassinFetch) returns (AssassinFetchResp);
+  rpc GNC(AssassinFetch) returns (AssassinFetchResp);
+  rpc ELF(AssassinFetch) returns (AssassinFetchResp);
+  rpc Etmall(AssassinFetch) returns (AssassinFetchResp);
+}
+
+// ---------------------------------------------------------------------------
+
+message AssassinGet {
+  string url = 1;
+  Source source = 2; // 废弃
+  spk.XPlatform platform = 9;
+  string id = 3;
+  string seller = 10;
+  bool noAPI = 4;
+  // 不走gospider
+  bool simple = 5;
+  // 不实时抓
+  bool notRealtime = 6;
+  // 不要使用cache
+  bool noCache = 7;
+  string scid = 8;
+}
+
+message AssassinGetResp {
+  Product item = 1;
+}
+
+message AssassinMGet {
+  repeated AssassinGet reqs = 1;
+}
+
+message AssassinMGetResp {
+  repeated Product items = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+enum Source {
+  SourceInvalid = 0;
+  SourceTaobao = 1;
+  SourceTmall = 2;
+  SourceOther = 3;
+  SourceTmallJu = 4; // 聚划算
+  SourceAmazon = 5;
+  SourceYiqihuo = 6;
+  SourceCarters = 7;
+  SourceOshkosh = 8;
+  SourceJingDong = 9;
+  SourceSephora = 10;
+  SourceEzSeller = 11;	// 卖家商品
+  SourceRalphlauren = 12;
+  SourceKatespade = 14;
+  SourceGap = 13;
+  SourceForever21 = 15;
+  SourceUnderarmour = 16;
+  SourceTheonlinedrugstore = 17;
+  SourcePhilips = 18;
+  SourceAbercrombie = 19;
+  SourceNike = 20;
+  SourceFootLocker = 21;
+  SourceSixpm = 22;
+  SourceChuchujie = 23;
+  SourceOne688 = 24;
+  SourceTarget = 25;
+  SourceOldNavyGap = 26;
+  SourceMogujie = 27;
+  SourceUlta = 28;
+  SourceColourpop = 29;
+}
+
+message Product {
+  string refId = 1;
+  bool isNotFound = 2;
+  bool isOnSale = 3; // 能提供商品信息
+  // Source productSource = 4;
+  spk.XPlatform platform = 5;
+  // sku 可以直接当作id使用
+  bool skuIndexable = 17;
+  
+  // 当 !isNotFound 时
+  EntityInfo entity = 10;
+  EntitySku sku = 11;
+  EntityDesc desc = 12;
+  EntityDelivery delivery = 13;
+  EntityRank rank = 15;
+  EntityPackage pkg = 16;
+  string url = 14;
+  int64 offLineTime = 18; //下架时间戳
+}
+
+message EntityPackage {
+  int64 weight = 1;
+  int32 height = 2;
+  int32 length = 3;
+  int32 width = 4;
+  int64 volWeight = 5;
+}
+
+message EntityRank {
+  int32 sellerRank = 1;
+}
+
+message EntityInfo {
+  string title = 1;
+  string subTitle = 7;
+  string titleEN = 21;
+  string originCode = 2;
+  biz.Region region = 20;
+  string vendorName = 4;
+  string shopName = 5;
+  string brand = 14;
+  string primaryPic = 13;
+  repeated string pics = 9;
+  int32 quantity = 8;
+  Price price = 10;
+  int64 cid = 11;
+  string location = 12;
+  repeated int64 cids = 15;
+  spk.XPlatform cidPlatform = 18;
+  bool thirdPartySeller = 17;
+  string vendorId = 19;
+  string internalUrl = 22;
+
+  // 可选
+  string scid = 16;
+}
+
+message Price {
+  PriceUnit normalPrice = 1;
+  PriceUnit promotionPrice = 2;
+}
+
+message PriceUnit {
+  int64 price = 1;
+  int64 maxPrice = 4;
+  string tips = 3;
+}
+
+message EntitySku {
+  repeated EntitySkuProp skuProps = 1;
+  repeated EntitySkuInfo skuInfo = 2;
+}
+
+message EntitySkuProp {
+  string skuPropId = 1;
+  string skuPropName = 2;
+  repeated EntitySkuPropValue skuPropValues = 3;
+}
+
+message EntitySkuPropValue {
+  string name = 1;
+  string valueId = 2;
+  string img = 3;
+}
+
+message EntitySkuInfo {
+  string skuId = 1;
+  string pvPair = 2;
+  int32 quantity = 3;
+  Price price = 4;
+  string title = 5;
+  string titleEN = 11;
+  string url = 6;
+  bool isSelected = 7;
+  EntityPackage pkg = 8;
+  repeated string detailImg = 9;
+  string swatchImg = 10;
+  bool thirdPartySeller = 12;
+  string seller = 13;
+  // 采购的价格
+  int64 originPurchasePrice = 14;
+}
+
+message EntityDelivery {
+  repeated EntityDeliveryWarehouse warehouses = 1;
+}
+
+message EntityDeliveryWarehouse {
+  biz.Warehouse warehouse = 1;
+  repeated EntityDeliveryWarehouseFee fee = 2;
+}
+
+message EntityDeliveryWarehouseFee {
+  string name = 2;
+  int64 price = 3;
+}
+
+message EntityDescProp {
+  string name = 1;
+  string value = 2;
+  repeated string values = 3;
+}
+
+message EntityDesc {
+  repeated EntityDescProp descProps = 1;
+  repeated string pics = 2;
+  repeated string features = 4;
+  string text = 3;
+  Rule rule = 5;
+}
+//尺码表格
+message Rule {
+  string key = 1; //表格名
+  string disclaimer = 2;  //免责声明 
+  Table table = 3 ;
+}
+
+message Table {
+  repeated string header = 1; 
+  repeated Row rows = 2;
+}
+
+message Row {
+  repeated string element = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message AssassinFetch {
+  string id = 1;
+}
+
+message AssassinFetchResp {
+  Product item = 1;
+}
+

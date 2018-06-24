@@ -1,0 +1,90 @@
+syntax = "proto3";
+package shadow;
+
+import "common/ezbuy.proto";
+
+service NinjaVan {
+    option (common.service).webapi = true;
+    option (common.service).public = true;
+    
+    // 查看包裹状态变更记录
+    rpc TrackPackageStatus(NinjaVanTrackPackageStatusReq) returns (NinjaVanTrackPackageStatusResp);
+
+    // 查询包裹最新状态(分页)
+    rpc QueryPackageStatus(NinjaVanQueryPackageStatusReq) returns (NinjaVanQueryPackageStatusResp);
+
+    // 判断包裹是否为ninjavan 派送
+    rpc IsShippedByNinjaVan(NinjaVanIsShippedByNinjaVanReq) returns (NinjaVanIsShippedByNinjaVanResp);
+}
+
+
+message NinjaVanTrackPackageStatusReq {
+    oneof pkgNo{
+        string subPackageNumber = 1; //二级包裹号
+        string packageNumber = 2;    //一级包裹号
+    }
+}
+
+message NinjaVanTrackPackageStatusResp {
+    repeated NinjaVanPackageStatusHistory list = 1;
+}
+
+message NinjaVanQueryPackageStatusReq{
+    oneof pkgNo {
+         string subPackageNumber = 1;  //二级包裹号
+         string packageNumber = 2;     //一级包裹号
+    }
+    repeated NinjavanStatus status = 3;    //可选，仅支持单个查询
+    int32 pageIndex = 4;
+    int32 pageSize = 5;
+}
+
+message NinjaVanQueryPackageStatusResp {
+    repeated NinjaVanPackageStatusInfo list = 1;
+    int32 totalCount = 2;
+}
+
+message NinjaVanPackageStatusInfo {
+    string subPackageNumber = 1;
+    string status = 2;
+    int64 eventDate = 3;
+}
+
+message NinjaVanPackageStatusHistory{
+    string subPackageNumber = 1;
+    repeated NinjaVanPackageStatusInfo history =2;
+}
+
+message NinjaVanIsShippedByNinjaVanReq{
+    repeated string subPackageNumber = 1; //待查询的二级包裹号
+    repeated string packageNumber = 2;    //待查询的一级包裹号
+}
+
+message NinjaVanIsShippedByNinjaVanResp {
+    repeated string subPackageNumber = 1; //由ninjavan派送的二级包裹号
+    repeated string packageNumber = 2;     //由ninjavan派送的一级包裹号
+}
+
+//ref: https://confluence.ninjavan.co/display/NV/Webhooks+API
+enum NinjavanStatus{
+    Unknown = 0;
+    Staging = 1;
+    PendingPickup = 2;
+    VanEnrouteToPickup = 3;
+    EnrouteToSortingHub = 4;
+    ArrivedAtSortingHub = 5;
+    OnVehicleForDelivery = 6;
+    Completed = 7;
+    PendingReschedule = 8;
+    PickupFail = 9;
+    Cancelled = 10;
+    ReturnedToSender = 11;
+    ParcelSize = 12;
+    ArrivedAtDistributionPoint = 13;
+    SuccessfulDelivery = 14;
+    SuccessfulPickup = 15;
+    ParcelWeight = 16;
+    CrossBorderTransit = 17;
+    CustomsCleared = 18;
+    CustomsHeld = 19;
+}

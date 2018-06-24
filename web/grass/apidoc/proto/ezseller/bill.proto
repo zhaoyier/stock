@@ -1,0 +1,851 @@
+syntax = "proto3";
+package ezseller;
+
+import "common/ezbuy.proto";
+import "ezseller/result.proto";
+import "ezseller/entity.proto";
+
+service Bill {
+    option (common.service).webapi = true;
+    option (common.service).public = true;
+
+    // 指定类目的通用费率
+    rpc ServiceFeeRateSetting (BillServiceFeeRateSetting) returns (BillServiceFeeRateSettingResp) {
+        option (common.auth).admin = true;
+    };
+
+    // 更新指定类目的通用费率
+    rpc ServiceFeeRateSettingUpdate (BillServiceFeeRateSettingUpdate) returns (BillServiceFeeRateSettingUpdateResp);
+
+    // 更新指定类目下一组店铺的通用费率
+    rpc ServiceFeeRateSettingUpdateShop (BillServiceFeeRateSettingUpdateShop) returns (BillServiceFeeRateSettingUpdateShopResp);
+
+    // 指定类目下设置了分时费率的店铺列表
+    rpc ServiceFeeRatePeriodShops (BillServiceFeeRatePeriodShops) returns (BillServiceFeeRatePeriodShopsResp);
+
+    // 指定类目-店铺的分时费率
+    rpc ServiceFeeRatePeriod (BillServiceFeeRatePeriod) returns (BillServiceFeeRatePeriodResp);
+
+    // 添加指定类目-店铺的分时费率
+    rpc ServiceFeeRatePeriodUpsert (BillServiceFeeRatePeriodUpsert) returns (BillServiceFeeRatePeriodUpsertResp);
+
+    // 商品批次费率
+    rpc ServiceFeeRateProductBatch (BillServiceFeeRateProductBatch) returns (BillServiceFeeRateProductBatchResp);
+
+    // 添加商品批次费率
+    rpc ServiceFeeRateProductBatchUpsert (BillServiceFeeRateProductBatchUpsert) returns (BillServiceFeeRateProductBatchUpsertResp);
+
+    // 计算费率
+    rpc ServiceFeeRateGet (BillServiceFeeRateGet) returns (BillServiceFeeRateGetResp);
+
+    // 通用配置编辑记录
+    rpc ServiceFeeRateSettingLog (BillServiceFeeRateSettingLog) returns (BillServiceFeeRateSettingLogResp);
+
+    // 分时配置编辑记录
+    rpc ServiceFeeRatePeriodLog (BillServiceFeeRatePeriodLog) returns (BillServiceFeeRatePeriodLogResp);
+
+    // 商品批次配置编辑记录
+    rpc ServiceFeeRateBatchProductLog (BillServiceFeeRateBatchProductLog) returns (BillServiceFeeRateBatchProductLogResp);
+
+    // 计算费率, 商品来自不同区域
+    rpc ServiceFeeRateMultiRegionGet (BillServiceFeeRateMultiRegionGet) returns (BillServiceFeeRateMultiRegionGetResp);
+
+    //=======本地配送费配置===========
+
+    // 查询本地配送费配置列表
+    rpc ServiceDeliveryFeeList (BillServiceDeliveryFeeList) returns (BillServiceDeliveryFeeListResp);
+
+    // 获取店铺当前生效的配置 rpc
+    rpc ServiceDeliveryFeeGet (BillServiceDeliveryFeeGet) returns (BillServiceDeliveryFeeGetResp);
+
+    // 修改店铺通用配置
+    rpc ServiceCommonDeliveryFeeUpsert (BillServiceCommonDeliveryFeeUpsert) returns (BillServiceCommonDeliveryFeeUpsertResp);
+
+    // 新增店铺分时配置
+    rpc ServicePeriodDeliveryFeeCreate (BillServicePeriodDeliveryFeeCreate) returns (BillServicePeriodDeliveryFeeCreateResp);
+
+    // 修改未生效店铺分时配置
+    rpc ServicePeriodDeliveryFeeUpdate (BillServicePeriodDeliveryFeeUpdate) returns (BillServicePeriodDeliveryFeeUpdateResp);
+
+    // 取消未生效店铺分时配置
+    rpc ServicePeriodDeliveryFeeCancel (BillServicePeriodDeliveryFeeCancel) returns (BillServicePeriodDeliveryFeeCancelResp);
+
+    // 中止生效中店铺分时配置
+    rpc ServicePeriodDeliveryFeeTerminate (BillServicePeriodDeliveryFeeTerminate) returns (BillServicePeriodDeliveryFeeTerminateResp);
+
+    // 店铺编辑记录
+    rpc ServiveDeliveryFeeChangeLog (BillServiveDeliveryFeeChangeLog) returns (BillServiveDeliveryFeeChangeLogResp);
+
+    // 生成默认通用记录 rpc
+    rpc ServiceCommonDeliveryFeeGenDefault (BillServiceCommonDeliveryFeeGenDefault) returns (BillServiceCommonDeliveryFeeGenDefaultResp);
+
+    // === 手工调整费用单 ===
+
+    // 查询手工调整费用单列表（ERP）
+    rpc GetAdjustmentReceipts (GetAdjustmentReceiptsReq) returns (GetAdjustmentReceiptsResp);
+
+    // 通过账单号查询手工调整费用单列表（ERP）
+    rpc GetAdjustmentReceiptsByBillNum (GetAdjustmentReceiptsByBillNumReq) returns (GetAdjustmentReceiptsByBillNumResp);
+
+    // 查询手工调整费用单详情（ERP）
+    rpc GetAdjustmentReceiptDetail (GetAdjustmentReceiptDetailReq) returns (GetAdjustmentReceiptDetailResp);
+
+    // 查询手工调整费用单日志列表（ERP）
+    rpc GetAdjustmentReceiptLogs (GetAdjustmentReceiptLogsReq) returns (GetAdjustmentReceiptLogsResp);
+
+    // 创建手工调整费用单（ERP）
+    rpc CreateAdjustmentReceipt (CreateAdjustmentReceiptReq) returns (CreateAdjustmentReceiptResp);
+
+    // 修改手工调整费用单（ERP）
+    rpc ModifyAdjustmentReceipt (ModifyAdjustmentReceiptReq) returns (ModifyAdjustmentReceiptResp);
+
+    // 取消手工调整费用单（ERP）
+    rpc CancelAdjustmentReceipt (CancelAdjustmentReceiptReq) returns (CancelAdjustmentReceiptResp);
+
+    // 导出账单期内手工调整费用单列表（ERP）
+    rpc ExportAdjustmentReceiptsByBillNum (ExportAdjustmentReceiptsByBillNumReq) returns (ExportAdjustmentReceiptsByBillNumResp);
+
+    // 查询手工调整费用单列表（卖家）
+    rpc GetSellerAdjustmentReceipts (GetSellerAdjustmentReceiptsReq) returns (GetSellerAdjustmentReceiptsResp);
+
+    // 通过账单号查询手工调整费用单列表（卖家）
+    rpc GetSellerAdjustmentReceiptsByBillNum (GetSellerAdjustmentReceiptsByBillNumReq) returns (GetSellerAdjustmentReceiptsByBillNumResp);
+
+    // 导出卖家账单期内手工调整费用单列表（卖家）
+    rpc ExportSellerAdjustmentReceiptsByBillNum (ExportSellerAdjustmentReceiptsByBillNumReq) returns (ExportSellerAdjustmentReceiptsByBillNumResp);
+
+    
+	//=======账单相关===========
+	// 使用billNum获取账单金额
+	rpc MultiGetBillInfo(MultiGetBillInfoReq) returns (MultiGetBillInfoResp);
+
+	// 使用billNum获取结算订单金额
+	rpc GetBillOrderItem(GetBillOrderItemReq) returns (GetBillOrderItemResp);
+
+    // 通过账单号查询手工单金额
+    rpc GetBillAdjustmentReceiptAmount(GetBillAdjustmentReceiptAmountReq) returns (GetBillAdjustmentReceiptAmountResp);
+
+    // base bill search
+    rpc SearchBill(SearchBillReq) returns (SearchBillResp);
+
+    rpc SearchBillTransfer(SearchBillTransferReq) returns (SearchBillTransferResp);
+
+    // bill update
+    rpc BatchUpdateBillMarked(BatchUpdateBillMarkedReq) returns (BatchUpdateBillMarkedResp);
+
+    rpc AddBillTransfer(AddBillTransferReq) returns (AddBillTransferResp);
+
+    rpc UserAppealBill(UserAppealBillReq) returns (UserAppealBillResp);
+
+}
+
+message BillServiceFeeRateItem {
+    double rate = 1;
+    bool inherited = 2;
+    bool isActive = 3;
+}
+
+message BillServiceFeeRateShopItem {
+    int32 shopId = 1;
+    string shopName = 2;
+    BillServiceFeeRateItem rateItem = 3;
+}
+
+message BillServiceFeeRateSetting {
+    string origin = 1;
+    int32 categoryId = 2;
+}
+
+message BillServiceFeeRateSettingResp {
+    BillServiceFeeRateItem common = 1;
+    repeated BillServiceFeeRateShopItem shops = 2;
+}
+
+message BillServiceFeeRateSettingUpdate {
+    string origin = 1;
+    int32 categoryId = 2;
+    double rate = 3;
+    bool isActive = 4;
+}
+
+message BillServiceFeeRateSettingUpdateResp {
+    BillServiceFeeRateItem common = 1;
+    repeated BillServiceFeeRateShopItem shops = 2;
+}
+
+message BillServiceFeeRateSettingUpdateShopItem {
+    int32 shopId = 1;
+    double rate = 2;
+    bool isActive = 3;
+}
+
+message BillServiceFeeRateSettingUpdateShop {
+    string origin = 1;
+    int32 categoryId = 2;
+    repeated BillServiceFeeRateSettingUpdateShopItem updates = 3;
+}
+
+message BillServiceFeeRateSettingUpdateShopResp {
+    BillServiceFeeRateItem common = 1;
+    repeated BillServiceFeeRateShopItem shops = 2;
+}
+
+message BillServiceFeeRatePeriodItem {
+    string id = 1;
+    double rate = 2;
+    bool isActive = 3;
+    int64 startDate = 4;
+    int64 endDate = 5;
+    string updateBy = 6;
+    int64 updateDate = 7;
+    string name = 8;
+}
+
+message BillServiceFeeRatePeriod {
+    string origin = 1;
+    int32 categoryId = 2;
+    int32 shopId = 3;
+}
+
+message BillServiceFeeRatePeriodResp {
+    repeated BillServiceFeeRatePeriodItem items = 1;
+}
+
+message BillServiceFeeRatePeriodUpsert {
+    string origin = 1;
+    int32 categoryId = 2;
+    int32 shopId = 3;
+    string periodId = 4;
+    bool isActive = 5;
+    int64 startDate = 6;
+    int64 endDate = 7;
+    double rate = 8;
+    string name = 9;
+    bool notStrict = 10;
+}
+
+message BillServiceFeeRatePeriodUpsertResp {
+    repeated BillServiceFeeRatePeriodItem items = 1;
+}
+
+message BillServiceFeeRateProductBatchItem {
+    string batchId = 1;
+    int32 productCount = 2;
+    double rate = 3;
+    bool isActive = 4;
+    int64 startDate = 5;
+    int64 endDate = 6;
+    string updateBy = 7;
+    int64 updateDate = 8;
+    string name = 9;
+}
+
+message BillServiceFeeRateProductBatch {
+    string origin = 1;
+}
+
+message BillServiceFeeRateProductBatchResp {
+    repeated BillServiceFeeRateProductBatchItem items = 1;
+}
+
+message BillServiceFeeRateProductBatchUpsert {
+    string origin = 1;
+    string batchId = 2;
+    repeated int32 productId = 3;
+    double rate = 4;
+    bool isActive = 5;
+    int64 startDate = 6;
+    int64 endDate = 7;
+    string name = 8;
+    bool notStrict = 9;
+}
+
+message BillServiceFeeRateProductBatchUpsertResp {
+    repeated BillServiceFeeRateProductBatchItem items = 1;
+}
+
+message BillServiceFeeRateGetItem {
+    int32 shopId = 1;
+    repeated int32 categoryId = 2;
+    int32 productId = 3;
+    int64 payDate = 4;
+}
+
+message BillServiceFeeRateGetResult {
+    double rate = 1;
+    string node = 2;
+}
+
+message BillServiceFeeRateGet {
+    repeated BillServiceFeeRateGetItem item = 1;
+    string origin = 2;
+}
+
+message BillServiceFeeRateGetResp {
+    repeated BillServiceFeeRateGetResult result = 1;
+}
+
+enum BillServiceFeeRateItemField {
+    BillServiceFeeRateItemFieldUnknown = 0;
+    BillServiceFeeRateItemFieldIsActive = 1; // 配置生效
+    BillServiceFeeRateItemFieldRate = 2; // 费率
+    BillServiceFeeRateItemFieldStartAt = 3; // 起始时间
+    BillServiceFeeRateItemFieldEndAt = 4; // 终止时间
+}
+
+message BillServiceFeeRateSettingLogItem {
+    int32 categoryId = 1;
+    int32 shopId = 2;
+    repeated string categories = 3;
+    string shopName = 4;
+    BillServiceFeeRateItemField field = 5;
+    string valBefore = 6;
+    string valAfter = 7;
+    string updateBy = 8;
+    int64 updateDate = 9;
+}
+
+
+message BillServiceFeeRateSettingLog {
+    string origin = 1;
+    repeated int32 categoryId = 2; // optional 值, 当没有对应项的时候, 留空
+    repeated int32 shopId = 3; // optional 值, 当没有对应项的时候, 留空
+    int32 offset = 4;
+    int32 limit = 5;
+}
+
+message BillServiceFeeRateSettingLogResp {
+    int32 total = 1;
+    repeated BillServiceFeeRateSettingLogItem items = 2;
+}
+
+message BillServiceFeeRatePeriodLogItem {
+    int32 categoryId = 1;
+    int32 shopId = 2;
+    repeated string categories = 3;
+    string shopName = 4;
+    BillServiceFeeRateItemField field = 5;
+    string valBefore = 6;
+    string valAfter = 7;
+    string updateBy = 8;
+    int64 updateDate = 9;
+    string periodId = 10;
+}
+
+message BillServiceFeeRatePeriodLog {
+    string origin = 1;
+    repeated int32 categoryId = 2; // optional 值, 当没有对应项的时候, 留空
+    repeated int32 shopId = 3; // optional 值, 当没有对应项的时候, 留空
+    repeated string periodId = 4; // optional 值, 当没有对应项的时候, 留空
+    int32 offset = 5;
+    int32 limit = 6;
+}
+
+message BillServiceFeeRatePeriodLogResp {
+    int32 total = 1;
+    repeated BillServiceFeeRatePeriodLogItem items = 2;
+}
+
+message BillServiceFeeRateBatchProductLogItem {
+    string batchId = 1;
+    BillServiceFeeRateItemField field = 2;
+    string valBefore = 3;
+    string valAfter = 4;
+    string updateBy = 5;
+    int64 updateDate = 6;
+}
+
+message BillServiceFeeRateBatchProductLog {
+    string origin = 1;
+    repeated string batchId = 2; // optional 值, 当没有对应项的时候, 留空
+    int32 offset = 3;
+    int32 limit = 4;
+}
+
+message BillServiceFeeRateBatchProductLogResp {
+    int32 total = 1;
+    repeated BillServiceFeeRateBatchProductLogItem items = 2;
+}
+
+message BillServiceFeeRatePeriodShopItem {
+    int32 shopId = 1;
+    string shopName = 2;
+    int32 periodCount = 3;
+}
+
+message BillServiceFeeRatePeriodShops {
+    string origin = 1;
+    int32 categoryId = 2;
+}
+
+message BillServiceFeeRatePeriodShopsResp {
+    repeated BillServiceFeeRatePeriodShopItem item = 1;
+}
+
+message BillServiceFeeRateMultiRegionGetItem {
+    string origin = 1;
+    int32 shopId = 2;
+    repeated int32 categoryId = 3;
+    int32 productId = 4;
+    int64 payDate = 5;
+}
+
+message BillServiceFeeRateMultiRegionGet {
+    repeated BillServiceFeeRateMultiRegionGetItem items = 1;
+}
+
+message BillServiceFeeRateMultiRegionGetResp {
+    repeated BillServiceFeeRateGetResult result = 1;
+}
+
+//=============================本地配送费=========
+
+//  配送费类型
+enum BillServiceLocalDeliveryFeeSettingType {
+    BillServiceLocalDeliveryFeeSettingTypeUnknown = 0;
+    BillServiceLocalDeliveryFeeSettingTypeCommon = 1;
+    BillServiceLocalDeliveryFeeSettingTypePeriod = 2;
+}
+
+// 配送费操作字段
+enum BillServiceLocalDeliveryFeeSettingField {
+    BillServiceLocalDeliveryFeeSettingFieldUnknown = 0;
+    BillServiceLocalDeliveryFeeSettingFieldFee = 1;
+    BillServiceLocalDeliveryFeeSettingFieldStartAt = 2;
+    BillServiceLocalDeliveryFeeSettingFieldEndAt = 3;
+    BillServiceLocalDeliveryFeeSettingFieldCancelled = 4;
+}
+
+// 配送费配置状态
+enum BillServiceLocalDeliveryFeeSettingStatus {
+    BillServiceLocalDeliveryFeeSettingStatusUnknown = 0;
+    BillServiceLocalDeliveryFeeSettingStatusActivated = 1;
+    BillServiceLocalDeliveryFeeSettingStatusWaiting = 2;
+    BillServiceLocalDeliveryFeeSettingStatusExpired = 3;
+    BillServiceLocalDeliveryFeeSettingStatusCancelled = 4;
+}
+
+// 配送费操作类型
+enum BillServiceLocalDeliveryFeeSettingOpType {
+    BillServiceLocalDeliveryFeeSettingOpTypeUnknown = 0;
+    BillServiceLocalDeliveryFeeSettingOpTypeCCommFee = 1;
+    BillServiceLocalDeliveryFeeSettingOpTypeUCommFee = 2;
+    BillServiceLocalDeliveryFeeSettingOpTypeCPeriodFee = 3;
+    BillServiceLocalDeliveryFeeSettingOpTypeUPeriodFee = 4;
+    BillServiceLocalDeliveryFeeSettingOpTypeCancelPeriodFee = 5;
+    BillServiceLocalDeliveryFeeSettingOpTypeTermPeriodFee = 6;
+
+}
+
+message BillServiceDeliveryFee {
+    BillServiceLocalDeliveryFeeSettingStatus status = 1;
+    string settingId = 2;
+    BillServiceLocalDeliveryFeeSettingType type = 3;
+    uint64 fee = 4;
+    int64 startAt = 5;
+    int64 endAt = 6;
+    string settingTopic = 7;
+
+}
+
+message BillServiceDeliveryFeeCommonResp {
+    bool success = 1;
+    string errMsg = 2;
+}
+
+// list
+message BillServiceDeliveryFeeList {
+    string originCode = 1;
+    int32 shopId = 2;
+    string shopName = 3;
+    int32 limit = 4;
+    int32 offset = 5;
+}
+
+message BillServiceDeliveryFeeListResp {
+    int32 total = 1;
+    repeated BillServiceDeliveryFeeListRespItem items = 2;
+
+}
+
+message BillServiceDeliveryFeeListRespItem {
+    int32 shopId = 1;
+    string shopName = 2;
+    BillServiceDeliveryFee common = 3;
+    repeated BillServiceDeliveryFee period = 4;
+}
+
+// get spec [shop, time] working fee
+message BillServiceDeliveryFeeGet {
+    int32 shopId = 1;
+    int64 time = 2;
+}
+
+message BillServiceDeliveryFeeGetResp {
+    BillServiceDeliveryFee fee = 1;
+}
+
+// upsert common fee
+message BillServiceCommonDeliveryFeeUpsert {
+    int32 shopId = 1;
+    uint64 fee = 2;
+}
+
+message BillServiceCommonDeliveryFeeUpsertResp {
+    BillServiceDeliveryFeeCommonResp result = 1;
+}
+
+// create period fee
+message BillServicePeriodDeliveryFeeCreate {
+    int32 shopId = 1;
+    uint64 fee = 2;
+    int64 startAt = 3;
+    int64 endAt = 4;
+    string topic = 5;
+
+}
+
+message BillServicePeriodDeliveryFeeCreateResp {
+    BillServiceDeliveryFeeCommonResp result = 1;
+}
+
+// update period fee
+message BillServicePeriodDeliveryFeeUpdate {
+    int32 shopId = 1;
+    string settingId = 2;
+    uint64 fee = 3;
+    int64 startAt = 4;
+    int64 endAt = 5;
+}
+
+message BillServicePeriodDeliveryFeeUpdateResp {
+    BillServiceDeliveryFeeCommonResp result = 1;
+    BillServiceDeliveryFee fee = 2;
+}
+
+// cancel
+message BillServicePeriodDeliveryFeeCancel {
+    int32 shopId = 1;
+    string settingId = 2;
+}
+
+message BillServicePeriodDeliveryFeeCancelResp {
+    BillServiceDeliveryFeeCommonResp result = 1;
+}
+
+// query change log
+message BillServiveDeliveryFeeChangeLog {
+    int32 shopId = 1;
+    int32 limit = 2;
+    int32 offset = 3;
+}
+
+message BillServiveDeliveryFeeChangeLogResp {
+    int32 total = 1;
+    repeated BillServiveDeliveryFeeChangeLogRespItem items = 2;
+}
+
+message BillServiveDeliveryFeeChangeLogRespItem {
+    BillServiceLocalDeliveryFeeSettingOpType opType = 1;
+    repeated BillServiveDeliveryFeeChangeLogRespOpItem ops = 2;
+    string opBy = 3;
+    int64 opTime = 4;
+    string settingTopic = 5;
+}
+
+message BillServiveDeliveryFeeChangeLogRespOpItem {
+    BillServiceLocalDeliveryFeeSettingField field = 1;
+    string valBefore = 2;
+    string valAfter = 3;
+}
+
+message BillServiceCommonDeliveryFeeGenDefault {
+    int32 shopId = 1;
+    uint64 fee = 2;
+}
+
+message BillServiceCommonDeliveryFeeGenDefaultResp {
+    BillServiceDeliveryFeeCommonResp result = 1;
+}
+
+// terminate
+message BillServicePeriodDeliveryFeeTerminate {
+    int32 shopId = 1;
+    string settingId = 2;
+}
+
+message BillServicePeriodDeliveryFeeTerminateResp {
+    BillServiceDeliveryFeeCommonResp result = 1;
+}
+
+// === MANUAL ADJUSTMENT RECEIPT ===
+
+enum AdjustmentReceiptFeeType {
+    AdjustmentReceiptFeeTypeUnknown = 0;
+    AdjustmentReceiptFeeTypeCargo = 1;
+    AdjustmentReceiptFeeTypeFreight = 2;
+    AdjustmentReceiptFeeTypeTechnology = 3;
+}
+
+enum AdjustmentReceiptStatus {
+    AdjustmentReceiptStatusUnknown = 0;
+    AdjustmentReceiptStatusSettled = 1;
+    AdjustmentReceiptStatusCancel = 2;
+    AdjustmentReceiptStatusUnsettle = 3;
+}
+
+enum AdjustmentReceiptReason {
+    AdjustmentReceiptReasonUnknown = 0;
+    AdjustmentReceiptReasonComplete = 1;
+    AdjustmentReceiptReasonShip = 2;
+    AdjustmentReceiptReasonAfterSales = 3;
+    AdjustmentReceiptReasonOther = 4;
+}
+
+message AdjustmentReceipt {
+    uint64 id = 1;
+    int64 shopID = 2;
+    string shopName = 3;
+    string orderNo = 4;
+    double orderAmount = 5;
+    string productName = 6;
+    AdjustmentReceiptFeeType feeType = 7;
+    AdjustmentReceiptReason reason = 8;
+    int32 quantity = 9;
+    double amount = 10;
+    string remark = 11;
+    AdjustmentReceiptStatus status = 12;
+    int64 opertaorID = 13;
+    string opertaor = 14;
+    int64 createDate = 15;
+    int64 updateDate = 16;
+}
+
+message AdjustmentReceiptLog {
+    uint64 id = 1;
+    string opertation = 2;
+    string changeContext = 3;
+    string operator = 4;
+    int64 createDate = 5;
+}
+
+message GetAdjustmentReceiptsReq {
+    int64 shopID = 1;
+    string orderNo = 2;
+    string productName = 3;
+    AdjustmentReceiptFeeType feeType = 4;
+    AdjustmentReceiptReason reason = 5;
+    string operator = 6;
+    AdjustmentReceiptStatus status = 7;
+    int32 offset = 98;
+    int32 limit = 99;
+}
+
+message GetAdjustmentReceiptsResp {
+    Result result = 1;
+    int32 total = 2;
+    repeated AdjustmentReceipt receipts = 3;
+}
+
+message GetAdjustmentReceiptsByBillNumReq {
+    string billNum = 1;
+    int32 offset = 2;
+    int32 limit = 3;
+}
+
+message GetAdjustmentReceiptsByBillNumResp {
+    Result result = 1;
+    int32 total = 2;
+    repeated AdjustmentReceipt receipts = 3;
+}
+
+message GetAdjustmentReceiptDetailReq {
+    uint64 id = 1;
+}
+
+message GetAdjustmentReceiptDetailResp {
+    Result result = 1;
+    AdjustmentReceipt receipt = 2;
+}
+
+message GetAdjustmentReceiptLogsReq {
+    uint64 id = 1;
+}
+
+message GetAdjustmentReceiptLogsResp {
+    Result result = 1;
+    repeated AdjustmentReceiptLog logs = 2;
+}
+
+message CreateAdjustmentReceiptReq {
+    AdjustmentReceipt receipt = 1;
+}
+
+message CreateAdjustmentReceiptResp {
+    Result result = 1;
+}
+
+message ModifyAdjustmentReceiptReq {
+    AdjustmentReceipt receipt = 1;
+}
+
+message ModifyAdjustmentReceiptResp {
+    Result result = 1;
+}
+
+message CancelAdjustmentReceiptReq {
+    uint64 id = 1;
+}
+
+message CancelAdjustmentReceiptResp {
+    Result result = 1;
+}
+
+message ExportAdjustmentReceiptsByBillNumReq {
+    string billNum = 1;
+}
+
+message ExportAdjustmentReceiptsByBillNumResp {
+    Result result = 1;
+    string exportId = 2;
+    bool isExisted = 3;
+}
+
+message GetSellerAdjustmentReceiptsReq {
+    string orderNo = 1;
+    AdjustmentReceiptFeeType feeType = 2;
+    AdjustmentReceiptReason reason = 3;
+    AdjustmentReceiptStatus status = 4;
+    int64 createStartTime = 5;
+    int64 createEndTime = 6;
+    int32 offset = 98;
+    int32 limit = 99;
+}
+
+message GetSellerAdjustmentReceiptsResp {
+    Result result = 1;
+    int32 total = 2;
+    repeated AdjustmentReceipt receipts = 3;
+}
+
+message GetSellerAdjustmentReceiptsByBillNumReq {
+    string billNum = 1;
+    int32 offset = 2;
+    int32 limit = 3;
+}
+
+message GetSellerAdjustmentReceiptsByBillNumResp {
+    Result result = 1;
+    int32 total = 2;
+    repeated AdjustmentReceipt receipts = 3;
+}
+
+
+message ExportSellerAdjustmentReceiptsByBillNumReq {
+    string billNum = 1;
+}
+
+message ExportSellerAdjustmentReceiptsByBillNumResp {
+    Result result = 1;
+    string exportId = 2;
+    bool isExisted = 3;
+}
+
+// === MANUAL ADJUSTMENT RECEIPT ===
+message MultiGetBillInfoReq {
+	repeated string billNum = 1;
+}
+
+message MultiGetBillInfoResp {
+	repeated BillInfo billInfo = 1;
+}
+
+message BillInfo {
+	string billNum = 1;
+	Amount amount = 2;
+}
+
+message Amount {
+	int32 totalQty = 1;
+	int64 totalAmount = 2;
+	int64 localDeliveryAmount = 3;
+	int64 totalCashOffAmount = 4;
+	int64 serviceAmount = 5;
+	int64 finalAmount = 6;
+	double serviceFeeRate = 7;
+}
+
+message GetBillOrderItemReq{
+	string billNum = 1;
+	int32 limit = 2;
+	int32 offset = 3;
+}
+
+message GetBillOrderItemResp{
+	string billNum = 1;
+	repeated BillOrderItem orderItems = 2;
+	int32 total = 3;
+}
+
+message BillOrderItem {
+	uint64 orderItemId = 1;
+	Amount amount = 2;
+}
+
+message GetBillAdjustmentReceiptAmountReq {
+    repeated string billNum = 1;
+}
+
+message GetBillAdjustmentReceiptAmountResp {
+    repeated int64 amount = 1;
+}
+
+message SearchBillReq {
+    repeated string billNums = 1;
+    repeated int32 shopIds = 2;
+    repeated BillStatus statuses = 3;
+    repeated BillPeriod periods = 4;
+    SPSearchOption option = 15;
+}
+
+message SearchBillResp {
+    Result result = 1;
+    int32 count = 2;
+    repeated SPBill bills = 3;    
+}
+
+message BatchUpdateBillMarkedReq {
+    repeated string billNums = 1;
+}
+
+message BatchUpdateBillMarkedResp {
+    Result result = 1;
+}
+
+message AddBillTransferReq {
+    SPBillTransfer transfer = 1;
+}
+
+message AddBillTransferResp {
+    Result result = 1;
+}
+
+message SearchBillTransferReq {
+    string billNum = 1;
+}
+
+message SearchBillTransferResp {
+    Result result = 1;
+    SPBillTransfer transfer = 2;
+}
+
+message UserAppealBillReq {
+    string billNum = 1;
+    double amount = 2;
+    string by = 3;
+    string remark = 4;
+}
+
+message UserAppealBillResp {
+    Result result = 1;
+}

@@ -1,0 +1,271 @@
+syntax = "proto3";
+package ezseller;
+
+import "ezseller/result.proto";
+import "common/empty.proto";
+
+service Stat {
+	// 每日汇总数据
+	rpc OrderDailySummary(StatOrderDailySummary) returns (StatOrderDailySummaryResp);
+
+	// 添加订单数据
+	rpc OrderAdd(StatOrderAdd) returns (StatOrderAddResp);
+
+	// 更新订单创建时间
+	rpc OrderUpdateTimestamp(StatOrderUpdateTimestamp) returns (StatOrderUpdateTimestampResp);
+
+	// 商品信息总况接口
+	rpc ShopInfo (StatShopInfoReq) returns (StatShopInfoResp);
+	// 单品分析
+	rpc ProductAnalytics(StatProductAnalytics) returns (StatProductAnalyticsResp);
+
+	// 获取SoldCount
+	rpc ProductSoldCount(ProductSoldCountReq) returns (ProductSoldCountResp);
+
+	// 获取时间段内商品销量排行
+	rpc ProductTopN(ProductTopNReq) returns (ProductTopNResp);
+
+	//----------卖家等级api-----------------------------------------
+
+	// admin卖家等级查询
+	rpc AdminSellerGrades(AdminSellerGradesReq) returns (AdminSellerGradesResp);
+
+	// 刷新卖家行业表
+	rpc GenSellerIndustry(GenSellerIndustryReq) returns (common.Empty);
+
+
+
+}
+
+enum StatOrderAction {
+	StatOrderActionUnknown = 0;
+	StatOrderActionCreate = 1;
+	StatOrderActionPay = 2;
+	StatOrderActionPoplace = 3;
+	StatOrderActionDispatch = 4;
+	StatOrderActionCancel = 5;
+	StatOrderActionBill = 6;
+	StatOrderActionFinish = 7;
+	StatOrderActionMaxLimit = 8;
+}
+
+// common
+message StatOrderActionTimestamp {
+	StatOrderAction action = 1;
+	int64 timestamp = 2;
+}
+
+message StatOrderActionSummary {
+	StatOrderAction action = 1;
+	int64 count = 2;
+	int64 amount = 3;
+}
+
+// Daily Summary
+message StatOrderDailySummary {
+	int64 shopId = 1;
+	int64 rangeStart = 2;
+	int64 rangeEnd = 3;
+}
+
+message StatOrderDailySummaryItem {
+	int64 shopId = 1;
+	int64 date = 2;
+	repeated StatOrderActionSummary action = 3;
+}
+
+message StatOrderDailySummaryResp {
+	repeated StatOrderDailySummaryItem summary = 1;
+}
+
+// AddOrder
+message StatOrderDetail {
+	int64 OrderId = 1;
+	string OriginCode = 2;
+	int64 shopId = 3;
+	int64 productId = 4;
+	repeated StatOrderActionTimestamp timestamp = 5;
+	repeated StatOrderItemDetail item = 12;
+}
+
+message StatOrderItemDetail {
+	int64 OrderItemId = 1;
+	int64 skuId = 2;
+	int64 unitCount = 3;
+	int64 unitPrice = 4;
+}
+
+message StatOrderAdd {
+	repeated StatOrderDetail detail = 1;
+}
+
+message StatOrderAddResp {
+	repeated Result result = 1;
+}
+
+// UpdateXXAt
+message StatOrderUpdateTimestampItem {
+	int64 orderId = 1;
+	repeated StatOrderActionTimestamp timestamp = 2;
+}
+
+message StatOrderUpdateTimestamp {
+	repeated StatOrderUpdateTimestampItem item = 1;
+	string source = 2;
+}
+
+message StatOrderUpdateTimestampResp {
+	repeated Result result = 1;
+}
+
+message StatShopInfoReq {
+	int64 shopId = 1;
+	int64 startTime = 2;
+	int64 endTime = 3;
+	int32 limit = 4;
+	bool noProduct = 5;
+}
+
+message StatShopInfoResp {
+	int64 addToCartCount = 1;
+	int64 vendorOrderAmount = 2;
+	int64 orderTotalCount = 3;
+	int64 orderCancelCount = 4;
+	int64 orderCustomerCount = 5;
+	int64 orderPayCount = 6;
+	int64 orderCashOffCount = 7;
+	int64 orderFlashSalesCount = 8;
+	int64 orderFreeShippingCount = 9;
+	int64 orderFriendsDealCount = 10;
+	int64 orderOtherCount = 11;
+	repeated ProductItem productLists = 12;
+}
+
+enum SortOption {
+	SortOptionUNKNOW = 0;
+	SortOptionADDTOCARTCOUNT = 1001;
+	SortOptionTOTALORDERCCOUNT = 1002;
+	SortOptionCUSTOMERORDERAMOUNT = 1003;
+}
+
+message ProductItem {
+	string productImg = 1;
+	string productName = 2;
+	int64 productId = 3;
+	int64 vendorOrderAmount = 4;
+	int64 orderTotalCount = 5;
+	int64 addToCartCount = 6;
+	int64 date = 7;
+	SortOption type = 8;
+}
+
+// 单品分析数据请求
+message StatProductAnalytics {
+	int64 shopId = 1;
+	int64 productId = 2;
+	int64 rangeStart = 3;
+	int64 rangeEnd = 4;
+
+}
+
+// 一天的分析数据
+message StatProductAnalyticsItem {
+	int64 date = 1;
+	StatProductAnalyticsItemDetail detail = 2;
+}
+
+message StatProductAnalyticsItemDetail {
+	int64 AddToCartCount = 1; // 加购件数
+	int64 FavouriteCount = 2; // 收藏人数
+	int64 SalesAmount = 3; //销售额
+	int64 TotalOrderCount = 4; // 订单数
+	int64 CashoffCount = 5; // 满减订单数
+	int64 FlashSalesCount = 6; // 闪购订单数
+	int64 FreeShippingCount = 7; // 包邮订单数
+	int64 FriendsDealCount = 8; // 拼团订单数
+	int64 OtherOrdersCount = 9; // 其他订单数
+}
+
+message StatProductAnalyticsResp {
+	repeated StatProductAnalyticsItem items = 1;
+	string productName = 2;
+}
+
+message ProductSoldCountReq {
+	int32 shopId = 1;
+	repeated int32 productIds = 2;
+}
+
+message ProductSoldCountResp {
+	map<string,int32> result = 1;
+}
+
+message ProductTopNReq {
+	int32 shopId = 1;
+	int64 rangeStart = 2;
+	int64 rangeEnd = 3;
+	int32 n = 4;
+	SortOption sortBy = 5;
+}
+
+message ProductTopNResp {
+	repeated ProductItem productLists = 1;
+}
+
+// =========== 卖家等级定义 ===============
+
+enum StatSellerGrade {
+	StatSellerGradeUnknown = 0;
+	StatSellerGradeOrderTrade = 1; // 交易等级
+	StatSellerGradeOrderDispatch = 2; // 发货时效等级
+	StatSellerGradeOrderCancel = 3; // 订单取消
+}
+
+enum StatSellerGradeSortOrder {
+	StatSellerGradeSortOrderUnknown = 0;
+	StatSellerGradeSortOrderAsc = 1;
+	StatSellerGradeSortOrderDesc = 2;
+}
+
+message AdminSellerGradesSort {
+	StatSellerGrade sortGrade = 1;
+	StatSellerGradeSortOrder sortOrder = 2;
+}
+
+message StatSearchRange {
+	int64 from = 1;
+	int64 to = 2;
+}
+
+message AdminSellerGradesSearch {
+	string shopName = 1; // 模糊搜索店铺名
+	int32 secondCatId = 2; // 二级发布类目
+	string trade = 3;	// 交易等级  A-AAAAA
+	StatSearchRange cancelRate = 4; // 取消率    (a,b] => (a%,b%]
+	string orderDispatch = 5; // 发货效率等级  F1-F5
+	AdminSellerGradesSort sort = 6; // 排序字段
+}
+
+message AdminSellerGradesReq {
+	int32 limit = 1;
+	int32 offset = 2;
+	AdminSellerGradesSearch search = 3;
+}
+
+message AdminSellerGradesItem {
+	string catPath = 1; // 行业标识 一级类目 > 二级类目
+	string shopName = 2; // 店铺名
+	string trade = 3; // 交易等级 
+	string cancelRate = 4; // 取消率
+	string orderDispatch = 5; // 发货时效等级
+}
+
+message AdminSellerGradesResp {
+	Result result = 1;
+	int32 count = 2;
+	repeated AdminSellerGradesItem items = 3;
+}
+
+message GenSellerIndustryReq {
+	int32 shopId = 1;
+}

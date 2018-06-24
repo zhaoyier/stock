@@ -1,0 +1,406 @@
+syntax = "proto3";
+package spk;
+
+import "common/ezbuy.proto";
+import "spk/spk_public.proto";
+import "common/setter.proto";
+
+service Category {
+  option (common.service).webapi = true;
+  // 获取与平台类目的匹配规则
+  rpc Mapping(CategoryMapping) returns (CategoryMappingResp);
+  rpc MappingPcat(CategoryMappingPcat) returns (CategoryMappingPcatResp);
+  rpc MappingList(CategoryMappingList) returns (CategoryMappingListResp);
+  rpc MappingExport(CategoryMappingExport) returns (CategoryMappingExportResp) {
+	option (common.webapi).download = true;
+  };
+  
+  rpc SetMapping(CategorySetMapping) returns (CategorySetMappingResp);
+  rpc SetMappingBySid(CategorySetMappingBySid) returns (CategorySetMappingBySidResp);
+  rpc GetMappingDetail(CategoryGetMappingDetail) returns (CategoryGetMappingDetailResp);
+  rpc PlatformList(CategoryPlatformList) returns (CategoryPlatformListResp);
+
+  // 设置平台类目
+  rpc Platform(CategoryPlatform) returns (CategoryPlatformResp);
+  rpc SetPlatform(CategorySetPlatform) returns (CategorySetPlatformResp);
+  rpc PlatformExport(CategoryPlatformExport) returns (CategoryPlatformExportResp) {
+	option (common.webapi).download = true;
+  }
+  rpc ModelMapping(CategoryModelMapping) returns (CategoryModelMappingResp) {
+	option (common.timeout) = "2s";
+  }
+
+  // 对应平台的类目模型
+  rpc Model(CategoryModel) returns (CategoryModelResp);
+  rpc ModelList(CategoryModelList) returns (CategoryModelListResp);
+  rpc SetModel(CategorySetModel) returns (CategorySetModelResp);
+  rpc ModelExport(CategoryModelExport) returns (CategoryModelExportResp);
+  rpc MinWeightSet(CategoryMinWeightSet) returns (CategoryMinWeightSetResp);
+
+  rpc KeywordRecommend(CategoryKeywordRecommend) returns (CategoryKeywordRecommendResp);
+  rpc KeywordRecommendSet(CategoryKeywordRecommendSet) returns (CategoryKeywordRecommendSetResp);
+
+  rpc KeywordRedirect(CategoryKeywordRedirect) returns (CategoryKeywordRedirectResp);
+  rpc KeywordRedirectSet(CategoryKeywordRedirectSet) returns (CategoryKeywordRedirectSetResp);
+}
+
+// ---------------------------------------------------------------------------
+
+message CategoryMappingPcat {
+  int32 pcid = 1;
+}
+
+message CategoryMappingPcatItem {
+  XPlatform platform = 1;
+  int64 cid = 2;
+}
+
+message CategoryMappingPcatResp {
+  repeated CategoryMappingPcatItem items = 1;
+}
+
+message CategoryMapping {
+  XPlatform platform = 1;
+  repeated int64 cid = 2;
+  string productTitle = 3;
+}
+
+// 如果是0表示没有
+message CategoryMappingResp {
+  repeated int32 pcid = 1;
+}
+
+message CategorySetMappingItem {
+  int64 cid = 1;
+  // 发布类目
+  int32 pcid = 2;
+  // 如果不是则是添加
+  bool isRemove = 3;
+  // 直接用请求中的 keywords 覆盖现有的关键词匹配, 否则追加到现有列表中
+  bool overrideKeyword = 4;
+  // 关键词匹配
+  repeated XCategoryKeywordMapping keywords = 5;
+}
+
+message XCategoryKeywordMapping {
+  string keyword = 1;
+  int32 pcid = 2;
+  // 设置时不需要, 展示时返回
+  string pcname = 3;
+}
+
+message CategorySetMappingItemSid {
+  string sid = 1;
+  // 发布类目
+  int32 pcid = 2;
+  // 如果不是则是添加
+  bool isRemove = 3;
+}
+
+message CategorySetMapping {
+  XPlatform platform = 1;
+  repeated CategorySetMappingItem oper = 2;
+}
+
+message CategorySetMappingResp {
+  int32 success = 1;
+  string jobId = 2;
+}
+
+message CategorySetMappingBySid {
+  XPlatform platform = 1;
+  repeated CategorySetMappingItemSid oper = 2;  
+}
+
+message CategorySetMappingBySidResp {
+  int32 success = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message CategorySetPlatform {
+  XPlatform platform = 1;
+  string sid = 2;
+  int64 parent = 3;
+  string name = 4;
+  string remark = 5;
+}
+
+message CategorySetPlatformResp {
+  int64 cid = 1;
+  string sid = 2;
+}
+
+message CategoryPlatformLeaveItem {
+  XPlatform platform = 1;
+  int64 cid = 2;
+  string name = 3;
+  int64 parent = 4;
+  string sid = 5; // 字符串id
+  string remark = 6;
+}
+
+message CategoryPlatform {
+  XPlatform platform = 1;
+  string sid = 2;
+}
+
+message CategoryPlatformResp {
+  CategoryPlatformLeaveItem item = 1;
+}
+
+message CategoryPlatformExport {
+  XPlatform platform = 1;
+}
+
+message CategoryPlatformExportResp {
+  string contentType = 1;
+  bytes data = 2;
+  string filename = 3;
+}
+
+// ---------------------------------------------------------------------------
+// 类目模型
+
+message CategoryModel {
+  XPlatform platform = 1;
+  // 我们自己的cid
+  int64 cid = 2;
+  // 以数据库结果为准, 在没找到的时候不自己去匹配
+  bool raw = 3;
+}
+
+message CategoryModelResp {
+  CategoryModelItem item = 1;
+}
+
+message CategoryModelItem {
+  int64 cid = 5;
+  int64 estGrossWeight = 1;
+  int64 estVolumeWeight = 2;
+  XEzbuyShipment ezbuy = 3;
+  XPrimeShipment prime = 4;
+  int32 primeWeight = 6;
+  map<string, CategoryModelCatalogItem> catalog = 7;
+  int32 minWeight = 8;
+}
+
+message CategoryModelCatalogItem {
+  bool noIndex = 1;
+  bool block = 2;
+}
+
+message CategoryModelCatalogItemOper {
+  common.SetBool noIndex = 1;
+  common.SetBool block = 2;
+}
+
+message CategorySetModel {
+  XPlatform platform = 1;
+  int64 cid = 2;
+  CategorySetModelOper oper = 3;
+}
+
+message CategorySetModelOper {
+  repeated int64 estGrossWeight = 1;
+  repeated int64 estVolumeWeight = 2;
+  repeated int32 ezbuy = 3;
+  repeated int32 prime = 4;
+  // 最高的重量
+  common.SetI32 minWeight = 8;
+  string updateBy = 5;
+  common.SetI32 primeWeight = 6;
+  map<string, CategoryModelCatalogItemOper> catalog = 7;
+}
+
+message CategorySetModelResp {
+  
+}
+
+message CategoryModelExport {
+  XPlatform platform = 1;
+}
+
+message CategoryModelExportResp {
+  repeated XCategoryModelItem items = 1;
+}
+
+message XCategoryModelItem {
+  XPlatform platform = 1;
+  int64 cid = 2;
+  int64 estGrossWeight = 3;
+  int64 estVolumeWeight = 4;
+  XEzbuyShipment ezbuy = 5;
+  XPrimeShipment prime = 6;
+  int32 primeWeight = 7;
+  int64 updateDate = 8;
+  string updateBy = 9;
+  bool isRemoved = 10;
+  int32 minWeight = 11;
+}
+
+// ---------------------------------------------------------------------------
+
+message CategoryModelMapping {
+  XPlatform platform = 1;
+  int64 cid = 2;
+  repeated int64 cids = 3;
+  string productTitle = 4;
+}
+
+message CategoryModelMappingResp {
+  int32 pcid = 1;
+  CategoryModelItem model = 2;
+}
+
+
+// ---------------------------------------------------------------------------
+
+message CategoryMappingList {
+  XPlatform platform = 1;
+  int32 limit = 2;
+  int32 offset = 3;
+  bool needName = 4;
+}
+
+message CategoryMappingListResp {
+  repeated XCategoryMappingItem items = 2;
+  int32 total = 3;
+}
+
+message XCategoryMappingItem {
+  int64 cid = 1;
+  string cname = 2;
+  int32 pcid = 3;
+  string pcname = 4;
+  int32 keywordCount = 5;
+}
+
+// ---------------------------------------------------------------------------
+
+message CategoryKeywordRecommend {
+  string keyword = 1;
+}
+
+message CategoryKeywordRecommendItem {
+  string keyword = 1;
+  repeated int32 dcid = 2;
+  string updateBy = 3;
+}
+
+message CategoryKeywordRecommendItemOper {
+  common.SetI32s dcid = 1;
+  common.SetStr updateBy = 2;
+}
+
+message CategoryKeywordRecommendResp {
+  CategoryKeywordRecommendItem item = 1;
+}
+
+message CategoryKeywordRecommendSet {
+  string keyword = 1;
+  CategoryKeywordRecommendItemOper oper = 2;
+}
+
+message CategoryKeywordRecommendSetResp {
+  CategoryKeywordRecommendItem item = 1;  
+}
+
+// ---------------------------------------------------------------------------
+
+message CategoryMappingExport {
+  XPlatform platform = 1;
+}
+
+message CategoryMappingExportResp {
+  string filename = 1;
+  bytes data = 2;
+  string contentType = 3;
+}
+
+// ---------------------------------------------------------------------------
+
+message CategoryModelList {
+  XPlatform platform = 1;
+}
+
+message CategoryModelListResp {
+  repeated CategoryModelItem items = 1;
+}
+
+
+// ---------------------------------------------------------------------------
+
+message CategoryKeywordRedirect {
+  string keyword = 1;
+}
+
+message CategoryKeywordRedirectItem {
+  string keyword = 1;
+  int32 dcid = 2;
+  string updateBy = 3;
+}
+
+message CategoryKeywordRedirectItemOper {
+  common.SetI32 dcid = 1;
+  common.SetStr updateBy = 2;
+}
+
+message CategoryKeywordRedirectResp {
+  CategoryKeywordRedirectItem item = 1;
+}
+
+message CategoryKeywordRedirectSet {
+  string keyword = 1;
+  CategoryKeywordRedirectItemOper oper = 2;
+}
+
+message CategoryKeywordRedirectSetResp {
+  CategoryKeywordRedirectItem item = 1;  
+}
+
+// ---------------------------------------------------------------------------
+
+message CategoryGetMappingDetail {
+  XPlatform platform = 1;
+  int64 cid = 2;
+}
+
+message CategoryGetMappingDetailResp {
+  int32 defaultPcid = 1;
+  string defaultPcname = 2;
+  repeated XCategoryKeywordMapping keywords = 3;
+  string cname = 4;
+  string platformLab = 5;
+}
+
+// ---------------------------------------------------------------------------
+
+message CategoryPlatformList {
+  bool excludeEzbuy = 1;
+}
+
+message XCategoryPlatformInfo {
+  XPlatform id = 1;
+  string label = 2;
+}
+
+message CategoryPlatformListResp {
+  repeated XCategoryPlatformInfo platforms = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message CategoryMinWeightSet {
+  repeated CategoryMinWeightSetItem items = 1;
+  string updateBy = 3;
+}
+
+message CategoryMinWeightSetItem {
+  int32 pcid = 1;
+  int32 minWeight = 2;
+}
+
+message CategoryMinWeightSetResp {
+  string jobId = 1;
+}

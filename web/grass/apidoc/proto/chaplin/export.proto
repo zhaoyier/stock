@@ -1,0 +1,59 @@
+syntax = "proto3";
+package chaplin;
+
+import "common/ezbuy.proto";
+
+service Export {
+    option (common.service).webapi = true;
+    // 报关
+    rpc CustomsDeclaration(CustomsDeclarationReq) returns (ExportFile) {
+        option (common.webapi).download = true;
+    }
+    // 清关
+    rpc CustomsClearance(CustomsClearanceReq) returns (ExportFile) {
+        option (common.webapi).download = true;
+    }
+
+    // my运单导出
+    rpc GetMyExpressInfo(GetMyExpressInfoReq) returns (ExportFile){
+        option (common.webapi).download = true;
+    }
+
+    // th--nim运单导出
+    rpc GetThNimExpressInfo(GetThExpressInfoReq) returns (ExportFile){
+        option (common.webapi).download = true;
+    }
+}
+
+message CustomsDeclarationReq {
+    string catalogCode = 1;
+    string packingBoxNo = 2;
+    // Ocean: 海运
+    // Air: 空运
+    string shipmentType = 3;
+}
+
+message CustomsClearanceReq {
+    string catalogCode = 1;
+    string packingBoxNo = 2;
+    // Ocean: 海运
+    // Air: 空运
+    string shipmentType = 3;
+}
+
+message GetMyExpressInfoReq {
+    int32 startDate = 1;
+    int32 endDate = 2;
+}
+
+message GetThExpressInfoReq {
+    int32 startDate = 1;
+    int32 endDate = 2;
+}
+
+
+message ExportFile {
+  string contentType = 1;
+  bytes data = 2;
+  string filename = 3;
+}

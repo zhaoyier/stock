@@ -1,0 +1,27 @@
+syntax = "proto3";
+package garencieres;
+
+import "common/html.proto";
+
+service BatchOrder {
+	rpc ReportForcePicking(ReportForcePickingReq) returns (common.Html);
+	rpc SplitPackage(SplitPackageReq) returns (SplitPackageResp);
+}
+
+message SplitPackageReq {
+	string userID = 1;
+	string userName = 2;
+	// 每个数组元素为 package 下面对应的 order id，以,分隔,
+	// 比如["1,2", "3,4"]
+	repeated string packageOrderIds = 3;
+	string packageSplitStep = 4;
+}
+
+message SplitPackageResp {
+	// 成功的话，status 为空
+	string status =1;
+}
+
+message ReportForcePickingReq {
+	repeated string StockinCodes = 1;
+}

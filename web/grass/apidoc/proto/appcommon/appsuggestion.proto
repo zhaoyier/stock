@@ -1,0 +1,75 @@
+syntax = "proto3";
+package appcommon;
+import "common/ezbuy.proto";
+import "appcommon/common_public.proto";
+
+option swift_prefix = "GR";
+
+service Suggestion {
+	option (common.service).webapi = true;
+	//获取全部建议的类型列表
+	rpc TypeList(SuggestionTypeList) returns (SuggestionTypeListResp);
+	//增加和删除类型，客户端可忽略
+	rpc AddType(SuggestionAddType) returns (appcommon.ResultResp);
+	rpc DeleteType(SuggestionDeleteType) returns (appcommon.ResultResp);
+
+	//提交用户建议
+	rpc Submit(SuggestionSubmit) returns (appcommon.ResultResp);
+	rpc List(SuggestionList) returns (SuggestionListResp);
+}
+
+message SuggestionList{
+	int32 offSet = 1;
+	int32 limit = 2;
+}
+message SuggestionListResp{
+	bool result = 1;
+	string msg = 2;
+	repeated SuggEnity suggList = 3;
+
+}
+
+message SuggEnity{
+	int32 suggestionTypeId = 1;		// 建议类型
+	string suggestionTypeName =2; 	// 类型名字
+    repeated string imgs = 3; 	  	// 图片
+    string content = 4;		  		// 建议内容
+    string email = 5;  	        	// 自填的邮箱
+	int32 customerId = 6;       	// 客户id
+    string customerName = 7;   		// 客户名
+    string registerEmail = 8;   	// 客户注册邮箱
+    string version = 9;         	// app版本号
+    string platform = 10;       	// app类型
+    string catalog = 11;        	// 国家
+    string lang = 12;            	// 语言
+	int64 createTime = 13;  		// 创建时间
+
+} 
+
+message SuggestionTypeList {}
+
+message SuggestionTypeListResp {
+    repeated SuggestionType typeList = 1;
+}
+message SuggestionType {
+	int32 suggestionTypeId = 1;
+	string name = 2;
+}
+
+message SuggestionSubmit {
+    int32 suggestionTypeId = 1;
+	repeated string imgs = 2;
+	string content = 3;
+	string email = 4;
+}
+
+message SuggestionDeleteType {
+	int32 suggestionTypeId = 1;
+}
+
+message SuggestionAddType {
+	int32 suggestionTypeId = 1;
+	string name = 2;
+}
+
+

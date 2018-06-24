@@ -1,0 +1,27 @@
+syntax = "proto3";
+package parcelforce;
+import "common/ezbuy.proto";
+
+service Payment {
+        option (common.service).webapi = true;
+
+        rpc CancelPendingPayments(PaymentReq) returns (PaymentReqResp);
+        rpc PayPendingPayments(PaymentReq) returns (PaymentReqResp);
+}
+
+message PaymentReq {
+        repeated PaymentItem payments = 1;
+        int64 customerId = 2;
+}
+
+message PaymentItem {
+        int64 paymentId = 1;
+        string billType = 2;
+}
+
+message PaymentReqResp {
+        bool result = 1;
+        string message = 2;
+}
+
+

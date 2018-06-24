@@ -1,0 +1,138 @@
+syntax = "proto3";
+package umbrellacn;
+
+import "common/empty.proto";
+import "common/ezbuy.proto";
+
+
+service UmbrellaCn {
+	rpc GetErpUserByCtx(common.Empty) returns(CookieResp);
+	rpc GetErpUserByCookie(CookieReq) returns(CookieResp);
+	rpc GetAllPickManFromUser(GetAllPickManFromUserReq) returns(GetAllPickManFromUserResp);
+
+	rpc GetDepartmentStaff(DepartmentReq) returns(DepartmentResp);
+	rpc GetStaffInfo(StaffReq) returns(StaffResp);
+	rpc GetUserInfoByNameReq(UserInfoByNameReq) returns(UserInfoByNameResp);
+
+	rpc GetAllDepartment(common.Empty) returns (GetAllDepartmentResp);
+	rpc GetAllErpUser(common.Empty) returns (GetAllErpUserResp);
+	rpc GetAllStaff(common.Empty) returns (GetAllStaffResp);
+	rpc GetUserByDptId(GetUserByDptIdReq) returns (GetAllErpUserResp);
+	rpc GetUserByIds(GetUserByIdsReq) returns (GetAllErpUserResp);
+	rpc GetGroupById(GetGroupByIdReq) returns (GetGroupByIdResp);
+	option (common.service) = {
+		webapi: true;
+	};
+}
+
+
+message CookieReq {
+	string cookie = 1;
+}
+
+message CookieResp {
+	bool isCookieValid = 1;
+	string userId = 2;
+	string userName = 3;
+	string userType = 4;
+	string catalogCode = 5;
+}
+
+
+message GetAllPickManFromUserReq {
+	string pickMan = 1;
+}
+
+message GetAllPickManFromUserResp {
+	message PickInfo{
+		string userName = 1;
+		string catalogCode = 2;
+	}
+	map<int32, PickInfo> pickManMap = 1;
+}
+
+message DepartmentReq {
+	int32 departmentId = 1;
+	string departmentName = 2;
+}
+
+message Department {
+	int32 jobNumber = 1;
+	string name = 2;
+}
+
+message DepartmentResp {
+	repeated Department staff = 1;
+}
+
+message StaffReq {
+	int32 staffId = 1;
+}
+
+message StaffResp {
+	string name = 1;
+}
+
+message UserInfoByNameReq {
+	string name = 1;
+}
+
+message UserInfo {
+	string departmentName = 1;
+}
+
+message UserInfoByNameResp {
+	repeated UserInfo userInfos = 1;
+}
+
+message GetAllDepartmentResp{
+	repeated DepartmentInfo departments = 1;
+}
+
+message DepartmentInfo{
+	int32 departmentId = 1;
+	string departmentName = 2;
+}
+
+
+message GetAllErpUserResp{
+	repeated ErpUserInfo users = 1;
+}
+
+message ErpUserInfo {
+	int32 userId = 1;
+	string userName = 2;
+	string catalogCode = 3;
+}
+
+
+message GetAllStaffResp{
+	repeated StaffInfo staffs = 1;
+}
+
+message StaffInfo{
+	int32 staffId = 1;
+	string staffName = 2;
+}
+
+message GetUserByDptIdReq{
+	int32 departmentId = 1;
+}
+
+message GetUserByIdsReq {
+	repeated int32 userIds = 1;
+}
+
+message GetGroupByIdReq{
+	int32 userId = 1;
+}
+
+message GetGroupByIdResp {
+	repeated GroupInfo groups = 1;
+}
+
+message GroupInfo{
+	int32 groupId = 1;
+	string groupName = 2;
+	bool fullAccess = 3;
+}

@@ -1,0 +1,16 @@
+syntax = "proto3";
+package ezseller;
+
+enum NewOrderSyncTaskStatus {
+	NewOrderSyncTaskStatusUnknown = 0;
+	NewOrderSyncTaskStatusPending = 1;
+	NewOrderSyncTaskStatusProcessing = 2;
+	NewOrderSyncTaskStatusFailed = 3;
+	NewOrderSyncTaskStatusAbort = 4;
+	NewOrderSyncTaskStatusSucceeded = 5;
+}
+
+enum NewOrderSyncTaskType {
+	NewOrderSyncTaskTypeNormal = 0;
+	NewOrderSyncTaskTypeFixMissedItems = 1;
+}

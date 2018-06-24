@@ -1,0 +1,68 @@
+syntax = "proto3";
+package adminBanner;
+import "common/ezbuy.proto";
+
+service Banner {
+    option (common.service) = {
+        webapi:true;
+        public:true;
+    };
+    rpc GetBanners(GetBannersReq) returns (TAreas){
+        option (common.webapi).enable = true;
+    };
+}
+
+message GetBannersReq {
+    string lang = 1;
+    repeated string areaNames = 2;
+    string catalogCode = 3;
+    int64 customerId = 4; //可选，用户id，用于rpc调用判断用户标签
+}
+
+message TAreas {
+    repeated TArea areas = 1;
+}
+
+message TArea {
+    string areaName = 1;
+    repeated TBanner banners =2;
+}
+
+message TClickArea {
+    string link = 1;
+    string type = 2;
+    TClickAreaShape area = 3;
+}
+
+message TClickAreaShape {
+    double left = 1;
+    double top = 2;
+    double width = 3;
+    double height = 4;
+}
+
+message TUserGroup {
+    int32 userGroupId = 1;
+    string userGroupName = 2;
+
+}
+
+message TBanner {
+    string id = 1; // 唯一id
+    string nation = 2;         //国家CODE    default: SG
+    string lang = 3;         //语言        default: en
+    string areaName = 4;  //区域名称
+    string name = 5;         //图片名称
+    string imageURL = 6;     //图片链接
+    string link = 7;  //链接地址     default: ''
+    bool visible = 8;         //是否显示     default: false
+    bool newWindow = 9;      //新窗口打开   default: false
+    int64 startAt = 10;  // 开始时间
+    int64 endAt = 11;
+    int32 index = 12;
+    int32 activityId = 13;
+    repeated TClickArea clickAreas = 14;
+    repeated TUserGroup  userGroups = 15;  //会员标签
+    bool isDefault = 16; //是否为默认banner
+}
+

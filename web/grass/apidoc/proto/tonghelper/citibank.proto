@@ -1,0 +1,101 @@
+syntax = "proto3";
+package tonghelper;
+
+import "common/file.proto";
+import "common/ezbuy.proto";
+
+
+service Citibank {
+    //查询
+    rpc CitibankQuery(CitibankQueryReq) returns (CitibankQueryResp);
+    //手工确认
+    rpc CitibankConfirm(CitibankConfirmReq) returns (CitibankConfirmResp);
+    // 上传csv
+    rpc CitibankUploadCsv(CitibankUploadCsvReq) returns (CitibankUploadCsvResp){
+        option (common.webapi).upload = true;
+    }
+    // 下载csv
+    rpc CitibankDownloadCsv(CitibankDownloadCsvReq) returns (CitibankDownloadCsvResp){
+        option (common.webapi).download = true;
+    }
+}
+
+//    匹配状态
+enum ConfirmStatus {
+    PENDING =  0;
+    CONFIRMED =  1;
+    ALL = 2;        // used for query
+}
+// 匹配方式
+enum ConfirmType {
+    AUTO  = 0;
+    MANUAL = 1;
+}
+
+message CitibankEntry {
+    string customerRef = 1;
+    string bankRef= 2;
+    int64  amount = 3;
+    string extral = 4;
+    string topupNumber = 5;
+    ConfirmStatus confirmStatus = 6;
+    ConfirmType confirmType = 7;
+    string operator  = 8;
+    int64  transTime = 9;
+    string customerName = 10;
+}
+
+message CitibankConfirmReq{
+    string bankRef = 1;         
+    string topupNumber = 2;
+    string operator = 3;
+}
+
+message CitibankConfirmResp {
+    bool sucess = 1;
+}
+
+message CitibankQueryReq {
+    string topupNumber = 1;     // 交易号  
+    int64  amount = 2;          // 金额
+    string customerName = 3;    // 用户名
+    string customerMail = 4;    // 用户邮箱
+    int64 from = 5;     // 开始时间 unix time
+    int64 to = 6;       // 结束时间 unix time
+    ConfirmStatus status = 7;    // 确认状态 status
+    // 用于分页获取
+    int64 offset = 8;
+    int64 size = 9;
+
+    string bankRef = 10;    //
+    string customerRef = 11;
+}
+
+message CitibankQueryResp {
+    repeated CitibankEntry entries = 1;
+    int64 total = 2;
+}
+
+message CitibankUploadCsvReq {
+    string operator = 1;    //操作者
+    common.File file = 2;
+}
+
+message CitibankUploadCsvResp {
+    bool   success = 1;
+    string msg = 2;
+    int64 add = 3;  //新增数量
+}
+
+//  ignore
+message CitibankDownloadCsvReq {
+    int64 from = 1;
+    int64 to = 2;
+    string operator = 3;
+}
+
+message CitibankDownloadCsvResp {
+    string filename = 1;
+    bytes  data = 2;
+    string contentType = 3;
+}

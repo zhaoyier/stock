@@ -1,0 +1,11 @@
+syntax = "proto3";
+package ordertrackmq;
+
+import "common/empty.proto";
+import "garencieres/mqsub.proto";
+
+service ordertrack {
+	rpc SyncTKNo (garencieres.SyncTKNoMsg) returns (common.Empty);
+}
+
+

@@ -1,0 +1,51 @@
+syntax = "proto3";
+package spk;
+
+option swift_prefix = "GR";
+
+import "common/ezbuy.proto";
+import "appcommon/appcommon_spk_public.proto";
+
+service App {
+  option (common.service).webapi = true;
+  // 搜索接口
+  rpc Search(AppSearch) returns (AppSearchResp);
+  // 搜索关键词补全
+  rpc SearchComplete(AppSearchComplete) returns (AppSearchCompleteResp);
+}
+
+// ---------------------------------------------------------------------------
+
+message AppSearch {
+  appcommon.XSearch search = 1;
+  int32 offset = 2;
+  int32 limit = 3;
+}
+
+message AppSearchResp {
+  appcommon.XList list = 1;
+}
+
+message AppSearchComplete {
+  string keyword = 1;
+}
+
+message AppSearchCompleteResp {
+  repeated XAppSearchCompleteItem items = 1;
+}
+
+message XAppSearchCompleteItem {
+  // 是否展示类目信息
+  bool hasCat = 1;
+  // 类目id
+  int32 dcid = 2;
+  // 类目名
+  string dcat = 3;
+
+  // 高亮的关键词
+  string keyword = 4;
+  // 匹配到的关键词
+  string keywordRaw = 5;
+  // 商品数量
+  string count = 6;
+}

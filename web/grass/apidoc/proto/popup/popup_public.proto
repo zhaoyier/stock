@@ -1,0 +1,173 @@
+syntax = "proto3";
+package popup;
+
+option java_multiple_files = true;
+option java_package = "com.daigou.sg.grpc";
+option swift_prefix = "GR";
+
+import "common/ezbuy.proto";
+import "common/html.proto";
+
+service PopUp {
+    option (common.service).webapi = true;
+
+
+    // 客户端获取弹框  
+    rpc Get(PopUpGet) returns (PopUpGetResp);
+
+    // 输出结果页面,方便测试
+    rpc GetHtml(PopUpGet) returns (common.Html);
+
+    // admin 后台相关api
+    rpc List(PopUpList) returns (PopUpListResp);
+
+    rpc ItemGet(PopUpItemGet) returns (PopUpItemGetResp);
+
+    rpc Add(PopUpAdd) returns (PopUpAddResp);
+
+    rpc Update(PopUpUpdate) returns (PopUpUpdateResp);
+
+    rpc ChangeStatus(PopUpChangeStatus) returns (PopUpChangeStatusResp);
+}
+
+enum PopUpContentType {
+    PopUpContentTypeUnknown = 0;
+    PopUpContentTypeText = 1;
+    PopUpContentTypeImage = 2;
+}
+
+enum PlatformType {
+    PlatformTypeUnknown = 0;
+    PlatformTypeMobile = 1;
+    PlatformTypePc = 2;
+}
+
+enum DisplayLocationType {
+    DisplayLocationTypeUnknown = 0;
+    DisplayLocationTypeHomePage = 1;
+    DisplayLocationTypeMyAccount = 2;
+}
+
+// -------------------------------------------------------------
+
+message PopUpGet {
+    // 客户端使用可不传 catalog, client, 会自动从域名判断，这个只是方便遍服务端调试用
+    string catalog = 1;
+    string client = 2;
+    // pc 的时候需要选弹出位置
+    DisplayLocationType location = 3;
+}
+
+message PopUpGetResp {
+    PopUpContent content = 1;
+    bool NotHasPopup = 2;
+}
+
+message PopUpContent {
+    PopUpContentType type = 1;
+    string text = 2;
+    string image = 3;
+    string link = 4;
+    string title = 5;
+    string id = 6;
+    string imageSuffix = 7;
+    string name = 8;
+}
+
+// -------------------------------------------------------------
+
+message PopUpList {
+    int32 limit = 1;
+    int32 offset = 2;
+    string catalog = 3;
+    string name = 4;
+    bool disabled = 5;
+}
+
+message PopUpListResp {
+    repeated PopUpListItem items = 1;
+    int32 total = 2;
+}
+
+message PopUpContentItem {
+    PopUpContentType type = 1;
+    string text = 2;
+    string image = 3;
+    string link = 4;
+    string title = 5;
+    string imageSuffix = 6;
+}
+
+message PopUpListItem {
+    string header = 1;
+    int64 updateDate = 2;
+    string updateBy = 3;
+    bool disabled = 4;
+    repeated PlatformType platform = 5;
+    string catalog = 6;
+    int64 startDate = 7;
+    int64 endDate = 8;
+    string owner = 9;
+    string id = 10;
+    repeated int32 groups = 11;
+    PopUpContentItem pcContent = 12;
+    PopUpContentItem mobileContent = 13;
+    DisplayLocationType location = 14;
+    string name = 15;
+}
+
+// ---------------------------------------------------------------
+
+message PopUpItemGet {
+    string id = 1;
+}
+
+message PopUpItemGetResp {
+    PopUpListItem item = 1;
+}
+
+// -------------------------------------------------------------
+
+message PopUpItem {
+    string header = 1;
+    repeated PlatformType platform = 2;
+    string catalog = 3;
+    int64 startDate = 4;
+    int64 endDate = 5;
+    PopUpContentItem pcContent = 6;
+    PopUpContentItem mobileContent = 7;
+    repeated int32 groups = 8;
+    DisplayLocationType location = 9;  // pc 才有 location 的选择
+    string name = 10;
+}
+
+message PopUpAdd {
+    PopUpItem item = 1;
+}
+
+message PopUpAddResp {
+    bool result = 1;
+}
+
+// ---------------------------------------------------------------
+
+message PopUpUpdate {
+    PopUpItem item = 1;
+    string id = 2;
+}
+
+message PopUpUpdateResp {
+    bool result = 1;
+}
+
+// ----------------------------------------------------------------
+
+message PopUpChangeStatus {
+    bool disabled = 1;
+    string id = 2;
+}
+
+message PopUpChangeStatusResp {
+    bool result = 1;
+}
+

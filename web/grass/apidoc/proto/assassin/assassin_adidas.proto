@@ -1,0 +1,18 @@
+syntax = "proto3";
+package assassin;
+import "assassin/assassin.proto";
+import "common/ezbuy.proto";
+
+service Adidas {
+    option (common.service).webapi = true;
+    rpc Get(AdidasGet) returns (AdidasGetResp);
+}
+
+message AdidasGet {
+  string id = 1;
+  bool notRealtime = 2;
+}
+
+message AdidasGetResp {
+  Product item = 1;
+}

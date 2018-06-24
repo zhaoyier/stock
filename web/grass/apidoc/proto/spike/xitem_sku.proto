@@ -1,0 +1,31 @@
+syntax = "proto3";
+package spike;
+import "spike/xitem_price.proto";
+
+message XSku {
+  repeated XSkuInfo skuInfos = 2;
+}
+
+message XProp {
+  repeated XSkuProp skuProps = 1;
+}
+
+message XSkuProp {
+  string skuPropId = 1;
+  string skuPropName = 2;
+  repeated XSkuPropValue skuPropValues = 3;
+}
+
+message XSkuPropValue {
+	string id = 1;
+	string name = 2;
+	string img = 3;
+}
+
+message XSkuInfo {
+	string skuId = 1;
+	string pvPair = 2;
+	XPriceItem price = 4;
+}
+
+

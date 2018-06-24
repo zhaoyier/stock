@@ -1,0 +1,31 @@
+syntax = "proto3";
+package spknet;
+import "common/ezbuy.proto";
+
+service Detail {
+  option (common.service).webapi = true;
+  // 手机详情页
+  rpc Mob(DetailMob) returns (DetailMobResp);
+  // PC详情页
+  rpc Pc(DetailPc) returns (DetailPcResp);
+}
+
+// ---------------------------------------------------------------------------
+
+message DetailMob {
+  
+}
+
+message DetailMobResp {
+  
+}
+
+// ---------------------------------------------------------------------------
+
+message DetailPc {
+  
+}
+
+message DetailPcResp {
+  
+}

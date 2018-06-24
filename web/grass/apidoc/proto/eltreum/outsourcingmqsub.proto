@@ -1,0 +1,15 @@
+syntax = "proto3";
+package eltreum;
+
+import "common/empty.proto";
+
+
+service OutSourcingMqSub {
+	//测试
+	rpc Test(common.Empty) returns (common.Empty);
+}
+
+// ----------------------------------------------------------------
+
+
+

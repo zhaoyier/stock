@@ -1,0 +1,469 @@
+syntax = "proto3";
+package spk;
+
+import "common/ezbuy.proto";
+import "spk/spk_xitem.proto";
+import "biz/region.proto";
+import "spk/spk_public.proto";
+import "spk/spk_xdetail_public.proto";
+import "spk/errors_public.proto";
+import "common/setter.proto";
+import "spk/spk_xerp.proto";
+import "spk/spk_ban.proto";
+
+service Item {
+  option (common.service).webapi = true;
+  rpc Walk(ItemWalk) returns (ItemWalkResp) {
+	option (common.timeout) = "100s";
+  }
+  // 聚合函数
+  rpc Get(ItemGet) returns (ItemGetResp) {
+	option (common.timeout) = "1s";
+  }
+  rpc Gets(ItemGets) returns (ItemGetsResp);
+  
+  // 批量获取单sku的信息, 一般用于列表页
+  // 并且根据catalog返回信息
+  rpc List(ItemList) returns (ItemListResp);
+
+  rpc Detail(ItemDetail) returns (ItemDetailResp) {
+	option (common.timeout) = "1s";
+  };
+  
+  rpc Detail10S(ItemDetail) returns (ItemDetailResp);
+  
+  rpc RefId(ItemRefIdSet) returns (ItemRefIdResp) {
+	option (common.timeout) = "1s";
+  };
+  rpc Batch(ItemBatch) returns (ItemBatchResp);
+  rpc Base(ItemBase) returns (ItemBaseResp) {
+	option (common.timeout) = "1s";
+  };
+  rpc BaseMulti(ItemBaseMulti) returns (ItemBaseMultiResp);
+  rpc BaseSet(ItemBaseSet) returns (ItemBaseSetResp);
+  rpc BaseGetByBanRule(ItemBaseGetByBanRule) returns (ItemBaseGetByBanRuleResp);
+  
+  rpc Update(ItemUpdate) returns (ItemUpdateResp);
+  rpc UpdateActivity(ItemUpdateActivity) returns (ItemUpdateActivityResp);
+  
+  rpc Remove(ItemRemove) returns (ItemRemoveResp);
+  // 通过url更新商品
+  rpc Fetch(ItemFetch) returns (ItemFetchResp);
+
+  rpc Sku(ItemSku) returns (ItemSkuResp);
+  rpc SkuSet(ItemSkuSet) returns (ItemSkuSetResp);
+
+  rpc Extend(ItemExtend) returns (ItemExtendResp);
+  rpc ExtendSet(ItemExtendSet) returns (ItemExtendSetResp);
+
+  rpc WeightSet(ItemWeightSet) returns (ItemWeightSetResp) {
+	option (common.timeout) = "5s";
+  };
+
+  rpc ChangeLog(ItemChangeLog) returns (ItemChangeLogResp);
+
+  // 生成一个 archive
+  rpc MakeArchive(ItemMakeArchive) returns (ItemMakeArchiveResp);
+
+  rpc DetailCache(ItemDetailCache) returns (ItemDetailCacheResp);
+  rpc DetailCacheSet(ItemDetailCacheSet) returns (ItemDetailCacheSetResp);
+  rpc LastWeight(ItemLastWeight) returns (ItemLastWeightResp);
+  // 替换商品销量
+  rpc Replace(ItemReplace) returns (ItemReplaceResp);
+
+  rpc Erps(ItemErps) returns (ItemErpsResp);
+}
+
+service ItemCn {
+  option (common.service).webapi = true;
+  // 给erp用的
+  rpc Erps(ItemErps) returns (ItemErpsResp);
+  rpc Erp(ItemErp) returns (ItemErpResp);
+  rpc WeightInfo(ItemWeightInfo) returns(ItemWeightInfoResp);
+  rpc Get(ItemGet) returns (ItemGetResp);
+}
+
+// ---------------------------------------------------------------------------
+
+message ItemGet {
+  XItemField field = 1;
+  int64 gpid = 2;
+  int64 version = 3;
+  bool getRemoved = 4;
+}
+
+message ItemGetResp {
+  XItem item = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message ItemBatch {
+  repeated int64 gpid = 2;
+}
+
+message ItemBatchResp {
+  repeated XItem items = 1;
+}
+
+message ItemUpdate {
+  int64 gpid = 1;
+  bool insert = 2;
+  // 更新人
+  string updateBy = 3;
+  
+  // 具体信息更新
+  XItemBaseOper base = 4;
+}
+
+message ItemUpdateResp {
+  XItem item = 1;
+}
+
+message ItemRemove {
+  int64 gpid = 1;
+}
+
+message ItemRemoveResp {
+}
+
+// ---------------------------------------------------------------------------
+
+message ItemFetch {
+  string url = 1;
+  XItemBaseOper baseOper = 2;
+  bool allowOutofstock = 3;
+  bool notRealtime = 4;
+  bool notSyncLang = 5;
+  string updateBy = 6;
+  // 只同步标题
+  bool syncLangTitleOnly = 7;
+  bool showBanCheck = 8;
+}
+
+message ItemFetchResp {
+  XItem item = 1;
+  int32 translation = 3;
+  BanCheck banreq = 4;
+}
+
+message ItemSku {
+  int64 gpid = 1;
+  int64 version = 2;
+}
+
+message ItemSkuResp {
+  XSku item = 1;
+}
+
+message ItemSkuSet {
+  int64 gpid = 1;
+  XSkuOper oper = 2;
+}
+
+message ItemSkuSetResp {
+  XSku item = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message ItemRefId {
+  string refId = 1;
+}
+
+message ItemRefIdSet {
+  string refId = 1;
+  ItemRefIdOper oper = 2;
+}
+
+message ItemRefIdOper {
+  biz.Region region = 1;
+  XPlatform platform = 2;
+  int64 gpid = 3;
+}
+
+message ItemRefIdResp {
+  int64 gpid = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message ItemBase {
+  int64 gpid = 1;
+  int64 version = 2;
+}
+
+message ItemBaseMulti {
+  repeated int64 gpid = 1;
+}
+
+message ItemBaseResp {
+  XItemBase item = 1;
+}
+
+message ItemBaseMultiResp {
+  repeated XItemBase item = 1;
+}
+
+message ItemBaseSet {
+  int64 gpid = 1;
+  XItemBaseOper oper = 2;
+}
+
+message ItemBaseSetResp {
+  XItemBase item = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message ItemExtend {
+  int64 gpid = 1;
+}
+
+message ItemExtendSet {
+  int64 gpid = 1;
+  XItemExtendOper oper = 2;
+}
+
+message ItemExtendResp {
+  XItemExtend item = 1;
+}
+
+message ItemExtendSetResp {
+  XItemExtend item = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message ItemDetail {
+  int64 gpid = 1;
+  XItemField field = 2;
+  int64 version = 3;
+
+  // 临时的
+  int64 skuId = 10;
+  bool noQiniu = 4;
+  bool getRemoved = 5;
+}
+
+message ItemDetailResp {
+  Error error = 2;
+  XDetail item = 1;
+}
+
+message ItemUpdateActivity {
+  repeated ItemUpdateActivityItem items = 1;
+  string updateBy = 2;
+}
+
+message ItemUpdateActivityItem {
+  common.SetOper oper = 10;
+  XActivity type = 1;
+  string id = 2;
+  common.SetI64 start = 3;
+  common.SetI64 end = 4;
+  repeated int64 gpid = 5;
+  common.SetStrs catalog = 6;
+  common.SetI32 clients = 7;
+}
+
+message ItemUpdateActivityResp {
+  int32 failed = 1;
+  repeated int64 failedGpids = 2;
+}
+
+// ---------------------------------------------------------------------------
+
+message ItemList {
+  repeated int64 gpid = 1;
+  bool nobuyforme = 2;  
+  bool noQiniu = 3;
+  bool getRemovedSku = 4;
+}
+
+message ItemListResp {
+  repeated XListItem items = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message ItemWalk {
+  string id = 1;
+}
+
+message ItemWalkResp {
+  string id = 2;
+  repeated XItemBase items = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message ItemWeightSet {
+  int64 gpid = 1;
+  repeated ItemWeightSetItem items = 2;
+  int32 totalWeight = 3;
+  string updateBy = 4;
+  bool tryEzbuy = 5;
+  // 重置重量（清除历史数据）
+  bool reset = 6;
+}
+
+message ItemWeightSetItem {
+  string skuId = 1;
+  XWeightOper weight = 2;
+  int32 qty = 3;
+}
+
+message ItemWeightSetResp {
+  XItem item = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message ItemChangeLog {
+  int64 gpid = 1;
+  bool  querySpu = 2;
+  int64 startDate = 3;
+  int64 endDate = 4;
+  string field = 5;
+}
+
+message ItemChangeLogResp {
+  repeated XItemChangeLogRecord records = 1;
+}
+
+message XItemChangeLogRecord {
+  int64 gpid = 1;
+  string updateDate = 2;
+  string updateBy = 3;
+  string updateExec = 4;
+  repeated XItemChangeLogItem items = 5;
+}
+
+message XItemChangeLogItem {
+  string name = 1;
+  string oldValue = 2;
+  string operation = 3;
+  string data = 4;
+}
+
+// ---------------------------------------------------------------------------
+
+message ItemBaseGetByBanRule {
+  string rule = 1;
+  int32 limit = 2;
+  int32 offset = 3;
+}
+
+message ItemBaseGetByBanRuleResp {
+  repeated int64 items = 1;
+  int32 total = 2;
+}
+
+// ---------------------------------------------------------------------------
+
+message ItemErp {
+  int64 gpid = 1;
+  int64 version = 2;
+  int64 skuId = 3;
+}
+
+message ItemErps {
+  repeated ItemErp items = 1;
+}
+
+message ItemErpsResp {
+  repeated XErpOptional items = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message ItemDetailCache {
+  string url = 1;
+  int64 version = 2;
+  bool useDefault = 3;
+}
+
+message ItemDetailCacheResp {
+  XItem item = 1;
+}
+
+message ItemDetailCacheSet {
+  string request = 1;
+  XItem item = 2;
+}
+
+message ItemDetailCacheSetResp {
+}
+
+// ---------------------------------------------------------------------------
+
+message ItemWeightInfo {
+  int64 gpid = 1;
+  string skuId = 2;
+}
+
+message ItemWeightInfoResp {
+  repeated int32 historyWeights = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message ItemLastWeight {
+  int64 baseGpid = 1;
+}
+
+message XItemLastWeightSku {
+  int64 gpid = 1;
+  string skuId = 2;
+  int32 weight = 3;
+  int64 updateDate = 4;
+}
+
+message ItemLastWeightResp {
+  repeated XItemLastWeightSku skus = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message ItemMakeArchive {
+  int64 gpid = 1;
+  int64 version = 2;
+}
+
+message ItemMakeArchiveResp {
+}
+
+// ---------------------------------------------------------------------------
+
+message ItemReplace {
+  int64 originGpid = 1;
+  int64 replaceGpid = 2;
+}
+
+message ItemReplaceResp {
+  int64 originGpid = 1;
+  int64 replaceGpid = 2;
+  int32 originPcid = 3;
+  int32 replacePcid = 4;
+  int64 createDate = 5;
+  int64 updateDate = 6;
+}
+
+// ---------------------------------------------------------------------------
+
+message ItemGets {
+  XItemField field = 1;
+  repeated int64 gpids = 2;
+}
+
+message ItemGetsResp {
+  repeated XItem item = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message ItemErpResp {
+  XErp item = 1;
+  Error error = 2;
+}

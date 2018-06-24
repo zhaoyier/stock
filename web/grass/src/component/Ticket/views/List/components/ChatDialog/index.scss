@@ -1,0 +1,43 @@
+.container {
+}
+
+.messageList {
+	height: 300px;
+	overflow-y: auto;
+	overflow-x: hidden;
+	border: 1px solid #ccc;
+	border-bottom: 0;
+}
+
+.send {
+	text-align: right;
+	margin-top: 20px;
+}
+
+.messageItem {
+	padding: 5px;
+	border-bottom: 1px solid #ccc;
+
+	&:last-child {
+		border: 0;
+	}
+}
+
+.messageHeader {
+	margin-bottom: 5px;
+
+	.messageTime {
+		margin-right: 10px;
+	}
+}
+
+.messageContent {
+	overflow-x: auto;
+}
+
+:global {
+	.ql-container.ql-snow {
+		height: 120px;
+		overflow-y: auto;
+	}
+}

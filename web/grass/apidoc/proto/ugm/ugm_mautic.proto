@@ -1,0 +1,13 @@
+syntax = "proto3";
+package ugm;
+
+import "common/ezbuy.proto";
+import "ugm/ugm.proto";
+
+service Mautic {
+    rpc SyncGroup (SyncGroupReq) returns (Ret);
+}
+
+message SyncGroupReq {
+    int64 gid = 1;
+}

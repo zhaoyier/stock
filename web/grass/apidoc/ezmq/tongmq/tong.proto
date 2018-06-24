@@ -1,0 +1,21 @@
+syntax = "proto3";
+package tongmq;
+
+import "common/empty.proto";
+
+service tong {
+    // 通知refund  deduct 调用结果
+    rpc WalletNotifyForPrime(WalletNotifyMsg) returns (common.Empty);
+    rpc WalletNotifyForOrder(WalletNotifyMsg) returns (common.Empty);
+}
+
+message WalletNotifyMsg {
+    string RequestNo  = 1; // echo调用方原始请求的billid
+    int32  RequestID  = 2; // echo原始请求的request id
+    string Method     = 4; // 调用方法deduct/refund
+    int32  Status     = 5; // 0 成功
+    string JournalNo  = 6; // 支付产生的流水号
+    string ErrMsg     = 7; // 错误信息
+    string CountryCode = 8;
+}
+

@@ -1,0 +1,122 @@
+syntax = "proto3";
+package crow;
+
+service Post {
+	rpc CreateTask(PostTask) returns (PostTaskResp);
+	rpc DeleteTask(PostDelete) returns (PostDeleteResp);
+	rpc ModifyTask (PostTask) returns (PostTaskResp);
+	rpc QueryTask(PostQuery) returns (PostQueryResp);
+
+	// 开启 暂停任务
+	rpc StartTask(PostId) returns (PostIdResp);
+	rpc StopTask(PostId) returns (PostIdResp);
+
+	rpc TestMessage(PostTest) returns (PostTestResp);
+	rpc ResultCallback(PostCallback) returns (PostCallbackResp);
+}
+
+// ---------------------------------------------------------------------------
+
+enum TaskStatus {
+	ALL = 0;       // 查询专用，用于表示所有状态
+	PENDING = 1;	// 创建成功，但没有被加入队列中，需要有权限手动启动
+	PROCESSING = 2;	// 该任务已加入调度队列，当cron条件触发，推送任务将执行
+	FINISHED = 4;	// 结束 
+	STOPPED = 8;	// 暂停
+	FAILED  = 16;	// 因为各种原因，错误失败
+	SENDING = 32;	// 正在发送
+}
+
+enum MessageType {
+	PUSH = 0;
+	SMS = 1;
+	EMAIL = 2;
+}
+
+message PostMessage {
+	MessageType message_type = 1;
+	string message_title = 2;
+	string message_content = 3;
+	bytes message_icon = 4;
+	string message_url  = 5;
+}
+
+message PostSchedule {
+	int32 schedule_type = 1;	// 1 once   0 cycle
+	int64 schedule_start_time = 2;	// 生效时间
+	string schedule_cron = 3;	// crontab的语法格式
+	int64 schedule_deadline = 4;	//截止时间
+	int64 schedule_max_times = 5;	// 1为单次发送， -1 为不限次数
+	int64 schedule_valid_time = 6;  // 任务发送的最长时间
+	int64 schedule_exec_time = 7; // 单次任务发送时间
+}
+
+message PostTask {
+	string id = 1;
+	string name = 2;
+	int32 priority = 3;		//优先级
+	string country = 4;
+	int64 source = 5;		// 发送源 group tag id 
+	string test_source = 7;
+	TaskStatus status = 8;		// task 状态
+	PostSchedule schedule = 10;		// 发送的周期
+	PostMessage message = 11;	// 消息体
+	string operator = 12;
+	string notes = 13;		// 备注
+	string reverse	= 14;	// 保留字段
+	repeated TaskStatus follow = 15; 	// 当前状态允许变迁的下一个状态
+}
+
+message PostTaskResp{
+	string id = 1;
+}
+
+message PostQuery {
+	// 查询条件 
+	string id = 1;
+	TaskStatus status = 2;
+
+	int32 offset = 8;
+	int32 limit = 9;
+}
+
+message PostQueryResp {
+	repeated PostTask tasks = 1;
+	int64 total = 2;
+}
+
+message PostDelete {
+	repeated string id = 1;
+}
+
+message PostDeleteResp {
+}
+
+message PostCallback {
+	string id = 1;		
+	bool success = 2;	//发送结果
+	int64 number = 3;	//发送数量
+	int64 total = 4;    //发送总数量
+	string msg = 5;
+}
+
+message PostCallbackResp {
+}
+
+message PostTest {
+	string source = 1;	// nick name 
+	string country = 2;
+	PostMessage message = 3;
+}
+
+message PostTestResp {
+
+}
+
+message PostId {
+	string id = 1;
+}
+
+message PostIdResp {
+	TaskStatus status = 1;
+}

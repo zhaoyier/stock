@@ -1,0 +1,10 @@
+syntax = "proto3";
+package ezOrder;
+
+import "common/empty.proto";
+
+
+service MqSub {
+	//测试
+	rpc Test(common.Empty) returns (common.Empty);
+}

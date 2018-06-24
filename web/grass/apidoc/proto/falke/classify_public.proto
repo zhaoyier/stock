@@ -1,0 +1,188 @@
+syntax = "proto3";
+package falke;
+
+import "falke/common_public.proto";
+import "common/ezbuy.proto";
+//Classify will classify different pkgs according to the special conditions.
+service Classify{
+    // 添加订单二维码位置信息
+    rpc AddInputs(AddInputsReq) returns (AddInputsResp){
+        option (common.webapi).enable = true;
+    }
+    // 添加包裹二维码位置信息
+    rpc AddOutputs(AddOutputsReq) returns (AddOutputsResp){
+        option (common.webapi).enable = true;
+    }
+    // 同步位置信息
+    rpc SyncLocations(SyncLocationsReq) returns (SyncLocationsResp){
+        option (common.webapi).enable = true;
+    }
+    // 同步格口与位置的对应关系
+    rpc SyncSettings(SyncSettingsReq) returns (SyncSettingsResp){
+        option (common.webapi).enable = true;
+    }
+    // 同步待扫描订单与包裹信息
+    rpc SyncInputs(SyncInputsReq) returns (SyncInputsResp){
+        option (common.webapi).enable = true;
+    }
+    // 同步待扫描包裹信息
+    rpc SyncOutputs(SyncOutputsReq) returns (SyncOutputsResp){
+        option (common.webapi).enable = true;
+    }
+    // 结果回调
+    rpc SwipeCallback(SwipeCallbackReq) returns (SwipeCallbackResp) {
+        option (common.webapi).enable = true;
+    }
+    // 二维码分拣结果:获取分拣机回传的分拣结果
+    rpc QRCodeResult(QRCodeResultReq) returns (QRCodeResultResp) {
+        option (common.webapi).enable = true;
+    }
+    // 通过channel查询deliverystationid
+    rpc GetDeliveryStationIdByChannel(GetDeliveryStationIdByChannelReq) returns(GetDeliveryStationIdByChannelResp) {
+        option (common.webapi).enable = true;
+    }
+    // 通过deliverystationid查询channel
+    rpc GetChannelByDeliveryStation(GetChannelByDeliveryStationReq) returns(GetChannelByDeliveryStationResp) {
+        option (common.webapi).enable = true;
+    }
+    // 通过deliverystations获取分别对应的channel
+    rpc GetChannelsByDeliveryStationInfos(GetChannelsByDeliveryStationInfosReq) returns(GetChannelsByDeliveryStationInfosResp){
+        option (common.webapi).enable = true;
+    }
+
+    // 扫描结果:测试二维码在分拣机中应该分拣的结果
+    rpc SwipeQRCode(SwipeQRCodeReq) returns (SwipeQRCodeResp) {
+        option (common.webapi).enable = true;
+    }
+}
+
+message AddInputsReq{
+    repeated Input items =1;
+}
+
+message AddInputsResp{
+    int32 effects=1;
+}
+
+message AddOutputsReq{
+    repeated Output items =1;
+}
+
+message AddOutputsResp{
+    int32 effects =1;
+}
+
+message SyncLocationsReq{
+    ClassifyMode mode =1;
+}
+
+message SyncLocationsResp{
+    repeated Location locations = 1;
+}
+
+message SyncSettingsReq{
+}
+
+message SyncSettingsResp{
+    repeated Setting settings = 1;
+}
+
+message SyncInputsReq{
+    //! 0, 忽略开始时间
+    int64 time_begin = 1;
+    //! 0, 忽略结束时间
+    int64 time_end = 2;
+    int32 limit = 3;
+    int32 offset = 4;
+    int64 warehouse_id = 5;
+}
+
+message SyncInputsResp{
+    int32 total = 1;
+    repeated Input items = 2;
+}
+
+message SyncOutputsReq{
+    //! 0, 忽略开始时间
+    int64 time_begin = 1;
+    //! 0, 忽略结束时间
+    int64 time_end = 2;
+    int32 limit = 3;
+    int32 offset = 4;
+    int64 warehouse_id = 5;
+}
+
+message SyncOutputsResp{
+    int32 total = 1;
+    repeated Output items = 2;
+}
+
+message Callback {
+    ClassifyMode mode = 1;
+    string qrcode = 2;
+    int64 location_id = 3;
+    int32 channel = 4;
+}
+
+message SwipeCallbackReq{
+    repeated Callback items = 1;
+}
+
+message SwipeCallbackResp{
+    int32 effects = 1;
+}
+
+message QRCodeResultReq{
+    ClassifyMode mode = 1;
+    string qrcode = 2;
+}
+
+message QRCodeResultResp{
+    int64 location_id = 1;
+    int32 channel = 2;
+}
+
+message GetDeliveryStationIdByChannelReq {
+    int32 channel = 1;
+}
+
+message GetDeliveryStationIdByChannelResp {
+    int64 deliveryStationId = 1;
+    int64 regionId = 2;
+}
+
+message GetChannelByDeliveryStationReq {
+    int64 deliveryStationId = 1;
+    TimePeriod time_period = 2;
+}
+
+message GetChannelByDeliveryStationResp {
+    int32 channel = 1;
+}
+
+
+message DeliveryStationInfo {
+    int64 deliveryStationId = 1;
+    TimePeriod time_period = 2;
+    int32 channel = 3; // 返回的时候，填充channel
+}
+
+message GetChannelsByDeliveryStationInfosReq {
+    repeated DeliveryStationInfo deliveryStationInfos = 1;
+}
+
+message GetChannelsByDeliveryStationInfosResp {
+    repeated DeliveryStationInfo deliveryStationInfos = 1;
+}
+
+message SwipeQRCodeReq{
+    ClassifyMode mode = 1;
+    string qrcode = 2;
+}
+
+message SwipeQRCodeResp{
+    int64 location_id = 1;
+    int32 channel = 2;
+    int64 deliveryStationId = 3;
+    int64 deliveryTypeId = 4;
+}

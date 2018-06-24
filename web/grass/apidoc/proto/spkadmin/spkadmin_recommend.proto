@@ -1,0 +1,138 @@
+syntax = "proto3";
+package spkadmin;
+
+import "common/ezbuy.proto";
+import "common/file.proto";
+
+service Recommend {
+    option (common.service).webapi = true;
+
+    rpc Upload(RecommendUpload) returns (RecommendUploadResp) {
+        option (common.webapi).upload = true;
+    }
+    
+    rpc Get(RecommendGet) returns (RecommendGetResp);
+
+    rpc GetByDcid(RecommendGetByDcid) returns (RecommendGetByDcidResp);
+    // 上传文件导入商品
+    rpc AdminUpload(RecommendAdminUpload) returns (RecommendAdminUploadResp){
+        option (common.webapi).upload = true;
+    }
+    
+    // 设置橱窗商品数量 和 保存商品的排序数组
+    rpc Set(RecommendSet) returns (ResultResp);
+
+    // 获取平台列表
+    rpc PlatformList(RecommendPlatformList) returns (RecommendPlatformListResp);
+    // 删除商品
+    rpc DeleteItems(RecommendDeleteItems) returns (ResultResp);
+    // 按条件筛选商品
+    rpc Search(RecommendSearch) returns (RecommendSearchResp);
+
+}
+
+message RecommendGetByDcid {
+    int32 dcid = 1;
+}
+
+message RecommendGetByDcidResp {
+    RecommendCategoryInfo item = 1; //not found 的情况 返回空
+}
+
+message RecommendAdminUpload {
+    common.File file = 1;
+}
+
+message RecommendAdminUploadResp {
+    int32 okCount = 1; //成功数量
+    int32 failedCount = 2; //失败数量
+    repeated DcidGpid errList = 3; //失败的dcid gpid 失败的原因
+
+}
+
+message DcidGpid {
+    int32 dcid = 1;
+    int64 gpid = 2;
+    string result = 3;
+}
+
+message ResultResp {
+    bool result = 1;
+    string msg = 2;
+}
+
+message RecommendPlatformList {
+
+}
+
+message RecommendPlatformListResp {
+   map<int32,string> platform = 1;
+}
+
+message RecommendDeleteItems {
+    repeated DeleteItem deleteItems = 1;
+}
+
+message DeleteItem {
+    int32 dcid = 1;
+    int64 gpid = 2;
+}
+
+message RecommendSearch {
+    int32 dcid = 1;
+    int32 platformId = 2;
+    int64 createTimeStart = 3;
+    int64 createTimeEnd = 4;
+    int32 status  = 5 ; //用整数表示是否下架，0表示空值，1表示在销售，2表示已经下架
+    //分页
+    int32 offset = 6;
+    int32 limit = 7;
+}
+
+message RecommendSearchResp {
+    repeated Item items = 1;
+    int32 count = 2;
+    string failMsg = 3;
+}
+
+message Item {
+    int64 gpid = 1;
+    int32 dcid = 2;
+    string title = 3;
+    string mainPic = 4;
+    string platform = 5;
+    int64 createTime = 6;
+    bool isOnSale = 7 ; 
+}
+
+message RecommendUpload {
+    common.File file = 1;
+}
+
+message RecommendUploadResp {
+
+}
+
+message RecommendGet {
+}
+
+message RecommendCategoryInfo {
+    int32 dcid = 1;
+    int32 appCount = 2;  // app 上插入列表的商品数
+    int32 pcCount = 3;   //  pc 上插入列表的商品数
+    repeated int64 prods = 4;
+}
+
+message RecommendGetResp {
+    repeated RecommendCategoryInfo items = 1;
+}
+
+message RecommendSet {
+    int32 dcid = 1; //这个是必须的
+    
+    int32 appCount = 2; //设置数量
+    int32 pcCount = 3; //设置数量
+
+    repeated int64 gpid = 4; // 用于修改商品的排序
+}
+

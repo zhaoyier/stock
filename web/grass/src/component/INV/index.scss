@@ -1,0 +1,50 @@
+.INVWrap {
+  position: relative;
+
+  .tableWrap {
+    width: 210mm;
+    height: 197mm;
+    page-break-after: always!important;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .table {
+    margin: auto;
+    font-size: 14px;
+    border-collapse:collapse;
+    border: 2px solid #000;
+    text-align: left;
+    box-sizing: border-box;
+    width: 180mm;
+    height: 100mm;
+
+    & th, & td {
+      border: 1px solid #ccc;
+    }
+    & tr {
+      border: 1px solid #ccc;
+    }
+  }
+
+  .download {
+    position: absolute;
+    right: 50px;
+    top: 20px;
+  }
+}
+@media print {
+	.download, h1 {
+		display: none;
+  }
+}
+
+h1 {
+  margin: 20px;
+}
+
+p {
+  padding: 0px;
+  margin: 0px;
+}
+

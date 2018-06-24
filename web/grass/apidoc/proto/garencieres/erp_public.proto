@@ -1,0 +1,44 @@
+syntax = "proto3";
+package garencieres;
+option java_multiple_files = true;
+option java_package = "com.daigou.sg.grpc";
+
+import "common/ezbuy.proto";
+
+service ErpPub {
+    option (common.service).webapi = true;
+
+    // 上架
+    rpc PutawayLocation (ErpPubPutawayLocation) returns (ErpPubPutawayLocationResp);
+
+    // 新理货
+    rpc FixLocation (ErpPubFixLocation) returns (ErpPubFixLocationResp);
+}
+
+
+message ErpPubPutawayScanInfo{
+    string stockinCode = 1;     // 入库单号
+	string locationCode = 2;    // 库位号
+}
+
+message ErpPubPutawayRespInfo {
+    string failReason = 1;
+    ErpPubPutawayScanInfo infos=2;
+}
+
+message ErpPubPutawayLocation {
+	repeated ErpPubPutawayScanInfo reqs = 1;
+}
+
+message ErpPubPutawayLocationResp{
+    repeated ErpPubPutawayRespInfo resps = 1;
+}
+
+message ErpPubFixLocation {
+    string stockinCode = 1;
+    string locationCode = 2;
+}
+
+message ErpPubFixLocationResp {
+    string stockinStatus = 1;
+}

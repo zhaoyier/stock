@@ -1,0 +1,78 @@
+syntax = "proto3";
+package nadesico;
+
+import "common/empty.proto";
+import "common/ezbuy.proto";
+import "appcommon/common_public.proto";
+import "nadesico/prime_public.proto";
+
+service PrimeAdmin {
+	rpc Ping(common.Empty) returns (appcommon.ResultResp);
+	rpc CreatePrimeDiscount(CreatePrimeDiscountReq) returns (appcommon.ResultResp);
+	rpc UpdatePrimeDiscount(UpdatePrimeDiscountReq) returns (appcommon.ResultResp);
+	rpc DeletePrimeDiscount(DeletePrimeDiscountReq) returns (appcommon.ResultResp);
+	rpc GetMultiPrimeDiscount(GetMultiPrimeDiscountReq) returns (GetMultiPrimeDiscountResp);
+	rpc DownloadUserPrimeDiscount(DownloadUserPrimeDiscountReq) returns (DownloadUserPrimeDiscountResp){
+        option (common.webapi).download = true;
+	};
+}
+
+enum PrimeDiscountStatus {
+	Invalid = 0; // 失效
+	Normal = 1; // 正常
+}
+
+message CreatePrimeDiscountReq {
+	string catalogCode = 1;
+	int64 price = 2;
+	nadesico.PrimeMembershipType primeMembershipTypeId = 3;
+	int64 startDate = 4;
+	int64 endDate = 5;
+}
+
+message UpdatePrimeDiscountReq {
+	string identId = 1;
+	int64 price = 2;
+	PrimeDiscountStatus status = 3;
+	int64 startDate = 4;
+	int64 endDate = 5;
+	string catalogCode = 6;
+}
+
+message DeletePrimeDiscountReq {
+	int64 primeDiscountId = 1;
+}
+
+message DownloadUserPrimeDiscountReq {
+	int64 primeDiscountId = 1;
+}
+
+message DownloadUserPrimeDiscountResp {
+	string filename = 1;
+    bytes data = 2;
+    string contentType = 3;
+}
+
+message GetMultiPrimeDiscountReq {
+	string catalogCode = 1;
+	int32 offset = 2;
+	int32 limit = 3;
+}
+
+message PrimeDiscount {
+	int64 id = 1;
+	string identId = 2;
+	string primeMembership = 3;
+	int32 price = 4;
+	string status = 5;
+	int64 startDate = 6;
+	int64 endDate = 7;
+	int64 createDate = 8;
+	int64 createBy = 9;
+}
+
+message GetMultiPrimeDiscountResp {
+	int32 totalCount = 1;
+	repeated PrimeDiscount primeDiscounts = 2;
+}
+

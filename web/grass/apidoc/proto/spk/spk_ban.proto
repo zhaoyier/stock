@@ -1,0 +1,359 @@
+syntax= "proto3";
+package spk;
+import "common/ezbuy.proto";
+import "biz/region.proto";
+import "spk/spk_public.proto";
+import "common/file.proto";
+import "spk/spk_xitem.proto";
+
+service Ban {
+    option (common.service).webapi = true;
+
+    //规则屏蔽
+    rpc AddRule(BanAddRule) returns (BanAddRuleResp);
+    rpc RemoveRule(BanRemoveRule) returns (BanRemoveRuleResp);
+    rpc ShowRule(BanShowRule) returns (BanShowRuleResp);
+    rpc RuleChangeLog(BanRuleChangeLog) returns (BanRuleChangeLogResp); 
+    //rpc RuleAddList(BanAddRuleList) returns (BanAddRuleListResp) {
+    //    option (common.webapi).upload = true;
+    //};
+
+    // 单品屏蔽
+    rpc Product(BanProduct) returns (BanProductResp);
+    rpc ProductListGet(BanProductListGet) returns (BanProductListGetResp);
+    rpc RemoveProduct(BanRemoveProduct) returns (BanRemoveProductResp);
+    rpc ProductChangeLog(BanProductChangeLog) returns (BanProductChangeLogResp);
+    rpc ProductList(BanProductList) returns (BanProductListResp) {
+        option (common.webapi).upload = true;
+    };
+    rpc ProductListMode(BanProductListMode) returns (BanProductListModeResp) {
+        option (common.webapi).download = true;
+    };
+
+    // 屏蔽搜索
+    rpc SearchProd(BanSearchProd) returns (BanSearchProdResp);
+    rpc SearchRule(BanSearchRule) returns (BanSearchRuleResp);
+    rpc Search(BanSearch) returns (BanSearchResp);
+    rpc SearchRuleById(BanSearchRuleById) returns (BanSearchRuleByIdResp);
+
+    rpc Check(BanCheck) returns (BanCheckResp);
+
+    rpc ModifyNotice(BanModifyNotice) returns (BanModifyNoticeResp);
+
+}
+
+
+enum BanType {
+    BanTypeUnknown = 0;
+    BanTypeProduct = 1;
+    BanTypeRule = 2;
+}
+
+message BanOper {
+    RuleBase xSearch = 1;
+    map<string, BanCatalog> catalog = 2;
+    string rule = 3;
+    BanType banType = 4;
+    string updateBy = 5;
+}
+
+// 屏蔽范围
+// public: XBanScope 也去更新他
+enum BanScope {
+  BanScopeUnknown = 0;
+  BanScopeListing = 1;
+  BanScopeDetail = 2;
+  // 最近购买屏蔽
+  BanScopeRecentPurchase = 4;
+}
+
+message BanCatalog {
+    BanScope banScope = 1;
+}
+
+message RuleBase {
+    int32 Pcid = 1;
+    int32 Dcid = 2;
+    string keyword = 3;
+    biz.Region region = 4;
+    XPlatform platform = 5;
+    string vendor = 6;
+    int64 platformCid = 7;
+}
+
+//--------------------------------------------------------
+
+message BanAddRule {
+    BanScope banScope = 1;
+    repeated string catalog = 2;
+    RuleBase base = 3;
+    string banReason = 4;
+}
+
+message BanAddRuleResp {
+  bool result = 1;
+  string ruleId = 2;
+}
+
+//---------------------------------------------------------
+
+message BanRemoveRule {
+    string rule = 1;
+}
+
+message BanRemoveRuleResp {
+    bool result = 1;
+}
+
+//---------------------------------------------------------
+
+message BanShowRule {
+    int32 limit = 1;
+    int32 offset = 2;
+}
+
+message RuleDetail {
+    string rule = 1;
+    repeated string catalog = 2;
+    RuleBase base = 3;
+    string updateBy = 4;
+    int64 updateDate = 5;
+    BanScope banScope = 6;
+    bool disabled = 7;
+}
+
+message BanShowRuleResp {
+    repeated RuleDetail items = 1;
+    int32 total = 2;
+}
+
+//---------------------------------------------------
+
+message BanRuleChangeLog {
+    string rule = 1;
+}
+
+message BanRuleChangeLogResp {
+    repeated ChangeLogItem items = 1;
+}
+
+//----------------------------------------------------
+
+message BanAddRuleList {
+}
+
+message BanAddRuleListResp {
+}
+
+//-------------------------------------------------------
+
+message BanProduct {
+    string url = 1;
+    repeated string catalog = 2;
+    BanScope banScope = 3;
+    string banReason = 4;
+}
+
+message BanProductResp {
+    bool result = 1;
+}
+
+message BanProductOper {
+    string updateBy = 1;
+    BanProduct item = 2;
+}
+
+//------------------------------------------------------
+
+message BanProductListGet {
+    int32 offset = 1;
+    int32 limit = 2;
+}
+
+message BanProductItem {
+    string url = 1;
+    repeated string catalog = 2;
+    BanScope banScope = 3;
+    string banReason = 4;
+    int64 gpid = 5;
+    string updateBy = 6;
+    int64 updateDate = 7;
+    bool disabled = 8;
+    string id = 9;
+}
+
+message BanProductListGetResp {
+    repeated BanProductItem items = 1;
+    int32 total = 2;
+}
+
+//--------------------------------------------------------
+
+message BanRemoveProduct {
+    int64 gpid = 1;
+}
+
+message BanRemoveProductResp {
+    bool result = 1;
+}
+
+//---------------------------------------------------------
+
+message BanProductChangeLog {
+    int64 gpid = 1;
+}
+
+message ChangeLogItem {
+    string updateBy =1;
+    int64 updateDate =2;
+    string banReason = 3;
+    repeated string catalog = 4;
+    BanScope banScope = 5;
+    bool disabled= 6;
+}
+
+message BanProductChangeLogResp {
+    repeated ChangeLogItem items = 1;   
+}
+
+
+//----------------------------------------------------------
+
+message BanProductList {
+    common.File file = 1;
+}
+
+message BanProductListResp {
+    bool result = 1;
+}
+
+//----------------------------------------------------------
+
+message BanSearchProd {
+    string url = 1;
+}
+
+message BanSearchProdResp {
+    repeated BanProductItem items = 1;
+    int32 total = 2;
+}
+
+//-----------------------------------------------------------
+
+message BanSearchRule {
+    int32 offset = 1;
+    int32 limit = 2;
+    RuleBase base = 3;
+}
+
+message BanSearchRuleResp {
+    repeated RuleDetail items = 1;
+    int32 total = 2;
+}
+
+//------------------------------------------------------------
+
+message BanSearch {
+    repeated string ids = 1;
+}
+
+message BanSearchItem {
+    repeated string catalog = 1;
+    string banReason = 2;
+    BanType banType = 3;
+    RuleBase banRule = 4;
+    string updateBy = 5;
+    int64 updateDate = 6;
+    BanScope banScope = 7;
+}
+
+message BanSearchResp {
+    repeated BanSearchItem items = 1;
+}
+
+//--------------------------------------------------------------
+
+message BanCheck {
+    string platformCidOld = 1;
+    repeated int64 platformCid = 9;
+    string vendor = 2;
+    map<string, string> name = 3;
+    XPlatform platform = 4;
+    biz.Region region = 5;
+    repeated XItemBaseDcid dcidPath = 6;
+    int64 gpid = 7;   
+    int32 Pcid = 8;
+}
+
+message BanCatalogItem {
+  BanScope banScope = 1;
+  XBanScope scope = 7;
+  repeated string banRules = 2;
+  repeated string indexBanRules = 3;
+  bool isProdBan = 4;
+  bool isIndexProdBan = 5;
+  repeated XBanItem rules = 6;
+}
+
+message XBanItem {
+  string id = 1;
+  XBanScope scope = 2;
+}
+
+message BanCheckResp {
+    repeated string rules = 1;
+    map<string, BanCatalogItem> catalog = 3;
+}
+
+//-----------------------------------------------------------------
+
+message BanModifyNotice {
+    common.File file = 1;
+}
+
+message BanModifyNoticeResp {
+    bool result = 1;
+}
+
+//------------------------------------------------------------------
+
+message AddProductChangeLog {
+    int64 gpid = 1;
+    ChangeLogItem item = 2;
+}
+
+message AddProductChangeLogResp {
+    bool result = 1;
+}
+
+message AddRuleChangeLog {
+    string rule = 1;
+    ChangeLogItem item = 2;
+}
+
+message AddRuleChangeLogResp {
+    bool result = 1;
+}
+
+
+//----------------------------------------------------------------------
+
+message BanProductListMode {
+
+}
+
+message BanProductListModeResp {
+    string filename = 1;
+    bytes data = 2;
+    string contentType = 3;
+}
+
+// ----------------------------------------------------------------------------
+
+message BanSearchRuleById {
+    string id = 1;
+}
+
+message BanSearchRuleByIdResp {
+    RuleDetail item = 1;
+}

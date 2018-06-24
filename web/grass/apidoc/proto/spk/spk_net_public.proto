@@ -1,0 +1,106 @@
+syntax = "proto3";
+package spk;
+import "common/ezbuy.proto";
+import "spk/spk_xdetail_public.proto";
+import "biz/region.proto";
+import "spk/errors_public.proto";
+import "spk/spk_public.proto";
+
+service Net {
+  option (common.service).webapi = true;
+  // 商品详情页
+  rpc Detail(NetDetail) returns (NetDetailResp);
+  // 批量接口
+  rpc Details(NetDetails) returns (NetDetailsResp);
+  // 获取运输方式
+  rpc Shipment(NetShipment) returns (NetShipmentResp);
+  // 获取sku图片(包括temp商品)
+  rpc SkuImg(NetSkuImg) returns (NetSkuImgResp);
+  // 批量获取sku描述信息
+  rpc SkuDesc(NetSkuDesc) returns (NetSkuDescResp);
+}
+
+// ---------------------------------------------------------------------------
+
+message NetDetail {
+  // gpid 和 url 2选1个参数
+  // 优先判断 gpid
+  int64 gpid = 1;
+  string url = 5;
+  // 临时的
+  int64 skuId = 10;
+  
+  XItemField field = 2;
+  
+  int64 version = 4;
+  // 如果通过url访问, 不要强制变成buyforme
+  bool noBuyforme = 6;
+  // 访问后不进行抓取
+  bool disableRefresh = 7;
+  // 强制传入的用户id
+  int32 customerId = 8;
+  // 不要转换七牛的链接
+  bool noQiniu = 9;
+  // 获取已经下架的sku
+  bool getRemovedSku = 11;
+}
+
+message NetDetailResp {
+  Error error = 2;
+  XDetail item = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message NetShipment {
+  biz.Region region = 1;
+  bool isBuyforme = 2;
+}
+
+message NetShipmentResp {
+  repeated XShipment items = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message NetDetails {
+  repeated NetDetail items = 1;
+}
+
+message NetDetailsResp {
+  repeated NetDetailResp items = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+message XNetSkuImgItem {
+  int64 gpid = 1;
+  int64 skuId = 2;
+}
+
+message NetSkuImg {
+  repeated XNetSkuImgItem items = 1;
+}
+
+message NetSkuImgResp {
+  repeated string imgs = 1;
+}
+
+message XNetSkuItem {
+  int64 gpid = 1;
+  int64 skuId = 2;
+}
+
+message XNetSkuDesc {
+    string name = 1;
+    string attr = 2;
+    string img = 3;
+}
+
+message NetSkuDesc {
+  repeated XNetSkuItem items = 1;
+}
+
+message NetSkuDescResp {
+  repeated XNetSkuDesc skus = 1;
+}

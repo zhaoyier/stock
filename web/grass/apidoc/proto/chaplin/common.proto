@@ -1,0 +1,58 @@
+syntax = "proto3";
+package chaplin;
+
+enum PackageStatus {
+  PackageUnknown = 0;
+  PackagePacked = 1;
+  PackagePartiallyPacked = 21;
+  PackageOnShelf = 22;
+  PackageCanceled = 2;
+  PackageBoxed = 3;
+  PackageDeliveried = 4;
+}
+//! 包裹
+message PackageInfo{
+  string code = 2;
+  string pickCode = 17;
+  bool  isPickBig = 27;
+  int64 pickWeight = 28;
+  int64 areaId = 3;
+  int64 warehouseId =  4;
+  PackageStatus status = 5;
+  int64 actualWeight = 6;
+  int64 chargeWeight = 7;
+  string serviceTypeCode = 8;
+  int64 originRegionId = 9;
+  int64 destinationRegionId = 10;
+  int64 deliveryTypeId = 11;
+  int64 deliveryStationId = 12;
+  int64 orderId = 13;
+  int64 shipmentId = 14;
+  int64 shipmentTypeId = 16;
+  string shipToName = 21;
+  string shipToZip = 22;
+  string shipToAddress = 23;
+  string shipToPhone = 24;
+  string shipToState = 29;
+  int32 bp = 18;
+  int64 customerID = 19;
+  string nickName = 20;
+  string colorName = 25;
+  string colorValue = 26;
+  string transportNumber = 30;
+  repeated PackageStockIn stocks = 15;
+  string stationLabel = 31;
+  string stationCode = 32;
+}
+
+message PackageStockIn {
+  string packageCode = 1;
+  string stockInCode = 2;
+}
+
+enum DHLOprateOption {
+  DHLUnknow = 0;
+  DHLCreateLable = 1;
+  DHLReprintLable = 2;
+  DHLEditLable = 3;
+}

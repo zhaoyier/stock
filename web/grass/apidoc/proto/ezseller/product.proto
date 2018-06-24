@@ -1,0 +1,359 @@
+syntax = "proto3";
+package ezseller;
+
+import "assassin/assassin.proto";
+import "common/ezbuy.proto";
+import "ezseller/result.proto";
+import "common/empty.proto";
+
+service Product {
+	option (common.service).webapi = true;
+	option (common.service).public = true;
+
+	rpc Get(ProductGet) returns (ProductGetResp);
+	rpc MGet(ProductMGet) returns (ProductMGetResp);
+	rpc MExpire(ProductMExpire) returns (ProductMExpireResp);
+
+	//查询单个spu信息
+	rpc GetSPU(ProductGetSPU) returns (ProductGetSPUResp);
+	//搜索spu信息
+	rpc SearchSPU(ProductSearchSPU) returns (ProductSearchSPUResp);
+	//查询sku信息
+	rpc GetSKU(ProductGetSKU) returns (ProductGetSKUResp);
+	//更新spu信息
+	rpc UpdateSPU(ProductUpdateSPU) returns (ProductUpdateSPUResp);
+	//更新sku信息
+	rpc UpdateSKU(ProductUpdateSKU) returns (ProductUpdateSKUResp);
+	//发布商品
+	rpc AddSPU(ProductAddSPU) returns (ProductAddSPUResp);
+
+	//通过refid获取卖家商品信息
+	rpc GetSPUByRefId(ProductGetSPUByRefId) returns (ProductGetSPUByRefIdResp);
+
+	//通过sellerSkuId 获取卖家商品sku信息
+	rpc GetSkuBySellerSkuId(ProductGetSkuBySellerSkuId) returns(ProductGetSkuBySellerSkuIdResp);
+
+
+	// ========== 卖家导入商品api =============
+	rpc ImportTaskAdd(ProductImportTaskAddReq) returns(ProductImportTaskAddResp);
+
+	rpc ImportTaskList(ProductImportTaskListReq) returns (ProductImportTaskListResp);
+
+	rpc ImportTaskDetailList(ProductImportTaskDetailListReq) returns (ProductImportTaskDetailListResp);
+
+	rpc ImportSubTaskManage(ProductImportSubTaskManageReq) returns (ProductImportSubTaskManageResp);
+	// 重置同步失败商品 内部接口 慎用！
+	rpc ResetSyncProduct(common.Empty) returns (common.Empty);
+
+	// 控制商品表写入并发的阻塞方法，临时方案
+	rpc ProductSaveControl(ProductSaveControlReq) returns (common.Empty);
+
+}
+
+message ProductGet { int64 gpid = 1; }
+
+message ProductGetResp { assassin.Product product = 1; }
+
+message ProductMGet { repeated int64 gpid = 1; }
+
+message ProductMGetResp { repeated assassin.Product product = 1; }
+
+message ProductMExpire { repeated int64 gpid = 1; }
+
+message ProductMExpireResp {}
+
+message SPU {
+	int32 gpid = 1;
+	string nameCN = 2;
+	string nameEN = 3;
+	bool isSensitive = 4;
+	repeated int32 skuIds = 5;
+	bool isOnSale = 6;
+	int64 createDate = 7;
+	// v1.2新增
+	int64 cid = 8;                       //类目id
+	string primaryImg = 9;               //商品主图
+	string description = 10;             //商品描述信息
+	repeated string images = 11;         //商品图
+	map<string, string> attributes = 12; //商品描述属性
+	repeated SkuProp skuProps = 13;      // sku类目属性
+	//for third party like 贡云...
+	int64 aliCid = 14; //平台类目id
+	string aliRefId = 15; //平台商品id
+	int32 importSource = 16; //平台来源
+}
+
+message ProductGetSPU {
+	int32 gpid = 1;
+	int32 shopId = 2;
+	string sellerAppName = 3;
+}
+
+message ProductGetSPUResp { SPU spu = 1; }
+
+message ProductSearchSPU {
+	repeated string name = 1;
+	repeated bool isSensitive = 2;
+	repeated bool isOnSale = 3;
+	int32 shopId = 4;
+	int32 pageIndex = 5;
+	int32 pageSize = 6;
+	string sellerAppName = 7;
+}
+
+message ProductSearchSPUResp {
+	repeated SPU spus = 1;
+	int32 pageIndex = 2;
+	int32 pageSize = 3;
+	int32 totalCount = 4;
+}
+
+message SKU {
+	int32 skuId = 1;
+	int32 gpid = 2;
+	string sellerSkuId = 3; //货号
+	string name = 4;
+	double originPrice = 5; // sku原价
+	double price = 6;       // sku售卖价
+	int32 quantity = 7;
+	double weight = 8;
+	bool isOnSale = 9;
+	// v1.2新增
+	int32 length = 10;                   //体积-长
+	int32 width = 11;                    //体积-宽
+	int32 height = 12;                   //体积-高
+	map<string, string> attributes = 13; // sku属性信息
+}
+
+message SkuProp {
+	Property prop = 1;
+	repeated PropertyValue values = 2;
+}
+
+message Property {
+	int32 pid = 1;    //属性id
+	string pname = 2; //属性名
+}
+
+message PropertyValue {
+	int32 vid = 1;    //属性值id
+	string name = 2;  //属性值
+	string image = 3; //属性值对应的图片，仅颜色属性支持
+}
+
+message ProductGetSKU {
+	int32 skuId = 1;
+	int32 shopId = 2;
+	string sellerAppName = 3;
+}
+
+message ProductGetSKUResp { SKU sku = 1; }
+
+message ProductUpdateSPU {
+	int32 gpid = 1;
+	repeated string nameCN = 2;
+	repeated string nameEN = 3;
+	repeated bool isSensitive = 4;
+	repeated bool isOnSale = 5;
+	repeated bool isDeleted = 6;
+	int32 shopId = 7;
+	string sellerAppName = 8;
+	repeated string description = 9;
+	repeated string	images = 10;
+	map<string, string> attributes = 12; //商品描述属性
+	repeated SkuProp skuProps = 13;      // sku类目属性
+	repeated int64 cid = 14;              //类目id
+	repeated int64 aliCid  =15; //平台cid
+	repeated string aliRefId =16; //平台商品id
+	repeated int32 importSource = 17;//平台
+
+}
+
+message ProductUpdateSPUResp {
+	bool success = 1;
+	string message = 2;
+}
+
+message ProductUpdateSKU {
+	int32 skuId = 1;
+	repeated double originPrice = 2;
+	repeated double price = 3;
+	repeated int32 quantity = 4;
+	repeated double weight = 5;
+	repeated bool isOnSale = 6;
+	int32 shopId = 7;
+	string sellerAppName = 8;
+}
+
+message ProductUpdateSKUResp {
+	bool success = 1;
+	string message = 2;
+}
+
+message ProductAddSPU {
+	int32 shopId = 1;
+	string sellerAppName = 2;
+	SPU productBase = 3;   //商品基本信息
+	repeated SKU skus = 4; // sku信息
+}
+
+message ProductAddSPUResp {
+	SPU productBase = 1;
+	repeated SKU skus = 2;
+}
+
+message ProductGetSPUByRefId{
+	string refId = 1;
+	int32 importSource = 2;
+}
+
+message ProductGetSPUByRefIdResp{
+	int64 productId = 1;
+}
+
+message ProductGetSkuBySellerSkuId{
+	int64 productId = 1;
+	string sellerSkuId =2;
+}
+
+message ProductGetSkuBySellerSkuIdResp{
+	int32 skuId = 1;
+}
+
+// 导入商品来源定义
+enum ImportProductSource {
+    ImportProductSourceUnknown = 0;
+    ImportProductSourceTaobao = 1;
+    ImportProductSourceTmall = 2;
+    ImportProductSourceYqh = 3;
+    ImportProductSourceAmazon = 4;
+    ImportProductSourceGongYun = 5;
+	ImportProductSourceOne688 = 6;
+    ImportProductSourceMaxlimit = 99;
+  }
+
+enum ImportUrlType {
+	ImportUrlTypeUnknown = 0;
+	ImportUrlTypeShop = 1;
+	ImportUrlTypeProduct = 2;
+}
+
+enum ImportSubTaskManageOp {
+	ImportSubTaskManageOpUnknown = 0;
+	ImportSubTaskManageOpOnSale = 1;
+	ImportSubTaskManageOpOffSale = 2;
+	ImportSubTaskManageOpDel = 3;
+	ImportSubTaskManageOpRetry = 4;
+	ImportSubTaskManageOpSetSensitive = 5;
+	ImportSubTaskManageOpUnSetSensitive = 6;
+}
+
+// ======== 卖家导入商品结构定义 =========
+
+message ProductImportTaskAddReq {
+	repeated string urls = 1;
+	ImportProductSource source = 2;
+}
+
+message ProductImportTaskAddResp {
+	Result result = 1;
+}
+
+enum ProductImportTaskTabStatus {
+	ProductImportTaskTabStatusUnknown = 0;
+	ProductImportTaskTabStatusTodo = 1;
+	ProductImportTaskTabStatusPub = 2;
+	ProductImportTaskTabStatusDel = 3;
+	ProductImportTaskTabStatusFail = 4;
+}
+
+enum ProductImportTaskStatus {
+	ProductImportTaskStatusUnknown = 0;
+	ProductImportTaskStatusPending = 1;
+	ProductImportTaskStatusProcessing = 2;
+	ProductImportTaskStatusAborted = 3;
+	ProductImportTaskStatusSuc = 4;
+	ProductImportTaskStatusFail = 5;
+}
+
+message ProductTaskProductSimpleInfo {
+	string childTaskId = 1;
+	string title = 2;
+	string catName = 3;
+	string origUrl = 4;
+	string primaryImg = 5;
+	int32  skuNum = 6;
+	string price = 7; // 价格或价格区间
+	string quantity = 8; // 库存区间
+	double weight = 9;
+	bool sensitive = 10;
+	bool onSale = 11;
+	int32 productId = 12;
+}
+
+message ProductTaskProductSimpleInfoSet {
+	repeated ProductTaskProductSimpleInfo infos = 1;
+}
+
+message ProductImportTaskListReq {
+	int32 limit = 1;
+	int32 offset = 2;
+}
+
+message ProductImportTaskInfo {
+	string  taskId = 1;
+	ImportProductSource source = 2;
+	int64 createTime = 3;
+	ProductImportTaskStatus status = 4;
+	int32 total = 5;
+	int32 sucNum = 6;
+	int32 failNum = 7;
+}
+
+message ProductImportTaskListResp {
+	Result result = 1;
+	int32 total = 2;
+	repeated ProductImportTaskInfo infos = 3;
+}
+
+message ProductImportTaskDetailListReq {
+	string taskId = 1;
+	ProductImportTaskTabStatus status = 2;
+	int32 limit = 3;
+	int32 offset = 4;
+}
+
+message ProductImportTaskDetailGroup {
+	int32 toPubCount = 1;
+	int32 pubCount = 2;
+	int32 delCount = 3;
+	int32 failCount = 4;
+}
+
+message ProductImportTaskDetailListResp {
+	Result result = 1;
+	int32 total = 2;
+	bool isSpu = 3;
+	ProductImportTaskDetailGroup group = 4;
+	repeated ProductTaskProductSimpleInfoSet set = 5;
+}
+
+message ProductImportSubTaskManageReq {
+	ImportSubTaskManageOp op = 1;
+	repeated string subTaskIds = 2;
+}
+
+message ProductImportSubTaskManageResp {
+	Result result = 1;
+	repeated ProductOnSaleErr errMsg = 2;
+}
+
+message ProductOnSaleErr {
+	int32 productId = 1;
+	string taskId = 2;
+	string msg = 3;
+}
+
+message ProductSaveControlReq {
+	string bucket = 1;
+}

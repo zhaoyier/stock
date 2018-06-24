@@ -1,0 +1,100 @@
+syntax = "proto3";
+package delivery;
+
+import "common/empty.proto";
+import "common/ezbuy.proto";
+
+service Delivery {
+    option (common.service).webapi = true;
+
+    rpc PackageIsCancelled(PackageIsCancelledReq) returns(PackageIsCancelledResp);
+    rpc HasScannedSubPackages(HasScannedSubPackagesReq) returns(HasScannedSubPackagesResp);
+    // 包裹状态变更
+    rpc NotifyPackageStatus(NotifyPackageStatusReq) returns(common.Empty);
+    rpc GetCustomerAddress(DeliveryGetCustomerAddress) returns (DeliveryGetCustomerAddressResp);
+
+    // 更新
+    rpc UserPostCustomerAddressRpc(UserPostCustomerAddressRpcReq) returns(UserPostCustomerAddressRpcReqResp);
+    rpc UserGetAllCustomerAddressRpc(UserGetAllCustomerAddressRpcReq) returns (UserGetAllCustomerAddressRpcResp);
+}
+
+message  PackageIsCancelledReq {
+	repeated string pkgNos = 1;
+	int64 deliveryDate = 2;
+}
+
+message  PackageIsCancelledResp {
+	map<string, bool> pkgCancelledMap = 1;
+}
+
+message HasScannedSubPackagesReq {
+	repeated string subPkgNos = 1;
+}
+
+message HasScannedSubPackagesResp {
+	map<string, bool> subPkgScannedMap = 1;
+}
+
+enum PackageStatus {
+    Unknown = 0;
+    // 到达马来西亚
+    ArrivedMalaysia = 18;
+    // 到达Local
+    Arrived = 4;
+    // 已经签收
+    Signed = 8;
+}
+
+message NotifyPackageStatusReq {
+    string subPkgNo = 1;
+    PackageStatus pkgStatus = 2;
+    string signatureImageUrl = 3;
+}
+
+message DeliveryGetCustomerAddress {
+	int32 id = 1;
+}
+
+message TCustomerAddress {
+	int32  id = 1;
+	string addressToName = 2;
+	string addressToPhone = 3;
+	string block = 4;
+	string street = 5;
+	string unit = 6;
+	string postcode = 7;
+	string company = 8;
+	string building = 9;
+	string state = 10;    // state/province
+	string city = 11;
+	string shipToAddress1 = 12;
+	string district = 13;
+	string subDistrict = 14;
+	string address = 15;
+	bool   isMajor = 16;
+	string region = 17;
+	string floor = 18;
+	string shipToAddress2 = 19;
+    string destCode = 20;
+}
+
+message DeliveryGetCustomerAddressResp {
+	TCustomerAddress item = 1;
+}
+
+message UserPostCustomerAddressRpcReq {
+	TCustomerAddress cusAddr = 1;
+	int32 customerId = 2;
+}
+
+message UserPostCustomerAddressRpcReqResp {
+	int32 customerAddressId = 1;
+}
+
+message UserGetAllCustomerAddressRpcReq {
+	int32 id = 1;
+}
+
+message UserGetAllCustomerAddressRpcResp {
+	repeated TCustomerAddress result = 1;
+}

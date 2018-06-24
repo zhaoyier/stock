@@ -1,0 +1,10 @@
+syntax = "proto3";
+package mithril;
+
+message D2DPing {
+	string Msg = 1;
+}
+
+service D2D {
+	rpc Ping(D2DPing) returns (D2DPing);
+}

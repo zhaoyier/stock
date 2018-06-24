@@ -1,0 +1,414 @@
+syntax = "proto3";
+package garencieres;
+
+import "common/empty.proto";
+import "garencieres/common.proto";
+import "garencieres/pickjob.proto";
+import "common/html.proto";
+
+service WaveService {
+	//ExecuteAllWaves 执行所有的waveid对应的波次
+	rpc ExecuteAllWaves(ExecuteAllWavesReq) returns (common.Empty);
+	//! 触发波次生成拣货任务
+	rpc WaveExecute(WaveExecuteReq) returns (common.Empty);
+	//VirtualWaveExecute 触发虚拟波次   虚拟波次:所有已到齐的Sku不会进波次 直接生成拣货号 和 拣货任务 用于打包
+	rpc VirtualWaveExecute(VirtualWaveExecuteReq) returns (common.Empty);
+	//! 波次管理
+	rpc SearchWave(SearchWaveReq) returns (SearchWaveResp);
+	rpc FetchWave(FetchWaveReq) returns (FetchWaveResp);
+	rpc CreateWave(CreateWaveReq) returns (common.Empty);
+	rpc ModifyWave(ModifyWaveReq) returns (ModifyWaveResp);
+	rpc DeleteWave(DeleteWaveReq) returns (DeleteWaveResp);
+	rpc ReleaseWave(ReleaseWaveReq) returns (common.Empty);
+
+	//拣货任务管理
+
+	//GetAllPickingJobs:按照波次编号展示全部的拣货任务
+	rpc GetAllPickingJobs(GetAllPickingJobsReq) returns (GetAllPickingJobsResp);
+	//! 拣货任务管理
+	rpc SearchPickJob(SearchPickJobReq) returns (SearchPickJobResp);
+	//SearchPickerHistory 查找拣货员历史搜索记录
+	rpc SearchPickerHistory(SearchPickerHistoryReq) returns (SearchPickerHistoryResp);
+	//SearchPickers 获取当前登录国家的所有拣货员信息
+	rpc SearchPickers(SearchPickersReq) returns (SearchPickersResp);
+	//SyncPickers 同步 picker
+	rpc SyncPickers(SyncPickerReq) returns (common.Empty);
+	//InitRemainWeight 初始化以及更新remain weight 功能等同于ezrun job remain
+	rpc InitRemainWeight(InitRemainWeightReq) returns (common.Empty);
+
+	rpc CountPickJob(CountPickJobReq) returns (CountPickJobResp);
+	//! 正常情况：分配拣货任务
+	rpc AssignPickJob(AssignPickJobReq) returns (common.Empty);
+	//! 异常情况：分配拣货号
+	rpc AssignPicking(AssignPickingReq) returns (common.Empty);
+	//SearchAbsentPickings 异常管理 搜索拣缺拣货号
+	rpc SearchAbsentPickings(SearchAbsentPickingsReq) returns (SearchAbsentPickingsResp);
+	// 通过order id /  OrderItemId 获得product url
+	rpc FetchUrlByOrder(FetchUrlByOrderReq) returns (FetchUrlByOrderResp);
+
+	//! 获取拣货任务详情 - 含入库号列表
+	rpc FetchPickJob(FetchPickJobReq) returns (FetchPickJobResp);
+	//! 按拣货人批量打印拣货任务: 按拣货任务单独打印
+	rpc PrintPickJobByPickers(PrintPickJobByPickersReq) returns (PrintPickJobByPickersResp);
+	//PrintPickJobByJobCode: 根据拣货任务号打印拣货任务
+	rpc PrintPickJobByJobCode(PrintPickJobByJobCodeReq) returns (PrintPickJobByJobCodeResp);
+	//! 按拣货人批量打印大货拣货任务：批量拣货任务打印到一个面单（大货一个任务一个入库号）
+	rpc PrintBigPick(PrintBigPickReq) returns (PrintBigPickResp);
+	//GetPickingsByPickJobCode 根据PickjobCode获取全部的Pickings 用于拣缺页面
+	rpc GetPickingsByPickJobCode(GetPickingsByPickJobCodeReq) returns (GetPickingsByPickJobCodeResp);
+	//! 提交拣货号拣缺: 更新拣缺数，同时对拣货号所属入库号全部下架
+	rpc CommitPickingAbsent(CommitPickingAbsentReq) returns (common.Empty);
+	//CommitPickJob: 提交拣货任务(正常状态)
+	rpc CommitPickJob(CommitPickJobReq) returns (common.Empty);
+	//ScanStockInCode 扫描入库号信息
+	rpc ScanStockInCode(ScanStockInCodeReq) returns (common.Empty);
+	//GetAllStockInsByOptions 根据状态和area信息获取入库号信息
+	rpc GetAllStockInsByOptions(GetAllStockInsByOptionsReq) returns (GetAllStockInsByOptionsResp);
+	//HangUpStockin 挂起入库号
+	rpc HangUpStockin(HangUpStockinReq) returns (common.Empty);
+	//HangUpPickings 挂起整个拣货号下的入库号
+	rpc HangUpPickings(HangUpPickingsReq) returns (common.Empty);
+	//RemarkPicking 根据入库号备注拣货号
+	rpc RemarkPicking(RemarkPickingReq) returns (common.Empty);
+	//SetStockinPacked 打包时更新入库号状态
+	rpc SetStockinPacked(SetStockinPackedReq) returns (common.Empty);
+	//UpdateStockinWeight 更新入库号重量
+	rpc UpdateStockinWeight(UpdateStockinWeightReq) returns (common.Empty);
+	//CheckPickings 确认一串拣货号下的入库号是否已打包
+	rpc CheckPickings(CheckPickingsReq) returns (CheckPickingsResp);
+	//GetAllStockinTags 获取所有可用的标签值
+	rpc GetAllStockinTags(GetAllStockinTagsReq) returns (GetAllStockinTagsResp);
+	//SetStockinTag 在入库号上设置某个标签值
+	rpc SetStockinTag(SetStockinTagReq) returns (common.Empty);
+	//封箱打包
+	rpc GetStockInfo(GetStockInfoReq) returns (GetStockInfoResp);
+	//GetB4MShipmentInfo 获取buy for me 的Shipment 信息
+	rpc GetB4MShipmentInfo(GetB4MShipmentInfoReq) returns (GetB4MShipmentInfoResp);
+	//GetPackageWeight 获取一级包裹(同仓库的orderid)总重
+	rpc GetPackageWeight(GetPackageWeightReq) returns (GetPackageWeightResp);
+	//GetOffsetStockinsInErrorPicking 在拣货异常获得SKU信息
+	rpc GetOffsetStockinsInErrorPicking(GetOffsetStockinsInErrorPickingReq) returns (GetOffsetStockinsInErrorPickingResp);
+	//OperStockinsInErrorPicking 差额补齐 或者 退单
+	rpc OperStockinsInErrorPicking(OperStockinsInErrorPickingReq) returns (OperStockinsInErrorPickingResp);
+	// 拣货报告页面
+	rpc ReportPicking(common.Empty) returns (common.Html);
+
+	// 拣货后拆包裹页面
+	rpc ReportPackage(common.Empty) returns (common.Html);
+
+	// 补发自动拆包裹
+	rpc ReportMissingStockin(common.Empty) returns (common.Html);
+
+	//ForceUpdateStatusToComplete 强制更新入库号状态已经对应拣货任务状态到99
+	rpc ForceUpdateStatusToComplete(ForceUpdateStatusToCompleteReq) returns (ForceUpdateStatusToCompleteResp);
+	//CheckIfPickingCodeMatchStockinCodes 检查是否拣货号和入库单是否匹配
+	rpc CheckIfPickingCodeMatchStockinCodes(CheckIfPickingCodeMatchStockinCodesReq) returns (CheckIfPickingCodeMatchStockinCodesResp);
+	// 获取异常的重量
+	rpc GetPickerWeightByAbnormalStatus(GetPickerWeightByAbnormalStatusReq) returns (GetPickerWeightByAbnormalStatusResp);
+
+	// 获取待生成任务数量
+	rpc CountGenerateJob(CountGenerateJobReq) returns (CountGenerateJobResp);
+	// 生成任务
+	rpc GenerateJob(GenerateJobReq) returns (common.Empty);
+
+	// 获取入库号的历史操作记录
+	rpc GetStockInCodeStatus(GetStockInCodeStatusReq) returns (GetStockInCodeStatusResp);
+}
+
+message GenerateJobReq {
+	int64 warehouseAreaId = 1;
+	int32 total = 2;
+}
+
+message CountGenerateJobReq {
+	int64 warehouseAreaId = 1;
+}
+
+message CountGenerateJobResp {
+	int32 total = 1;
+}
+
+message OffsetStockinItem{
+	bool isOffset = 1;
+	string stockinCode = 4;
+	int64 qty =5;
+	int64 orderId = 6;
+	int64 orderItemId = 7;
+	int64 oldOrderItemId = 8;
+	int64 oldOrderId = 9;
+	//offset/cancel reason
+	string reason = 11;
+	string remark = 12;
+
+}
+
+message OperStockinsInErrorPickingReq{
+	repeated OffsetStockinItem stockinItems = 1;
+}
+
+message OperStockinsInErrorPickingResp{}
+
+
+message GetOffsetStockinsInErrorPickingReq{
+	string stockinCode = 1;
+}
+
+message GetOffsetStockinsInErrorPickingResp{
+	repeated OffsetOrderInfo order = 1;
+}
+
+message OffsetOrderInfo{
+	int64 orderId = 1;
+	int64 orderItemId = 2;
+	int64 oldOrderItemId = 8;
+	int64 oldOrderId = 7;
+	int64 price = 3;
+	string goodsName = 4;
+	int64  qty = 5;
+	bool canOffset = 6;
+	bool isEzSeller = 9;
+}
+
+message InitRemainWeightReq{
+}
+
+message SearchPickersReq{}
+
+message SearchPickersResp{
+	repeated Picker pickers = 1;
+}
+
+message CheckIfPickingCodeMatchStockinCodesReq{
+	string pickingCode = 1;
+	repeated string stockinCodes = 2;
+}
+
+message CheckIfPickingCodeMatchStockinCodesResp{
+	bool match = 1;
+}
+
+message ForceUpdateStatusToCompleteReq{
+	repeated string stockinCodes = 1;
+}
+
+message ForceUpdateStatusToCompleteResp{
+	int64 stockinAffect = 1;
+	int64 pickjobAffect = 2;
+	repeated string inWaveStockins = 3;
+}
+
+message Package{
+	int64 orderID = 1;
+	int64 orderItemID = 2;
+}
+
+message GetPackageWeightReq{
+	repeated Package package = 1;
+}
+
+message GetPackageWeightResp{
+	int64 weight = 1;
+}
+
+message GetStockInfoReq{
+	repeated string StockCode = 1;
+}
+
+message GetStockInfoResp{
+	repeated StockInfo Stocks = 1;
+}
+
+message FetchUrlByOrderReq{
+	int64 OrderId = 1;
+	int64 OrderItemId = 2;
+}
+
+message FetchUrlByOrderResp{
+	string ProductUrl = 1;
+}
+
+message GetB4MShipmentInfoReq{
+	int64 orderId = 1;
+}
+
+message GetB4MShipmentInfoResp{
+	ShipmentInfo shipmentInfo = 1;
+}
+
+message ShipmentInfo{
+	int64 shipmentId = 1;
+	int64 customerId = 2;
+	int64 deliveryTypeId = 3;
+	int64 deliveryStationId = 4;
+	int64 pickupPeriodId = 5;
+	string shipToName = 6;
+	string shipToZip = 7;
+	string shipToAddress = 8;
+	string shipToPhone = 9;
+	string ShipToState = 10;
+	int64 pickupPeriodTypeId = 11;
+}
+
+
+message VirtualWaveExecuteReq{}
+
+message ExecuteAllWavesReq{}
+
+message GetAllStockinTagsReq{}
+
+message GetAllStockinTagsResp{
+	repeated Tag tags = 1;
+}
+
+message SetStockinTagReq{
+	repeated string stockCodes = 1;
+	repeated int64 tagIds = 2;
+}
+
+message CheckPickingsReq{
+	repeated string pickCodes = 1;
+	bool disableSkip = 2;
+}
+
+message CheckPickingsResp{
+	map<string,bool> checkResult = 1;
+}
+
+message UpdateStockinWeightReq{
+	string stockinCode = 1;
+	int64  weight = 2;
+}
+
+message RemarkPickingReq{
+	repeated string stockCode = 1;
+	string remark = 2;
+}
+
+message SetStockinPackedReq{
+	repeated string stockInCode = 1;
+	bool isSmall = 2;
+}
+
+message WaveExecuteReq {
+	repeated int64 waveId = 1;
+	int64 startDate = 2;
+	int64 endDate = 3;
+	int32 limit = 4;
+	int32 offset = 5;
+	waveSrc src  = 6;
+	string orderId = 7;
+}
+
+enum StockInStatus{
+	ErrorStockIn = 0;
+	NormalStockIn = 1;
+}
+
+message HangUpStockinReq{
+	repeated string stockins = 1;
+}
+
+message HangUpPickingsReq{
+	repeated string pickingCodes = 1;
+}
+
+message ScanStockInCodeReq{
+	string stockCode =1;
+}
+
+message GetAllStockInsByOptionsReq{
+	string pickerName = 4;
+	string pickingCode= 5;
+	string nickName = 6;
+	int64 areaId = 1;
+	string stockInCode = 3;
+	StockInStatus status = 2;
+	int64 shipmentTypeId = 7;
+	string pkgCode = 11;
+	int64 tag = 8;
+	int32 offset = 9;
+	int32 limit = 10;
+	// 未回复问题件日期
+	int64 noReplyIssueCreateDate = 12;
+}
+
+message GetAllStockInsByOptionsResp{
+	repeated Stockin stockin = 1;
+	int32 total = 2;
+}
+
+message SearchWaveReq{
+	repeated int64 areaId = 1;
+	int32 limit =2;
+	int32 offset =3;
+}
+
+message SearchWaveResp{
+	repeated Wave wave = 1;
+	int32 total = 2;
+}
+
+message FetchWaveReq{
+	int64 waveId = 1;
+}
+
+message FetchWaveResp{
+	Wave wave = 1;
+}
+
+message CreateWaveReq{
+	Wave wave = 1;
+}
+
+message ModifyWaveReq{
+	Wave wave = 1;
+}
+
+message ModifyWaveResp{
+	int32 effect = 1;
+	Wave wave = 2;
+}
+
+message DeleteWaveReq{
+	int64 waveId = 1;
+}
+
+message DeleteWaveResp{
+	int32 effect = 1;
+	int64 deletedWaveId =2;
+}
+
+
+message ReleaseWaveReq{
+	repeated int64 jobId = 1;
+}
+
+message SyncPickerReq{
+	string pickerName = 1;
+}
+
+message GetPickerWeightByAbnormalStatusReq{
+	int64 pickerId = 1;
+	int64 warehouseAreaId = 2;
+	int64 tagId = 3;
+}
+
+message GetPickerWeightByAbnormalStatusResp{
+	int64 abnormalSumWeight = 1;
+}
+
+message GetStockInCodeStatusReq {
+	string packageCode = 1 ; // 包裹号
+}
+
+message StockInCodeInfo {
+	string stockInCode = 1;
+	int64 createDate = 2; // 入库时间
+	int64 status = 3; // 入库号状态
+	string updateBy = 4; // 操作者
+	int64 updateDate = 5; // 操作时间
+}
+
+message GetStockInCodeStatusResp {
+	repeated StockInCodeInfo stockInCodeInfos = 1;
+}

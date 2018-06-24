@@ -1,0 +1,179 @@
+syntax = "proto3";
+package chaplin;
+
+import "common/empty.proto";
+
+//! invoice service
+service InvoiceService{
+    //! 面单
+    rpc CreateInvoice(CreateInvoiceReq) returns (common.Empty);
+    rpc FetchInvoice(FetchInvoiceReq) returns (FetchInvoiceResp);
+    rpc FetchInvoiceByStockIn(FetchInvoiceByStockInReq) returns (FetchInvoiceByStockInResp);
+    rpc UpdateInvoice(UpdateInvoiceReq) returns (common.Empty);
+    rpc FetchInvoiceSKUs(FetchInvoiceSKUsReq) returns (FetchInvoiceSKUsResp);
+    rpc UpdateInvoiceSKU(UpdateInvoiceSKUReq) returns (common.Empty);
+    rpc AppendInvoiceSKU(AppendInvoiceSKUReq) returns (AppendInvoiceSKUResp);
+    rpc RemoveInvoiceSKU(RemoveInvoiceSKUReq) returns (common.Empty);
+    rpc SetInvoicePrinted(SetInvoicePrintedReq) returns (common.Empty);
+
+    //! 商检分类
+    rpc FetchCategory(FetchCategoryReq) returns (FetchCategoryResp);
+
+    //! 面单模板
+    rpc CreateInvoiceTemplate(CreateInvoiceTemplateReq) returns (common.Empty);
+    rpc UpdateInvoiceTemplate(UpdateInvoiceTemplateReq) returns (common.Empty);
+    rpc SearchInvoiceTemplate(SearchInvoiceTemplateReq) returns (SearchInvoiceTemplateResp);
+}
+
+message Category{
+    int64 cid = 6;
+    string category = 1;
+    string chinese_category = 2;
+    string english_category = 3;
+    string trade_category = 4;
+    string hs_code = 5;
+}
+
+message SetInvoicePrintedReq{
+    int64 invoice_id = 1;
+    bool printed = 2;
+}
+
+message FetchCategoryReq{
+    repeated int64 cid = 1;
+}
+
+message FetchCategoryResp{
+    repeated Category items = 1;
+}
+
+message InvoiceSKU{
+    int64  invoice_sku_id = 10;
+    string goods_description = 1;
+    string chinese_category = 2;
+    string trade_category = 3;
+    string unit_type = 4;
+    int32 qty = 5;
+    int64 unit_value = 6; 
+    string english_category = 7;
+    string hs_code = 8;
+    int64 cid = 11;
+    int64 order_id = 12;
+    int64 order_item_id = 13;
+}
+
+message Invoice{
+    int64 invoice_id = 20;
+    int64 shipment_type_id = 21;
+    int64 logistics_provider_id = 2;
+    int64 dispatch_provider_id = 3;
+    int64 delivery_type_id = 22;
+    string nick_name = 4;
+    string package_code = 5;
+    string send_to = 6;
+    string send_zipcode = 7;
+    string send_phone = 8;
+    string send_address = 9;
+    string send_state = 33;
+    string from = 10;
+    string from_zipcode = 11;
+    string from_phone = 12;
+    string from_address = 13;
+    int64  warehouse_id = 14;
+    string origin_country_code = 15;
+    string destination_country_code = 16;
+    repeated InvoiceSKU skus = 17;
+    int64 total_value = 18;
+    bool is_print = 19;
+    bool is_pick_big = 23;
+    int64 pick_weight = 34;
+    //从包裹中获取的辅助字段
+    string color_name = 30;
+    string color_value = 31;
+    // 运单号
+    string transport_number = 32;
+    // 取货时段
+    int64  pickup_period_type_id = 35;
+}
+
+message CreateInvoiceReq{
+    Invoice invoice = 1;
+}
+
+message FetchInvoiceReq{
+    string package_code = 1;
+}
+
+message FetchInvoiceResp {
+    Invoice invoice = 1;
+}
+
+message FetchInvoiceByStockInReq{
+    string stockin_code = 1;
+}
+
+message FetchInvoiceByStockInResp{
+    Invoice invoice = 1;
+}
+
+message UpdateInvoiceReq{
+    Invoice invoice = 1;
+}
+
+message FetchInvoiceSKUsReq{
+    int64 invoice_id = 1;
+}
+
+message FetchInvoiceSKUsResp{
+    repeated InvoiceSKU skus = 1;
+}
+
+message UpdateInvoiceSKUReq{
+    InvoiceSKU sku = 1;
+}
+
+message AppendInvoiceSKUReq{
+    InvoiceSKU sku = 1;
+    int64 invoice_id = 2;
+}
+
+message AppendInvoiceSKUResp{
+    int64 invoice_sku_id = 1;
+}
+
+message RemoveInvoiceSKUReq{
+    int64 invoice_sku_id = 1;
+}
+
+message InvoiceTemplate {
+    int64 invoice_template_id = 8;
+    int64 shipment_type_id = 1;
+    int64 delivery_type_id = 2;
+    string origin_country_code = 3;
+    string destination_country_code = 4;
+    int64 logistics_provider_id = 5;
+    int64 dispatch_provider_id = 6;
+    string template = 7;
+    int64  warehouse_id = 9; 
+}
+
+message CreateInvoiceTemplateReq{
+    InvoiceTemplate template = 1;
+}
+
+message UpdateInvoiceTemplateReq {
+    InvoiceTemplate template = 1;
+}
+
+message SearchInvoiceTemplateReq {
+    int64 shipment_type_id = 1;
+    int64 delivery_type_id = 2;
+    string origin_country_code = 3;
+    string destination_country_code = 4;
+    int64 logistics_provider_id = 5;
+    int64 dispatch_provider_id = 6;
+}
+
+message SearchInvoiceTemplateResp {
+    repeated InvoiceTemplate templates = 1;
+}

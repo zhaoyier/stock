@@ -1,0 +1,8 @@
+--Payment
+ curl -d '{"method": "Payment.GetPaymentSummary", "params": [], "id": 1}' http://192.168.199.187:8055/SG.ashx
+
+ curl -d '{"method": "Payment.GetPaymentListByStatus", "params": ["Unpaid",0,10], "id": 1}' http://192.168.199.187:8055/SG.ashx
+
+ curl -d '{"method": "Order.GetArrivedOrderSummary", "params": ["CN","Shanghai"], "id": 1}' http://192.168.199.187:8055/SG.ashx
+
+ 

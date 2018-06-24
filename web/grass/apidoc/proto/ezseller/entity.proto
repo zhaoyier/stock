@@ -1,0 +1,154 @@
+syntax = "proto3";
+package ezseller;
+
+// 相当于数据层定义 
+
+// enum
+enum BillStatus {
+    BillStatusUnknown = 0;
+    BillStatusPending = 1;                    // 财务侧, 待处理
+    BillStatusApproved = 2;                   // 财务侧, 已审核
+    BillStatusAppealled = 3;                 // 卖家侧, 卖家申诉
+    BillStatusConfirmed = 4;              // 卖家侧, 确认订单, 由 TransferAdd 行为附带
+    BillStatusFinancePending = 5;             // 运营侧, 待财务确认
+    BillStatusMaxLimit = 6;
+}
+
+enum TransferStatus {
+    TransferStatusUnknown = 0;
+    TransferStatusPending = 1;                // 卖家侧, 发起提现请求, 待处理
+    TransferStatusRejected = 2;                   // 财务侧, 已拒绝
+    TransferStatusTransferred = 3;                // 财务侧, 已完成转账操作
+    TransferStatusApproved = 4;                   // 财务侧, 已批准
+    TransferStatusTransferring = 5;               // 财务侧, 已确认；卖家状态转账中
+    TransferStatusMaxLimit = 6;
+}
+
+
+enum BillRemarkType {
+    BillRemarkTypeUnknown = 0;
+    BillRemarkTypeNormal = 1;                     // 普通备注, 双方可见
+    BillRemarkTypeInternal = 2;                   // 内部备注, 财务侧可见
+    BillRemarkTypeAppealling = 3;                 // 申诉备注, 双方可见
+    BillRemarkTypeTransfer = 4;                   // 转账备注, 双方可见
+    BillRemarkTypeMaxLimit = 5;
+}
+
+// // 订单结算状态
+// enum OrderBillStatus {
+//     OrderBillStatusUnknown = 0;                                // 限位
+//     OrderBillStatusPending = 1;                                // 进行中
+//     OrderBillStatusBillable = 2;                               // 可结算
+//     OrderBillStatusBillConfirmed = 3;                          // 已结算
+//     OrderBillStatusMaxLimit = 4;                                // 限位
+// }
+
+enum BillOperationType {
+    BillOperationTypeUnknown = 0;
+    BillOperationTypeApprove = 1;                    // 审核通过
+    BillOperationTypeAppeal = 2;                     // 发起申诉
+    BillOperationTypeOpAppealDispose = 3;            // 运营对申诉订单处理通过
+    BillOperationTypeMaxLimit = 4;
+}
+
+enum BillPeriod {
+    BillPeriodUnknown = 0;
+    BillPeriodNever = 1;
+    BillPeriodMonthly = 2;
+    BillPeriodWeekly = 3;
+    BillPeriodDaily = 4;
+    BillPeriodShortTerm = 5;
+    BillPeriodHalfMonth = 6;    // 每半个月执行一次，即每个月的1，15号执行
+    BillPeriodMaxLimit = 7;
+}
+
+message SPSearchOption {
+    bool countOnly = 1;
+    bool allCount = 2;
+    int32 limit = 3;
+    int32 offset = 4;
+}
+
+// SP entity
+
+message SPBill {
+    string billNum = 1;
+    int32 shopId = 2;
+    string generateDate = 3;
+    int64 dateRangeStart = 4;
+    int64 dateRangeEnd = 5;
+    BillStatus status = 6;
+    string shopName = 7;
+    double finalAmount = 8;
+    double approvedAmount = 9;
+    double appeallingAmount = 10;
+    bool transferred = 11;
+    repeated SPBillOpHistory opHistory = 12;
+    repeated SPBillRemark billRemark = 13;
+    int64 createdAt = 14;
+    int32 orderCount = 15;
+    BillPeriod period = 16;
+    bool marked = 17;
+}
+
+
+
+message SPBillOpHistory{
+    double amount = 1;
+    BillOperationType type = 2;
+    int64 createdAt = 3;
+    string createdBy = 4;
+    string remark = 5;
+}
+
+message SPBillRemark {
+    string text = 1;
+    BillRemarkType type = 2;
+    int64 createdAt = 3;
+    string createdBy = 4;
+}
+
+message SPBillTransfer {
+    string billNum = 1;
+    int32 shopId = 2;
+    string shopName = 3;
+    string originCode = 4;
+    double amount = 5;
+    SPBillTransferAccount account = 6;
+    int64 createdAt = 7;
+    TransferStatus status = 8;
+    int32 approvedById = 9;
+    string approvedBy = 10;
+    int64 approvedAt = 11;
+    SPBillTransferInfo transferInfo = 12;
+    repeated SPBillRemark remarks = 13;
+    repeated SPTransferOpHistory opHistory = 14;
+    bool marked = 15;
+}
+
+message SPBillTransferAccount {
+    string bankName = 1;
+    string agencyAddress = 2;
+    string agencyName = 3;
+    string accountNumber = 4;
+    string accountName = 5;
+    string phone = 6;
+    string beneficiaryName = 7;
+    string beneficiaryBankAddress = 8;
+    string bankSwiftCode = 9;
+}
+
+message SPBillTransferInfo {
+   double amount = 1;
+   double fee = 2;
+   string trackingNum = 3;
+   string operatedBy = 4;
+   int64 operatedAt = 5;
+}
+
+message SPTransferOpHistory {
+    TransferStatus status = 1;
+    int64 createdAt = 2;
+    string createdBy = 3;
+    string remark = 4;
+}

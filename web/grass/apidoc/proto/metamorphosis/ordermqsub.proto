@@ -1,0 +1,22 @@
+syntax = "proto3";
+package metamorphosis;
+
+import "common/empty.proto";
+import "metamorphosis/cartorder.proto";
+
+service OrderMqSub {
+	//测试
+	rpc Test(common.Empty) returns (common.Empty);
+
+	// 获取未成功处理的创建老订单请求
+	rpc GetReqForGenMsSqlOrder(GetReqForGenMsSqlOrderReq) returns (GetReqForGenMsSqlOrderResp) {
+	}
+}
+
+message GetReqForGenMsSqlOrderReq {
+}
+
+message GetReqForGenMsSqlOrderResp {
+	Result_Order Result = 1;
+	repeated ReqForGenMsSqlOrder ReqForGenMsSqlOrders = 2;
+}

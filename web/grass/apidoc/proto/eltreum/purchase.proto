@@ -1,0 +1,1948 @@
+syntax = "proto3";
+package eltreum;
+
+import "common/empty.proto";
+import "common/ezbuy.proto";
+
+// ---------------------------------------------------------------------------
+// 采购服务
+service Purchase {
+	// ---------------------------------------------------------------------------
+	// health check
+	rpc PurchasePing(ReqPurchasePing) returns (common.Empty);
+
+	// ---------------------------------------------------------------------------
+	// 获取目的地国家
+	rpc CatalogGet (ReqCatalogGet) returns (RespCatalogGet);
+	// 获取采购地国家
+	rpc ProSourceRegionGet (ReqProSourceRegionGet) returns (RespProSourceRegionGet);
+	// 获取仓库
+	rpc WarehouseGet (ReqWarehouseGet) returns (RespWarehouseGet);
+	// 获取运输方式
+	rpc ShipmentTypeGet (ReqShipmentTypeGet) returns (RespShipmentTypeGet);
+	// 获取模块
+	rpc ModuleGet (ReqModuleGet) returns (RespModuleGet);
+	// 获取服务类型
+	rpc ServiceTypeGet (ReqServiceTypeGet) returns (RespServiceTypeGet);
+	// 获取域名
+	rpc DomainGet (ReqDomainGet) returns (RespDomainGet);
+	// 获取所有部门
+	rpc DepartmentGet (ReqDepartmentGet) returns (RespDepartmentGet);
+	// 获取所有标签
+	rpc LabelGet (ReqLabelGet) returns (RespLabelGet);
+	// 通过MssqlOrderId查看其下的Sku的状态
+	rpc ShowSkuInfos (ReqShowSkuInfos) returns (RespShowSkuInfos);
+	// 根据orderItem查采购SKU信息
+	rpc PoSkuInfoByOrderItemGet (ReqPoSkuInfoByOrderItemGet) returns (RespPoSkuInfoByOrderItemGet);
+	// ---------------------------------------------------------------------------
+	// 添加敏感词
+	rpc BanKeywordAdd (ReqBanKeywordAdd) returns (RespBanKeywordAdd);
+	// 修改敏感词
+	rpc BanKeywordUpdate (ReqBanKeywordUpdate) returns (common.Empty);
+	// 删除敏感词
+	rpc BanKeywordDelete (ReqBanKeywordDelete) returns (common.Empty);
+	// 查找敏感词
+	rpc BanKeywordGet (ReqBanKeywordGet) returns (RespBanKeywordGet);
+	// 获取所有敏感词
+	rpc BanKeywordGetAll (ReqBanKeywordGetAll) returns (RespBanKeywordGetAll);
+	// 初始化同步敏感词
+	rpc SyncBanKeyword (common.Empty) returns (common.Empty);
+	// 添加多个敏感词
+	rpc MultiBanKeywordAdd (common.Empty) returns (common.Empty);
+
+	// ---------------------------------------------------------------------------
+	// 添加仓库配置
+	rpc WarehouseSettingAdd (ReqWarehouseSettingAdd) returns (RespWarehouseSettingAdd);
+	// 修改仓库配置
+	rpc WarehouseSettingUpdate (ReqWarehouseSettingUpdate) returns (common.Empty);
+	// 删除仓库配置
+	rpc WarehouseSettingDelete (ReqWarehouseSettingDelete) returns (common.Empty);
+	// 获取仓库配置
+	rpc WarehouseSettingGet (ReqWarehouseSettingGet) returns (RespWarehouseSettingGet);
+	// 前日仓库数据统计
+	rpc WarehouseStatis (ReqWarehouseStatis) returns (RespWarehouseStatis);
+
+	// ---------------------------------------------------------------------------
+	// 获取待分配订单 用户分组
+	rpc OrderGetGroupByUser (ReqOrderGet) returns (RespOrderGetGroupByUser);
+	// 获取待分配订单详情 用户分组
+	rpc OrderDetailGetGroupByUser (ReqOrderDetailGetGroupByUser) returns (RespOrderDetailGetGroupByUser);
+	// 获取待分配订单 卖家分组
+	rpc OrderGetGroupBySeller (ReqOrderGet) returns (RespOrderGetGroupBySeller);
+	// 获取待分配订单详情 卖家分组
+	rpc OrderDetailGetGroupBySeller (ReqOrderDetailGetGroupBySeller) returns (RespOrderDetailGetGroupBySeller);
+
+	// 获取待分配订单 卖家仓库分组
+	rpc OrderGetGroupBySellerWarehouse (ReqOrderGet) returns (RespOrderGetGroupBySellerWarehouse);
+	// 获取待分配订单详情 卖家仓库分组
+	rpc OrderDetailGetGroupBySellerWarehouse (ReqOrderDetailGetGroupBySellerWarehouse) returns (RespOrderDetailGetGroupBySellerWarehouse);
+	
+	// 获取采购员
+	rpc BuyerGet (ReqBuyerGet) returns (RespBuyerGet);
+	// 批量获取采购员
+	rpc BatchBuyerGet (ReqBatchBuyerGet) returns (RespBatchBuyerGet);
+	// 获取所有采购员
+	rpc BuyerGetAll (common.Empty) returns (RespBuyerGet);
+	// 获取订单统计信息
+	rpc OrderStatis (ReqOrderStatis) returns (RespOrderStatis);
+	// 按客户分配采购订单
+	rpc OrderAssignByCustomer (ReqOrderAssignByCustomer) returns (common.Empty);
+	// 按卖家分配采购订单
+	rpc OrderAssignBySeller (ReqOrderAssignBySeller) returns (common.Empty);
+	// 按卖家和仓库分配采购订单
+	rpc OrderAssignBySellerWarehouse (ReqOrderAssignBySellerWarehouse) returns (common.Empty);
+	// 重新分配
+	rpc OrderReAssign (ReqOrderReAssign) returns (common.Empty);
+	// 采购员任务统计
+	rpc MissionAnalyze (ReqMissionAnalyze) returns (RespMissionAnalyze);
+	// 采购分配统计
+	rpc AssignAnalyze (ReqAssignAnalyze) returns (RespAssignAnalyze);
+
+	// ---------------------------------------------------------------------------
+	// 采购订单获取
+	rpc PurchaseOrderGet (ReqPurchaseOrderGet) returns (RespPurchaseOrderGet);
+	// 获取锁定国家和仓库
+	rpc LockRegionWarehouseGet (common.Empty) returns (RespLockRegionWarehouseGet);
+	// 卖家纠错
+	rpc CorrectSellerName (ReqCorrectSellerName) returns (common.Empty);
+	// 订单打标签
+	rpc LabelOrder (ReqLabelOrder) returns (common.Empty);
+	// 采购备注
+	rpc PurchaseRemark (ReqPurchaseRemark) returns (common.Empty);
+	// 获取订单所有备注历史
+	rpc PurchaseRemarkGetAll (ReqPurchaseRemarkGetAll) returns (RespPurchaseRemarkGetAll);
+	// 下单
+	rpc PlaceOrder (ReqPlaceOrder) returns (common.Empty);
+	// 上传 excel
+	rpc UploadExcelPO (ReqUploadExcelPO) returns (RespUploadExcelPO) {
+		option (common.timeout) = "10000s";
+	};
+	// 导出已分配代采购的指定用户的单子
+    rpc DownloadAssignedOrders(ReqDownloadAssignedOrders) returns (ExportFile){
+        option (common.webapi).download = true;
+    }
+	// 导出已分配代采购的指定用户的单子
+    rpc DownloadPurchasedOrders(ReqDownloadPurchasedOrders) returns (ExportFile){
+        option (common.webapi).download = true;
+    }
+	// 下单 sku 完整性检查
+	rpc SkuIntegrityCheck(ReqSkuIntegrityCheck) returns (RespSkuIntegrityCheck);
+	// 退单
+	rpc CancelOrder (ReqCancelOrder) returns (common.Empty);
+	// 批量退单
+	rpc CancelOrders (ReqCancelOrders) returns (common.Empty);
+	// 多个类型差额补齐
+    rpc MakeOffsets (ReqMakeOffsets) returns (common.Empty);
+	// 修改运输方式
+	rpc ChangeShipmentType (ReqChangeShipmentType) returns (common.Empty);
+	// 保存采购内控
+	rpc SavePurchaseCheck (ReqSavePurchaseCheck) returns (common.Empty);
+	// 任务列表
+	rpc TaskListGet (ReqTaskListGet) returns (RespTaskListGet);
+	// 任务列表统计
+	rpc TaskListStatis (ReqTaskListStatis) returns (RespTaskListStatis);
+	// 获取选中任务 ID
+	rpc TaskListGetIDs (ReqTaskListGetIDs) returns (RespTaskListGetIDs);
+	// 获取状态异常订单， 获取不到商品库
+	rpc AnbormalOrderGet (ReqAnbormalOrderGet) returns (RespAnbormalOrderGet);
+	// 尝试修复 Abnormal Order
+	rpc AbnormalFix (ReqAbnormalFix) returns (RespAbnormalFix);
+	// 尝试修复所有 Abnormal Order
+	rpc AbnormalFixAll (ReqAbnormalFixAll) returns (RespAbnormalFixAll);
+	// 修复采购单的商品信息
+	rpc RefreshProductInfo (ReqRefreshProductInfo) returns (RespRefreshProductInfo);
+	// 记录返利链接
+	rpc SaveRebateURL (ReqSaveRebateURL) returns (RespSaveRebateURL);
+	// 记录淘宝退款状态
+	rpc SaveTaobaoRefundStatus (ReqBatchSaveTaobaoRefundStatus) returns (RespSaveTaobaoRefundStatus);
+	// 获取淘宝退款状态
+	rpc TaobaoRefundStatusGet (ReqTaobaoRefundStatusGet) returns (RespTaobaoRefundStatusGet);
+	// 采购订单导出
+	rpc PurchaseOrderExport (ReqPurchaseOrderGet) returns (RespPurchaseOrderExport){
+		option (common.webapi).download = true;
+	};
+	// ---------------------------------------------------------------------------
+	// 查询超级采购员列表
+	rpc SuperPurchaserGet (ReqSuperPurchaserGet) returns (RespSuperPurchaserGet);
+	// 设置超级管理员
+	rpc SetSuperPurchaser (ReqSetSuperPurchaser) returns (RespSetSuperPurchaser);
+
+	// ---------------------------------------------------------------------------
+    // 监控，查询进入了Sync表，但是没进入主表的数量
+    rpc MonitorGetNotEnterPurchaseSystem (ReqMonitorGetNotEnterPurchaseSystem) returns (RespMonitorGetNotEnterPurchaseSystem);
+    // 监控，查询进入了采购系统后，各个状态的数量统计
+    rpc MonitorGetOrderCountPerStatus (ReqMonitorGetOrderCountPerStatus) returns (RespMonitorGetOrderCountPerStatus);
+    // 监控，查询进入了采购系统后，在某状态停留的时间统计
+    rpc MonitorGetDurationInStatus (ReqMonitorGetDurationInStatus) returns (RespMonitorGetDurationInStatus);
+	
+	// ---------------------------------------------------------------------------
+	// 再次返回众包系统
+	rpc ReturnToOutsourcing (ReqReturnToOutsourcing) returns (RespReturnToOutsourcing);
+	// 写入操作日志                                         
+	rpc OperationLogAdd (ReqOperationLogAdd) returns (RespOperationLogAdd);
+	// 查询操作日志
+	rpc OperationLogGet (ReqOperationLogGet) returns (RespOperationLogGet);
+	// 美国台湾订单生成运单号
+	rpc GenTrackNo (ReqGenTrackNo) returns (RespGenTrackNo);
+}
+
+// ---------------------------------------------------------------------------
+
+
+message PoOrderItem{
+	int64 orderID = 1;
+	int64 orderItemID = 2;
+}
+
+message ReqPoSkuInfoByOrderItemGet{
+	PoOrderItem orderItem = 1;
+}
+
+message PoInfo{
+	string poNumber = 1;
+	string placeOrderAccount = 2;
+	string placeOrderUserName = 3;
+	string trackingNo = 4;
+	string trackingStatus = 5;	
+}
+
+message RespPoSkuInfoByOrderItemGet{
+	int64 orderID = 1;
+	int64 orderItemID = 2;
+	string productName = 3;
+	string sku = 4;
+	int64 qty = 5;
+	int64 internalUnitPrice = 6;
+	string vendorName = 7;
+	int64 orderDate = 8;
+	repeated PoInfo purchaseOrderInfo = 9;
+	string productURL = 10;
+	int64 gpid = 11;
+}
+
+message ReqPurchasePing {
+	string Msg = 1;
+}
+
+message BanKeyword {
+	// 国家代码
+	string CountryName = 1;
+	// 国家代码 Id
+	int64 RegionId = 2;
+	// 仓库名
+	string WarehouseName = 3;
+	// 仓库 Id
+	int64 WarehouseId = 4;
+	// 运输方式名
+	string ShipmentTypeName = 5;
+	// 运输方式 Id
+	int64 ShipmentTypeId = 6;
+	// 模块名
+	string Module = 7;
+	// 模块Id
+	int64 ModuleId = 8;
+	// 关键字
+	string Keyword = 9;
+	// Id 唯一标识
+	string Id = 10;
+	// 创建人
+	string CreatedBy = 11;
+	// 创建时间
+	int64 CreateTime = 12;
+	// 更新人
+	string UpdatedBy = 13;
+	// 更新时间
+	int64 UpdateTime = 14;
+}
+
+message ReqBanKeywordAdd {
+	// 国家代码
+	string CountryName = 1;
+	// 国家代码 Id
+	int64 RegionId = 2;
+	// 仓库名
+	string WarehouseName = 3;
+	// 仓库 Id
+	int64 WarehouseId = 4;
+	// 运输方式名
+	string ShipmentTypeName = 5;
+	// 运输方式 Id
+	int64 ShipmentTypeId = 6;
+	// 模块名
+	string Module = 7;
+	// 模块Id
+	int64 ModuleId = 8;
+	// 关键字
+	string Keyword = 9;
+}
+
+message RespBanKeywordAdd {
+	// Id 唯一标识
+	string Id = 1;
+}
+
+message ReqBanKeywordUpdate {
+	// 国家名字
+	string CountryName = 1;
+	// 国家代码 Id
+	int64 RegionId = 2;
+	// 仓库名
+	string WarehouseName = 3;
+	// 仓库 Id
+	int64 WarehouseId = 4;
+	// 运输方式名
+	string ShipmentTypeName = 5;
+	// 运输方式 Id
+	int64 ShipmentTypeId = 6;
+	// 模块名
+	string Module = 7;
+	// 模块Id
+	int64 ModuleId = 8;
+	// 关键字
+	string Keyword = 9;
+	string Id = 10;
+}
+
+message ReqBanKeywordDelete {
+	// Id 唯一标识
+	string Id = 1;
+}
+
+message ReqBanKeywordGet {
+	// 国家代码
+	int64 RegionId = 1;
+	// 仓库
+	int64 WarehouseId = 2;
+	// 运输方式
+	int64 ShipmentTypeId = 3;
+	// 模块
+	int64 ModuleId = 4;
+	// 模糊匹配关键词
+	string Query = 5;
+	// 页码 从1开始
+	int64 Page = 6;
+	// 页面大小
+	int64 Size = 7;
+}
+
+message RespBanKeywordGet {
+	// 搜索返回关键词
+	repeated BanKeyword BanKeywords = 1;
+	// 关键词总数
+	int64 Total = 2;
+}
+
+message ReqBanKeywordGetAll {
+	// 国家代码
+	int64 RegionId = 1;
+	// 仓库
+	int64 WarehouseId = 2;
+	// 运输方式
+	int64 ShipmentTypeId = 3;
+	// 模块
+	int64 ModuleId = 4;
+}
+
+// RespBanKeywordGetAll 返回纯关键字 string 数组
+message RespBanKeywordGetAll {
+	// 搜索返回关键词
+	repeated string BanKeywords = 1;
+}
+
+// ReqBanKeywordMatch 是否匹配到关键字，所有字段必传
+message ReqBanKeywordMatch {
+	// 国家代码
+	int64 RegionId = 1;
+	// 仓库
+	int64 WarehouseId = 2;
+	// 运输方式
+	int64 ShipmentTypeId = 3;
+	// 模块
+	int64 ModuleId = 4;
+	// 匹配的标题
+	string Title = 5;
+}
+
+message RespBanKeywordMatch {
+	// 是否含有敏感词
+	bool Matched = 1;
+}
+
+// ReqBanKeywordsMatch 是否匹配到关键字，所有字段必传
+message ReqBanKeywordsMatch {
+	repeated ReqBanKeywordMatch Matches = 1;
+}
+
+message RespBanKeywordsMatch {
+	// 是否含有敏感词
+	repeated RespBanKeywordMatch Result = 1;
+}
+
+message WarehouseSettingMeta {
+	// 仓库 Id
+	int64 WarehouseId= 1;
+    // 比例
+	int64 WarehouseWeight = 2;
+	// 运费相等
+	bool IsUseFeeEqual = 3;
+}
+
+message WarehouseSetting {
+	// 运输方式
+	int64 ShipmentTypeId = 1; 
+	// 运输方式名
+	string ShipmentTypeName = 2;
+    // 采购区域Id
+	int64 ProSourceRegionId = 3;
+	// 采购区域名
+	string ProSourceRegionName = 4;
+    // 目的地国家Id
+	int64 RegionId = 5;
+	// 目的地国家
+	string RegionName = 6;
+	// 仓库 Id
+	int64 WarehouseId= 7;
+	// 仓库名
+	string WarehouseName = 8;
+    // 比例
+	int64 WarehouseWeight = 9;
+	// 运费相等
+	bool IsUseFeeEqual = 10;
+	// 操作人
+	string UpdatedBy = 11;
+	// 操作时间
+	int64 UpdateTime = 12;
+}
+
+message ReqWarehouseSettingAdd {
+    // 采购区域Id
+	int64 ProSourceRegionId = 1;
+    // 目的地国家
+	int64 RegionId = 2;
+	// 运输方式
+	int64 ShipmentTypeId = 3; 
+	// 所有仓库配置
+	repeated WarehouseSettingMeta WarehouseSettings = 4;
+}
+
+message RespWarehouseSettingAdd {
+}
+
+message ReqWarehouseSettingUpdate {
+	//  原采购区域Id
+	int64 ProSourceRegionId = 1;
+    // 原目的地国家
+	int64 RegionId = 2;
+	// 原运输方式
+	int64 ShipmentTypeId = 3; 
+	// 新仓库设定
+	repeated WarehouseSettingMeta WarehouseSettings = 4;
+}
+
+message ReqWarehouseSettingDelete {
+	//  原采购区域Id
+	int64 ProSourceRegionId = 1;
+    // 原目的地国家
+	int64 RegionId = 2;
+	// 原运输方式
+	int64 ShipmentTypeId = 3; 
+}
+
+message ReqWarehouseSettingGet {
+    // 采购区域Id
+	int64 ProSourceRegionId = 1;
+    // 目的地国家
+	int64 RegionId = 2;
+	// 运输方式
+	int64 ShipmentTypeId = 3; 
+	// 页码
+	int64 Page = 4;
+	// 页面数量
+	int64 Size = 5;
+}
+
+message RespWarehouseSettingGet {
+	// 仓库设定
+	repeated WarehouseSetting WarehouseSettings = 1;
+	// 总数
+	int64 Total = 2;
+}
+
+message WarehouseStatis {
+	// 仓库名
+	string WarehouseName = 1;
+	// 仓库 ID
+	int64 WarehouseId = 2;
+	// 前日仓库订单数
+	int64 OrderCount = 3;
+}
+
+message ReqWarehouseStatis {
+	// 国家 Id
+	int64 RegionId = 1;
+	// 采购地
+	int64 ProSourceRegionId = 2;
+}
+
+message RespWarehouseStatis {
+	repeated WarehouseStatis Statis = 1;
+}
+
+message OrderGroupByUser {
+	// 昵称
+	string UserNickName = 1;
+	// 用户 Id
+	int64 CustomerId = 2;
+	// 新订单号
+	int64 OrderNum = 3;
+	// 运输方式名
+	string ShipmentTypeName = 4;
+	// 运输方式 Id
+	int64 ShipmentTypeId = 5;
+	// 支付时间
+	int64 PayTime = 6;
+	// 服务类型名
+	string ServiceTypeName = 7;
+	// 服务类型 Id
+	int64 ServiceTypeId = 8;
+	// 任务数
+	int64 Tasks = 9;
+	// 仓库名
+	string WarehouseName = 10;
+	// 仓库 Id
+	int64 WarehouseId = 11;
+	// 国家Id
+	int64 RegionId = 12;
+}
+
+message OrderGroupBySeller {
+	// 商家名称
+	string VendorName = 1;
+	//店铺名称
+	string ShopName = 2;
+	// 新订单号
+	int64 OrderNum = 3;
+	// 运输方式名
+	string ShipmentTypeName = 4;
+	// 运输方式 Id
+	int64 ShipmentTypeId = 5;
+	// 支付时间
+	int64 PayTime = 6;
+	// 服务类型名
+	string ServiceTypeName = 7;
+	// 服务类型 Id
+	int64 ServiceTypeId = 8;
+	// 任务数
+	int64 Tasks = 9;
+	// 仓库名
+	string WarehouseName = 10;
+	// 仓库 Id
+	int64 WarehouseId = 11;
+	// 国家Id
+	int64 RegionId = 12;
+}
+
+message OrderGroupBySellerWarehouse {
+	string VendorName = 1;
+	string ShopName = 2;
+	int64 Tasks = 3;
+	string WarehouseName = 4;
+	int64 WarehouseId = 5;
+	int64 TotalPrice = 6;
+}
+
+// 敏感词选项
+enum BanKeywordOption {
+	// 全部
+    BankeywordAll = 0;
+	// 无敏感词
+    BankeywordNonSensitive = 1;
+	// 有敏感词
+    BankeywordSensitive = 2;
+}
+
+enum RemarkOption {
+	// 全部
+	RemarkAll = 0;
+	// 无备注
+	NonRemark= 1;
+	// 有备注
+	Remark = 2;
+}
+
+enum HandlingFeeOption {
+	// 所有
+	All = 0;
+	// 有手续费
+	YES = 1;
+	// 无手续费
+	NO = 2;
+}
+
+message ReqOrderGet {
+	//  国家代码
+	int64 RegionId = 1;
+	// 仓库
+	int64 WarehouseId = 2;
+	// 服务类型
+	int64 ServiceTypeId = 3;
+	// 运输方式
+	int64 ShipmentTypeId = 4;
+	// 域名
+	int64 DomainId = 5;
+	// 是否敏感词
+	BanKeywordOption BanKeyword = 6;
+	// 是否有备注
+	RemarkOption Remark = 7;
+	// 价格区间最小值 单位元
+	double PriceMin = 8;
+	// 价格区间最大值 单位元
+	double PriceMax = 9;
+	// 重量区间最小值 单位 kg
+	double WeightMin = 10;
+	// 重量区间最大值 单位 kg
+	double WeightMax = 11;
+	// 订单号
+	string OrderNum = 12;
+	// 老订单号
+	string OldOrderNum = 13;
+	// 用户 昵称
+	string UserNickName = 14;
+	// 页码从1开始
+	int64 Page = 15;
+	// 页面大小
+	int64 Size = 16;
+	// 付款时间最小值 unixtime 秒
+	int64 PayDateMin = 17;
+	// 付款时间最大值 unixtime 秒
+	int64 PayDateMax = 18;
+	// 商家名
+	string VendorName = 19;
+	// 特殊卖家
+	bool SpecialVendor = 20;
+	// handling_fee
+	HandlingFeeOption HandlingFee = 21;
+}
+
+message RespOrderGetGroupByUser {
+	// 返回订单
+	repeated OrderGroupByUser Orders = 1;
+	// 总数
+	int64 Total = 2;
+}
+
+message RespOrderGetGroupBySeller {
+	// 返回订单
+	repeated OrderGroupBySeller Orders = 1;
+	// 总数
+	int64 Total = 2;
+}
+
+message RespOrderGetGroupBySellerWarehouse {
+	repeated OrderGroupBySellerWarehouse Orders = 1;
+	int64 Total = 2;
+}
+
+message ReqOrderDetailGetGroupBySellerWarehouse {
+	// 卖家名
+	string VendorName = 1;
+	// 仓库 Id
+	int64 WarehouseId = 2;
+	// 筛选条件
+	ReqOrderGet Req = 6;
+}
+
+message RespOrderDetailGetGroupBySellerWarehouse {
+	repeated OrderDetail Orders = 1;	
+}
+
+message ReqOrderDetailGetGroupByUser {
+	// 用户 Id
+	int64 CustomerId = 1;
+	// 仓库 Id
+	int64 WarehouseId = 2;
+	// 运输方式 Id
+	int64 ShipmentTypeId = 3;
+	// 服务类型 Id
+	int64 ServiceTypeId = 4;
+	// 订单号
+	int64 OrderNum = 5;
+	// 筛选条件
+	ReqOrderGet Req = 6;
+}
+
+message ReqOrderDetailGetGroupBySeller {
+	// 商户姓名
+	string VendorName = 1;
+	// 仓库 Id
+	int64 WarehouseId = 2;
+	// 运输方式 Id
+	int64 ShipmentTypeId = 3;
+	// 服务类型 Id
+	int64 ServiceTypeId = 4;
+	// 订单号
+	int64 OrderNum = 5;
+	// 筛选条件
+	ReqOrderGet Req = 6;
+}
+
+message RespOrderDetailGetGroupByUser {
+	// 订单详情
+	repeated OrderDetail Orders = 1;
+}
+
+message RespOrderDetailGetGroupBySeller {
+	// 订单详情
+	repeated OrderDetail Orders = 1;
+}
+
+message OrderDetail {
+	// 订单号
+	int64 OrderNum = 1;
+	// 商品名
+	string ProductName = 2;
+	// 敏感词
+	string Sensitives = 3;
+	// 小计 单位元
+	double TotalPrice = 4;
+	// 货币符号
+	string PriceSymbol = 5;
+	// 备注
+	string Remark = 6;
+}
+
+message Buyer {
+	// 用户 Id
+	int64 UserId = 1;
+	// 用户名
+	string Name = 2;
+	// 国家代码
+	string CatalogCode = 7;
+	// 采购任务数
+	int64 Tasks = 8;
+}
+
+message ReqBuyerGet {
+	int64 UserId = 1;
+}
+
+message RespBuyerGet {
+	// 返回采购员
+	repeated Buyer Buyers = 1;
+}
+
+ message ReqBatchBuyerGet {
+	 repeated int64 UserIds = 1;
+ }
+
+ message RespBatchBuyerGet {
+	// 返回采购员
+	repeated Buyer Buyers = 1;
+ }
+
+message ReqOrderStatis {
+	int64 RegionId = 1;
+	int64 WarehouseId = 2;
+	int64 ServiceTypeId = 3;
+	int64 ShipmentTypeId = 4;
+}
+
+message RespOrderStatis {
+	// 所有订单
+	int64 All = 1;
+	// 待分配
+	int64 Pending = 2;
+	// 采购中
+	int64 Processing = 3;
+	// 问题订单
+	int64 Issue = 4;
+}
+
+message Module {
+	// 模块
+	string Module = 1;
+	// 模块 Id
+	int64 ModuleId = 2;
+}
+
+message Region {
+	// 国家 Id
+	int64 RegionId = 1;
+	// 国家代码
+	string CatalogCode = 2;
+	// 国家名字
+	string CountryName = 3;
+}
+
+message ReqCatalogGet {
+}
+
+message RespCatalogGet {
+	// 国家
+	repeated Region Regions = 1;
+}
+
+message ProSourceRegion {
+	// 采购地 Id
+	int64 ProSourceRegionId = 1;
+	// 采购地 Code
+	string ProSourceRegionCode = 2;
+	// 国家名
+	string CountryName = 3;
+}
+
+message ReqProSourceRegionGet {
+}
+
+message RespProSourceRegionGet {
+	repeated ProSourceRegion Regions = 1;
+}
+
+message Warehouse {
+	// 仓库 Id
+	int64 WarehouseId = 1;
+	// 目的地国家 Id
+	int64 RegionId = 2;
+	// 目的地国家 Code
+	string RegionCode = 3;
+	// 来源地国家 Id
+	int64 ProSourceRegionId = 4;
+	// 来源地国家 Code
+	string ProSourceRegionCode = 5;
+	// 仓库 Code
+	string WarehouseCode = 6;
+	// 仓库名
+	string WarehouseName = 7;
+	// 仓库名翻译
+	string AltWarehouseName = 8;
+}
+
+message ReqWarehouseGet {
+	// 目的地国家 Id
+	int64 RegionId = 1;
+	// 采购地国家 Id
+	int64 ProSourceRegionId = 2;
+}
+
+message RespWarehouseGet {
+	// 仓库
+	repeated Warehouse Warehouses = 1;
+}
+
+message ShipmentType {
+	// 运输方式 Id
+	int64 ShipmentTypeId = 1;
+	// 运输方式 Code
+	string ShipmentTypeCode = 2;
+	// 运输方式名
+	string ShipmentTypeName = 3;
+	// 运输方式名翻译
+	string AltShipmentTypeName = 4;
+	// 目的地国家代码
+	string RegionCode = 5;
+	// 目的地国家 Id
+	int64 RegionId = 6;
+	// 运输方式 Group
+	string ShipmentTypeGroup = 7;
+}
+
+message ReqShipmentTypeGet {
+	// 国家 Id,传0/不传 为所有国家
+	int64 RegionId = 1;
+}
+
+message RespShipmentTypeGet {
+	// 运输方式
+	repeated ShipmentType ShipmentTypes = 1;
+}
+
+message ReqModuleGet {
+}
+
+message RespModuleGet {
+	// 模块
+	repeated Module Modules = 1;
+}
+
+message ReqServiceTypeGet {
+	// 国家 Id
+	int64 RegionId = 1;
+}
+
+message RespServiceTypeGet {
+	repeated ServiceType ServiceTypes = 1;
+}
+
+message ServiceType {
+	// 服务类型 Id
+	int64 ServiceTypeId = 1;
+	// PurchaseType
+	string PurchaseType = 2;
+	// 服务类型
+	string ServiceName = 3; 
+	// 服务类型
+	string AltServiceName = 4;
+}
+
+message Domain {
+	// 域名 Id
+	int64 DomainId = 1;
+	// 域名
+	string Domain = 2;
+	// 名称
+	string Name = 3;
+}
+
+message ReqDomainGet {
+}
+
+message RespDomainGet {
+	repeated Domain Domains = 1;
+}
+
+message Department {
+	int64 DepartmentId = 1;
+	string DepartmentName = 2;
+	int64 ManagerId = 3;
+}
+
+message ReqDepartmentGet {
+}
+
+message RespDepartmentGet {
+	repeated Department Departments = 1;
+}
+
+message Label {
+	// 标签 Id
+	int64 LabelId = 1;
+	// 国家代码
+	string CatalogCode = 2;
+	// 模块 Id
+	int64 ModuleId = 3;
+	// 问题标签
+	string Label = 4;
+	// 更新人
+	string UpdatedBy = 5;
+	// 更新时间
+	int64 UpdateTime = 6;
+}
+
+message ReqLabelGet {
+	// 国家代码
+	int64 RegionId = 1;
+	// 模块 Id
+	int64 ModuleId = 2;
+}
+
+message RespLabelGet {
+	repeated Label Labels = 1;
+}
+
+//按客户分配，接收参数实体类
+message AssignConditionByCustomer {
+	// 用户 Id
+	int64 CustomerId = 1;
+	// 目的地国家 Id
+	int64 RegionId = 2;
+	// 运输方式 Id
+	int64 ShipmentTypeId = 3;
+	// 仓库 Id
+	int64 WarehouseId = 4;
+	// 服务类型 Id
+	int64 ServiceTypeId = 5;
+	// 订单库MySql的OrderId
+	int64 PaymentId = 6;
+	// 订单重量最小值
+	double WeightMin = 7;
+	// 订单重量最大值
+	double WeightMax = 8;
+	// 域名Id
+	int64 DomainId = 9;
+}
+
+//按卖家分配，接收参数实体类
+message AssignConditionBySeller {
+	// 卖家名称
+	string VendorName = 1;
+	// 目的地国家 Id
+	int64 RegionId = 2;
+	// 运输方式 Id
+	int64 ShipmentTypeId = 3;
+	// 仓库 Id
+	int64 WarehouseId = 4;
+	// 服务类型 Id
+	int64 ServiceTypeId = 5;
+	// 订单库MySql的OrderId
+	int64 PaymentId = 6;
+	// 订单重量最小值
+	double WeightMin = 7;
+	// 订单重量最大值
+	double WeightMax = 8;
+	// 域名Id
+	int64 DomainId = 9;
+}
+
+//按卖家和仓库分配，接收参数实体类
+message AssignConditionBySellerWarehouse {
+	// 卖家名称
+	string VendorName = 1;
+	// 目的地国家 Id
+	int64 RegionId = 2;
+	// 仓库 Id
+	int64 WarehouseId = 3;
+	// 服务类型 Id，如果有用服务类型筛选的话，就传大于0的服务类型Id，没有则传0或者不传
+	int64 ServiceTypeId = 4;
+	// 订单重量最小值
+	double WeightMin = 5;
+	// 订单重量最大值
+	double WeightMax = 6;
+	// 域名Id
+	int64 DomainId = 7;
+}
+
+// 按客户分配，接收参数
+message ReqOrderAssignByCustomer {
+	// 按客户分配的条件
+	repeated AssignConditionByCustomer AssignConditionByCustomers = 1;
+	// 要分配到的人员Id
+	repeated int64 UserIds = 2;
+	// 分配给外包平台,为 true 时, Userids不需要
+	bool Outsourcing = 3;
+}
+
+// 按客户分配，接收参数
+message ReqOrderAssignBySeller {
+	// 按卖家分配的条件
+	repeated AssignConditionBySeller AssignConditionBySellers = 1;
+	// 要分配到的人员Id
+	repeated int64 UserIds = 2;
+	// 分配给外包平台,为 true 时, Userids不需要
+	bool Outsourcing = 3;
+}
+
+message ReqOrderAssignBySellerWarehouse {
+	// 按卖家和仓库分配的条件
+	repeated AssignConditionBySellerWarehouse AssignConditionBySellerWarehouses = 1;
+	// 要分配到的人员Id
+	repeated int64 UserIds = 2;
+	// 分配给外包平台,为 true 时, Userids不需要
+	bool Outsourcing = 3;
+}
+
+// 重新分配
+message ReqOrderReAssign {
+	// 采购单 Id列表
+	repeated int64 PurcahseOrderIds = 1;
+	// 要分配到的人员Id
+	int64 UserIdTo = 2;
+	// 分配信息
+	string AssignInfo = 3;
+}
+
+message ReqMissionAnalyze {
+	// 仓库 Id
+	int64 WarehouseId = 1;
+}
+
+message RespMissionAnalyze {
+	repeated VendorTaskAnalyze Items = 1;
+}
+
+message VendorTaskAnalyze {
+	string VendorName = 1;
+	int64 Tasks = 2;
+}
+
+message ReqAssignAnalyze {
+	// 部门 Id
+	int64 department_id = 10;
+	// 采购人员 Id
+	int64 buyer_id = 11;
+	// 开始日期
+	int64 start_date = 20;
+	// 结束日期
+	int64 end_date = 21;
+}
+
+message RespAssignAnalyze {
+	repeated AssignAnalyzeItem items = 10;
+}
+
+message AssignAnalyzeItem {
+	int64 buyer_id = 10;
+	string buyer_name = 11;
+	int64 tasks = 20;
+	repeated DailyAssignAnalyze daily = 21;
+}
+
+message DailyAssignAnalyze {
+	string date = 10;
+	int64 ezbuy = 20;
+	int64 prime = 30;
+	int64 agent = 40;
+}
+
+enum IssueOption {
+	// 全部
+	IssueAll = 0;
+	// 问题件
+	Issue = 1;
+	// 非问题件
+	NonIssue = 2;
+}
+
+message PurchaseOrder {
+	// 采购订单 Id
+	int64 OrderId = 1;
+	// 订单号
+	string OrderNumberSKU = 2;
+	// 老订单号
+	string OldOrderNumber = 3;
+	// 客户 Id
+	int64 CustomerId = 4;
+	// 客户昵称
+	string UserNickName = 5;
+	// 国家代码
+	int64 RegionId = 6;
+	// 运输方式
+	string ShipmentType = 7;
+	// 运输方式 Id
+	int64 ShipmentTypeId = 8;
+	// 商品名
+	string ProductName = 11;
+	// 商品地址
+	string ProductUrl = 12;
+	// 商品图片地址
+	string ProductImage = 13;
+	// 敏感词
+	string BanKeywords = 14;
+	// 包含敏感词
+	bool ContainBanKeyword = 15;
+	// 包含备注
+	bool ContainRemark = 16;
+	// 采购地单价
+	double InternalUnitPrice = 18;
+	// 实际数量
+	int64 ActualQty = 20;
+	// 已下单数量
+	int64 PurchasedQty = 21;
+	// 剩余数量
+	int64 RemainQty = 22;
+	// 已采购的订单
+	repeated PurchasedOrder POs = 23;
+	// 国内运费
+	double InternalShipmentFee = 24;
+	// 商家名
+	string VendorName = 25;
+	// 采购员
+	string BuyerName = 27;
+	// 付款时间
+	int64 PayTime = 28;
+	// sku
+	string SKU = 29;
+	// sku 翻译
+	string AltSKU = 30;
+	// 
+	string SKUProperties = 31;
+	// 用户备注
+	string Remark = 32;
+	// 采购备注
+	string PurchaseRemark = 33;
+	// 全局备注
+	string GlobalRemark = 34;
+	// 前台备注
+	string FrontRemark = 35;
+	// 附件备注
+	string Attachment = 36;
+	// 问题标签
+	string IssueLabels = 37;
+	// 货币符号
+	string PriceSymbol = 38;
+	// 小计
+	double Total = 39;
+	// 老订单 Id
+	int64 OldOrderId = 40;
+	// 等待客户答复
+	bool PendingReply = 41;
+	// 客户已答复，等待处理
+	bool PendingAttention = 42;
+	// 差额补齐
+	double OffsetTotal = 43;
+	// gpid
+	int64 Gpid = 44;
+	// sku id
+	string SkuId = 45;
+	// 服务类型 id
+	int64 ServiceTypeId = 46;
+	// 新订单 Id
+	int64 NewOrderId = 47;
+	// 新订单 Item Id
+	int64 NewOrderItemId = 48;
+	// sql server
+	string OldPurchaseRemark = 49;
+	// 是否闪购
+	bool IsFlashSale = 50;
+	// 是否拼团
+	bool IsFriendsDeal = 51;
+	// 汇率
+	double CurrencyExchange = 52;
+	// 仓库Id
+	int64 WarehouseId = 53;
+	// 仓库名称
+	string WarehouseName = 54;
+	// 商家Id
+	string VendorId = 55;
+	// 美国台湾 handling_fee
+	double HandlingFee = 56;
+	// 来源地
+	int64 ProSourceRegionId = 57;
+	// 运单号
+	string TrackingNo = 58;
+}
+
+message PurchasedOrder {
+	// 采购记录 Id
+	int64 Id = 1;
+	// 采购订单 Id
+	int64 PurchaseOrderId = 2;
+	// 采购单号
+	string PONumber = 3;
+	// 淘宝账号 Id
+	int64 TaobaoAccountId = 4;
+	// 采购地单价
+	double InternalUnitPrice = 5;
+	// 国内运费采购地
+	double InternalShipmentFee = 6;
+	// 采购数量
+	int64 Qty = 7;
+	// 是否外网
+	bool IsOutSite = 8;
+	// 批量下单
+	bool IsFromBatch = 9;
+	// 单个下单
+	bool IsFromSingle = 10;
+	// 创建人
+	string CreateBy = 11;
+	// 创建时间
+	int64 CreateDate = 12;
+	// 更新人
+	string UpdateBy = 13;
+	// 更新时间
+	int64 UpdateDate = 14;
+	// 下单账号
+	string PlaceAccount = 15;
+}
+
+message ReqPurchaseOrderGet {
+	// 国家 Id
+	int64 RegionId = 1;
+	// 付款号
+	string PaymentNumber = 2;
+	// 订单号
+	string OrderNumberSKU = 3;
+	// 老订单号
+	string OldOrderNumber = 4;
+	// 用户昵称
+	string UserNickName = 5;
+	// 商家名
+	string VendorName = 6;
+	// 店铺名
+	string ShopName = 66;
+	// 最小价格
+	double PriceMin = 7;
+	// 最大价格
+	double PriceMax = 8;
+	// 部门 Id
+	int64 DepartmentId = 9;
+	// 采购员 Id
+	int64 BuyerId = 10;
+	// 运输方式 Id
+	int64 ShipmentTypeId = 11;
+	// 服务类型
+	int64 ServiceTypeId = 12;
+	// 备注选项
+	RemarkOption Remark = 13;
+	// 敏感词选项
+	BanKeywordOption BanKeyword = 14;
+	// 域名 Id
+	int64 DomainId = 15;
+	// 问题件选项
+	IssueOption Issue = 16;
+	// Label Id
+	int64 LabelId = 17;
+	// 搜索所有订单
+	bool SearchAllBuyer = 18;
+	// 仓库 Id
+	int64 WarehouseId = 19;
+	// 页码
+	int64 Page = 20;
+	// 页面大小
+	int64 Size = 21;
+	// 订单 Id
+	repeated int64 OrderIds = 22;
+	// 按照卖家 sku 排序
+	bool OrderByVenderSku = 23;
+}
+
+message RespPurchaseOrderGet {
+	repeated PurchaseOrder Orders = 1;
+	int64 Total = 2;
+}
+
+message RespLockRegionWarehouseGet {
+	// 锁定国家
+	int64 RegionId = 1;
+	// 锁定仓库
+	int64 WarehouseId = 2;
+	// 锁定运输方式
+	int64 ShipmentTypeId = 3;
+}
+
+message ReqCorrectSellerName {
+	// 订单 Id
+	int64 OrderId = 1;
+	// 真实卖家名
+	string SellerName = 2;
+}
+
+message ReqLabelOrder {
+	// 订单 Id
+	repeated int64 OrderIds = 1;
+	// 标签 Ids
+	repeated int64 Labels = 2;
+}
+
+message ReqPurchaseRemark {
+	// 订单号
+	int64 OrderId = 1;
+	// 备注内容
+	string Content = 2;
+}
+
+message PurchaseRemark {
+	// 备注 Id
+	int64 PurchaseRemarkId = 1;
+	// 订单 Id
+	int64 OrderId = 2;
+	// 备注内容
+	string Content = 3;
+	// 创建人
+	string CreateBy = 4;
+	// 创建时间
+	int64 CreateDate = 5;
+	// 更新人
+	string UpdateBy = 6;
+	// 更新时间
+	int64 UpdateDate = 7;
+}
+
+message ReqPurchaseRemarkGetAll {
+	// 订单号
+	int64 OrderId = 1;
+}
+
+message RespPurchaseRemarkGetAll {
+	// 备注历史
+	repeated PurchaseRemark Remarks = 1;
+}
+
+message ReqPlaceOrderCondition {
+	// 采购的PoId，若是批量下单，那么此值忽略
+	int64 PoId = 1;
+	// 采购单Id，若是批量下单，那么此值忽略
+	int64 PurchaseOrderId = 2;
+	// 采购单号，可用作单次或者批量下单
+	string PoNumber = 3;
+	// 采购单价，可用作单次或者批量下单，用作批量时，表示商品采购总价
+	double InternalUnitPrice = 4;
+	// 运费，可用作单次或者批量下单，用作批量时，表示总运费
+	double InternalShipmentFee = 5;
+	// 采购数量，可用作单次或者批量下单，用作批量时，表示总数量
+	int64 Qty = 6;
+	// 是否外网
+	bool IsOutSite = 7;
+	// 是否自动拍单
+	bool IsAutoPlace = 8;
+	// 下单账号
+	string PlaceAccount = 9;
+	// 收件地址
+	string ReceivingAddress = 10;
+}
+
+message ReqPlaceOrder {
+	// 是否批量下单[1:表示批量下单（不是拍单神器）,0:表示非批量箱单（单次下单或者拍单神器下单）]
+	bool IsBatch = 1;
+	// 采购单Id列表，如果是批量下单，那么此值是必填，反之不必
+	repeated int64 PurchaseOrderIds = 2;
+	// 下单时的条件，若批量下单时，只取第0条记录
+	repeated ReqPlaceOrderCondition Conditions = 3;
+}
+
+message ReqUploadExcelPO {
+	// excel 内容
+	string Content = 1;
+}
+
+message RespUploadExcelPO {
+	// 对应每行的结果
+	repeated UploadExcelPOResult Results = 1;
+}
+
+message UploadExcelPOResult {
+	// 0 成功 否则失败
+	int64 Code = 1;
+	// 消息
+	string Msg = 2;
+	// 老订单号
+	string OrderNumber = 3;
+	// sku
+	string Sku = 4;
+}
+
+message ReqSkuIntegrityCheck {
+	repeated int64 PurchaseOrderIds = 1;
+}
+
+message RespSkuIntegrityCheck {
+	bool Integrity = 1;
+	string Msg = 2;
+}
+
+message ReqDownloadAssignedOrders {
+	//需要导出的UserId
+	int64 UserId = 1;
+	//导出的时间范围，起始时间，<=0 则忽略此条件
+	int64 StartDate = 2;
+	//导出的时间范围，截止时间，<=0 则忽略此条件
+	int64 EndDate = 3;
+}
+
+message ReqDownloadPurchasedOrders {
+	//需要导出的UserId
+	int64 UserId = 1;
+	//导出的时间范围，起始时间，<=0 则忽略此条件
+	int64 StartDate = 2;
+	//导出的时间范围，截止时间，<=0 则忽略此条件
+	int64 EndDate = 3;
+}
+
+message ExportFile {
+  string contentType = 1;
+  bytes data = 2;
+  string filename = 3;
+}
+
+message ReqCancelOrder {
+	// 退单的采购单Id【sku对应的采购单Id】
+	int64 PurchaseOrderId = 1;
+	//Mssql OrderId
+	int64 OldOrderId = 2;
+	//退单备注
+	string CancelRemark = 3;
+	//退单原因
+	string CancelReason = 4;
+	//手动修改的费用
+	double ManualFee = 5;
+}
+
+message ReqCancelOrders {
+	repeated ReqCancelOrder Reqs = 1;
+}
+
+enum OffsetType {
+	Unknow_Balance = 0;
+	InternalExpress = 1;
+	Qty = 2;
+	UnitPrice = 3;
+	Other = 99;
+}
+
+message OffsetInfo {
+    //差额补齐类型
+    OffsetType OffsetType = 1;
+    //差额补齐的值，可以是金额，也可以是数量
+    int64 OffsetValue = 2;
+    //差额补齐的备注
+    string Remark = 3;
+	// 差额补齐原因
+	string Reason = 4;
+}
+
+message ReqMakeOffsets {
+    //OrderIdMysql
+    int64 OrderIdMysql = 1;
+    //OrderItemIdMysql
+    int64 OrderItemIdMysql = 2;
+    // 所有差额补齐
+    repeated OffsetInfo Infos = 3;
+}
+
+message ReqChangeShipmentType {
+	//采购单Id
+	repeated int64 PurchaseOrderIds = 1;
+	//运输方式Id
+	int64 ShipmentTypeId = 2;
+	//备注
+	string Remark = 3;
+}
+
+message ReqSavePurchaseCheck {
+	string ErpUrl = 1;
+	int64 OrderId = 2;
+	//国内运费
+	int64 InternalShipmentFee = 3;
+	string OrderNumber = 4;
+	string CatalogCode = 5;
+	string OriginCode = 6;
+	string ProductName = 7;
+	//采购单号
+	repeated string PoNumbers = 8;
+	string ProductUrl = 9;
+	string PurchaseType = 10;
+	int64 Qty = 11;
+	int64 UnitPrice = 12;
+	int64 CustomerId = 13;
+	// 是否补拍
+	bool IsReorder = 14;
+	//TaobaoAccount的NickName
+	repeated string PayAccounts = 15;
+	//TaobaoAccount的Id
+	repeated int32 PayAccountIds = 16;
+	//是否闪购
+	bool IsFlashSales = 17;
+	//差额补齐
+	int64 Offset = 18;
+	string CreateBy = 19;
+	string UpdateBy = 20;
+	//productTotal + InternalShipmentFee + offset
+	int64 Total = 21;
+}
+
+message Task {
+	// 用户昵称
+	string UserNickName = 1;
+	// 用户 Id
+	int64 CustomerId = 2;
+	// 运输方式
+	string ShipmentType = 3;
+	// 运输方式 Id
+	int64 ShipmentTypeId = 4;
+	// 仓库
+	string WarehouseName = 5;
+	// 仓库 Id
+	int64 WarehouseId = 6;
+	// 国家
+	string CountryName = 7;
+	// 国家 code
+	string CatalogCode = 8;
+	// 国家 Id
+	int64 RegionId = 9;
+	// 最后付款时间
+	int64 PayTime = 10;
+	// 卖家数
+	int64 SellerCount = 11;
+	// 订单数
+	int64 OrderCount = 12;
+	// 总价
+	double TotalPrice = 13;
+	// 货币符号
+	string PriceSymbol = 14;
+}
+
+message ReqTaskListGet {
+	// 国家 Id
+	int64 RegionId = 1;
+	// 仓库 Id
+	int64 WarehouseId = 2;
+	// 服务类型 Id
+	int64 ServiceTypeId = 3;
+	// 运输方式 Id
+	int64 ShipmentTypeId = 4;
+	// 页码
+	int64 Page = 5;
+	// 页面大小
+	int64 Size = 6;
+}
+
+message RespTaskListGet {
+	repeated Task Tasks = 1;
+	int64 Total = 2;
+}
+
+message TaskListStatis {
+	int64 WarehouseId = 1;
+	string WarehouseName = 2;
+	int64 AgentCount = 3;
+	int64 PrimeCount = 4;
+	int64 EzbuyCOunt = 5;
+}
+
+message ReqTaskListStatis {
+	// 目的地国家 Id
+	int64 RegionId = 1;
+}
+
+message RespTaskListStatis {
+	repeated TaskListStatis Statis = 1;
+}
+
+message ReqTaskListGetIDs {
+	repeated Task Tasks = 1;
+}
+
+message RespTaskListGetIDs {
+	repeated int64 Ids = 1;
+}
+
+message ReqShowSkuInfos {
+	// MssqlOrderId
+	int64 MssqlOrderId = 1;
+}
+
+message ShowSkuInfosEntity{
+	// skuid
+	string SkuId = 1;
+	// 商品名称
+	string ProductName = 2;
+	// sku
+	string Sku = 3;
+	// 状态描述
+	string StatusDesc = 4;
+}
+
+message RespShowSkuInfos {
+	// 结果列表
+	repeated ShowSkuInfosEntity Entities = 1;
+}
+
+// 异常订单，获取不到商品库
+message AbnormalOrder {
+	string NickName = 1;
+	int64 OrderIdMysql = 2;
+	int64 OrderItemIdMysql = 3;
+	string OrderNumber = 4;
+	string Remark = 5;
+	int64 ProsourceRegionId = 6;
+	int64 ShipmentTypeId = 7;
+	int64 Qty = 8;
+	int64 UnitPrice = 9;
+	int64 DomesticShippingFee = 10;
+	int64 HandlingFee = 11;
+	int64 RegionId = 12;
+	int64 ServiceTypeId = 13;
+	int64 OrderDate = 14;
+	int64 Gpid = 15;
+	int64 PurchaseOrderId = 16;
+	int64 OldOrderId = 17;
+	int64 GpidVersion = 18;
+	string SkuId = 19;
+	// 异常取消
+	bool AbnormalCancel = 20;
+}
+
+message ReqAnbormalOrderGet {
+	int64 Page = 1;
+	int64 Size = 2;
+
+	// 付款时间
+	int64 PayDateMin = 10;
+	int64 PayDateMax = 11;
+	// 订单号
+	string OrderNumber = 20;
+}
+
+message RespAnbormalOrderGet {
+	// 异常订单
+	repeated AbnormalOrder Orders = 1;
+	// 总计
+	int64 Total = 2;
+}
+
+message ReqAbnormalFix {
+	repeated int64 OperPurchaseOrderIds = 10;
+}
+
+message RespAbnormalFix {
+	repeated bool Result = 10;
+}
+
+message ReqAbnormalFixAll {
+}
+
+message RespAbnormalFixAll {
+	repeated bool Result = 10;
+}
+
+// 手动拍单、拍单神器拍单、自动拍单
+enum PlaceOrderSourceType {
+	// 未知
+	Unknown = 0;
+	// 手动拍单
+	Manual = 1;
+	// 拍单神器
+	Tool = 2;
+	// 自动拍单
+	Auto = 3;
+	// 神器手动拍单
+	ToolManual = 21;
+}
+
+message ReqSaveRebateURL {
+	// 订单 id
+	int64 OperPurchaseOrderId = 1;
+	// 采购单的ProductUrl
+	string OriginUrl = 2;
+	// 第一次跳转 url
+	string RedirectUrl = 3;
+	// 返利链接
+	string RebateUrl = 4;
+	// 拍单神器版本
+	string Version = 5;
+	// 来源类型
+	PlaceOrderSourceType SourceType = 6;
+	// 域名
+	string DomainUrl = 7;
+}
+
+message RespSaveRebateURL {
+}
+
+message ReqBatchSaveTaobaoRefundStatus {
+	repeated ReqSaveTaobaoRefundStatus Reqs = 1;
+}
+
+message ReqSaveTaobaoRefundStatus {
+	// 淘宝拍单账号
+	string taobao_account = 1;
+    // 淘宝订单Id
+  	string taobao_order_id = 2;
+	// 商品Id
+  	int64 product_id = 3;
+	// 商品名
+  	string product_name = 4;
+	// SKU ID
+  	int64 sku_id = 5;
+	// SKU
+  	string sku = 6;
+	// 店铺名
+  	string shop_name = 7;
+	// 退款状态
+  	string refund_status = 8;
+	// 订单状态
+  	string order_status = 9;
+	// 单价
+  	int64 product_price = 10;
+	// 数量
+	int64 qty = 11;
+    // 订单总价
+	int64 total_product_price = 12;
+    // 运费
+	int64 shipping_fee = 13;
+	// 订单创建时间
+	int64 order_create_date = 14;
+}
+
+message RespSaveTaobaoRefundStatus {
+}
+
+message ReqTaobaoRefundStatusGet {
+	// 淘宝账号
+	string taobao_account = 1;
+	// 淘宝订单号
+	string taobao_order_id = 2;
+	// 店铺名
+	string shop_name = 3;
+	// 订单创建时间
+	int64 order_create_date_min = 4;
+	int64 order_create_date_max = 5;
+	int64 Page = 10;
+	int64 Size = 11;
+}
+
+message RespTaobaoRefundStatusGet {
+	repeated OrderRefundStatus Items = 1;
+}
+
+message OrderRefundStatus {
+	// 主键
+	int64 Id = 20;
+	// 淘宝拍单账号
+	string taobao_account = 1;
+    // 淘宝订单Id
+  	string taobao_order_id = 2;
+	// 商品Id
+  	int64 product_id = 3;
+	// 商品名
+  	string product_name = 4;
+	// SKU ID
+  	int64 sku_id = 5;
+	// SKU
+  	string sku = 6;
+	// 店铺名
+  	string shop_name = 7;
+	// 退款状态
+  	string refund_status = 8;
+	// 订单状态
+  	string order_status = 9;
+	// 单价
+  	int64 product_price = 10;
+	// 数量
+	int64 qty = 11;
+    // 订单总价
+	int64 total_product_price = 12;
+    // 运费
+	int64 shipping_fee = 13;
+	// 订单创建时间
+	int64 order_create_date = 14;
+    // 创建人
+	string create_by = 15;
+	// 创建时间
+  	int64 create_date = 16;
+	// 更新人
+  	string update_by = 17;
+	// 更新时间
+  	int64 update_date = 18;
+}
+
+
+message ReqMonitorGetNotEnterPurchaseSystem {
+
+}
+
+message RespMonitorGetNotEnterPurchaseSystem {
+    int64 Count = 1;
+}
+
+message ReqMonitorGetOrderCountPerStatus {
+
+}
+
+message OrderCountPerStatusEntity {
+    int64 StatusId = 1;
+    //状态描述
+    string StatusDescription = 2;
+    int64 Count = 3;
+}
+
+message RespMonitorGetOrderCountPerStatus {
+    repeated OrderCountPerStatusEntity Entities = 1;
+}
+
+message ReqMonitorGetDurationInStatus {
+	//状态Id
+	int64 StatusId = 1;
+}
+
+message RespMonitorGetDurationInStatus {
+    //小于1天的数量
+    int64 CountLessOneDay = 1;
+    //大于1天小于2天的数量
+    int64 CountLessTwoDayMoreOneDay = 2;
+    //大于2天的数量
+    int64 CountMoreTwoDay = 3;
+}
+
+message ReqSuperPurchaserGet {
+	//国家Id
+	int64 RegionId = 1;
+	//部门Id
+	int64 DepartmentId = 2;
+	//采购员Id
+	int64 UserId = 3;
+	//是否超级采购员
+	bool IsSuperPurchaser = 4;
+}
+
+message SuperPurchaserEntity {
+	//采购员Id
+	int64 UserId = 1;
+	//国家Id
+	int64 RegionId = 2;
+	//国家名
+	string RegionName = 3;
+	//部门Id
+	int64 DepartmentId = 4;
+	//部门名称
+	string DepartmentName = 5;
+	//采购员账号
+	string UserName = 6;
+	//员工Id
+	int64 StaffId = 7;
+	//员工名字
+	string StaffName = 8;
+	//是否超级管理员
+	bool IsSuperPurchaser = 9;
+}
+
+message RespSuperPurchaserGet {
+	repeated SuperPurchaserEntity Entities = 1;
+}
+
+message ReqSetSuperPurchaser {
+	//需要设置的采购员Id列表
+	repeated int64 UserIds = 1;
+	//是否设置为采购员
+	bool IsSetSuperPurchaser = 2;
+}
+
+message RespSetSuperPurchaser {
+}
+
+message ReqReturnToOutsourcing {
+	//采购单Id列表
+	repeated int64 OperPurchaseOrderIds = 1;
+}
+
+message RespReturnToOutsourcing {
+
+}
+
+message ReqOperationLogAdd {
+	repeated OperationLog Logs = 1;
+}
+
+message OperationLog {
+	int64 OperPurchaseOrderId = 1;
+	int64 BeforeStatusId = 2;
+	string BeforeStatus = 3;
+	int64 AfterStatusId = 4;
+	string AfterStatus = 5;
+	string Remark = 6;
+	string CreateBy = 7;
+	int64 CreateDate = 8;
+}
+
+message RespOperationLogAdd {
+}
+
+message ReqOperationLogGet {
+	int64 OperPurchaseOrderId = 1;
+}
+
+message RespOperationLogGet {
+	repeated OperationLog Logs = 1;
+}
+
+message ReqGenTrackNo {
+	repeated int64 PurchaseOrderIds = 1;
+}
+
+message RespGenTrackNo {
+	string TrackNo = 1;
+}
+
+message ReqRefreshProductInfo {
+	// 采购单Id列表
+	repeated int64 PurchaseOrderIds = 1;
+}
+
+message RespRefreshProductInfo {
+	
+}
+
+message RespPurchaseOrderExport {
+	string contentType = 1;
+	bytes data = 2;
+	string filename = 3;
+}

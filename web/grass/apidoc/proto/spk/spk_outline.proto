@@ -1,0 +1,47 @@
+syntax = "proto3";
+package spk;
+
+import "common/ezbuy.proto";
+
+service Outline {
+    option (common.service).webapi = true;
+
+    rpc Get(OutlineGet) returns (OutlineGetResp) {
+        option (common.timeout) = "1s";
+    };
+}
+
+//---------------------------------------------------------
+
+message OutlineGet {
+   repeated int64 gpids = 1;
+}
+
+message OutlineGetResp {
+    repeated XOutlineItem items = 1;
+}
+
+message XOutlineItem {
+    int32 CommentGradeAvg = 1;
+    int32 OrderQuantity = 2;
+}
+
+//---------------------------------------------------------
+
+message OutlineJobSyncCommentGrade {
+}
+
+message OutlineJobSyncOrderQuantity {
+}
+
+//---------------------------------------------------------
+
+message OutlineCommentGradeCacheKey {
+    int64 gpid = 1;
+    int64 date = 2;
+}
+
+message OutlineOrderQuantityCacheKey {
+    int64 gpid = 1;
+    int64 date = 2;
+}

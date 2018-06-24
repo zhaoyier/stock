@@ -1,0 +1,18 @@
+syntax = "proto3";
+package assassin;
+import "common/ezbuy.proto";
+import "assassin/assassin.proto";
+
+service Mogujie {
+  option (common.service).webapi = true;
+  rpc Fetch(MogujieFetch) returns (MogujieFetchResp);
+}
+
+message MogujieFetch {
+  string id = 1;
+  int32 fcid = 2;
+}
+
+message MogujieFetchResp {
+  Product item = 1;
+}

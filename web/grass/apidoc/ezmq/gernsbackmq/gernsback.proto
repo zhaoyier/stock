@@ -1,0 +1,28 @@
+syntax = "proto3";
+package gernsbackmq;
+
+import "common/empty.proto";
+
+service gernsback {
+	rpc PackageSplit(PackageSplitReq) returns (common.Empty);
+}
+
+
+message PackageSplitReq {
+	repeated Package packages = 1;
+}
+
+message Package {
+	string packageCode = 1;
+
+	// 实际上包裹号可以精确对应到入库号
+	// 而入库号又可以对应到订单号
+	// 旧SPU级别订单Id
+	// 但可能也存在一个入库号东西被分开打包到两个包裹的场景怎么破？
+	// 暂时直接传包裹号，等派送端迁移时再考虑把订单准确划分到包裹
+	repeated int64 orderIds = 2;
+	string colorName = 3;
+	string colorValue = 4;
+	bool isBig = 5;
+	int64 actualWeight = 6;
+}

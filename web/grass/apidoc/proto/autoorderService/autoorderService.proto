@@ -1,0 +1,35 @@
+syntax = "proto3";
+package autoorderService;
+
+enum Mode {
+	ModeSemiAutomatic = 0;
+	ModeAutomatic = 1;
+}
+
+message IdentifyResp {
+  Mode mode = 1;
+  string version = 2;
+  string downloadLink = 3;
+  string updateBy = 4;
+  int64 updateDate = 5;
+}
+
+message VersionInfo {
+  Mode mode = 1;
+  string version = 2;
+  string downloadLink = 3;
+}
+
+message Identify {
+  Mode mode = 1;
+}
+
+message VersionInfoResp {
+  int32 code = 1;
+  string msg = 2;
+}
+
+service ForceUpdate {
+  rpc Get (Identify) returns (IdentifyResp);
+  rpc Set (VersionInfo) returns (VersionInfoResp);
+}

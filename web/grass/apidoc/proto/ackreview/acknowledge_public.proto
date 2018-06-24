@@ -1,0 +1,258 @@
+syntax = "proto3";
+package ackreview;
+
+import "common/ezbuy.proto";
+import "appcommon/common_public.proto";
+
+
+service Acknowledge {
+    option (common.service).webapi = true;
+	option (common.service).public = true;
+
+    //web、app端保存用户评论
+    rpc SaveAcknowledge (SaveAcknowledgeReq) returns (appcommon.ResultResp);
+    
+    //web端展示用户评论&客服回复
+    rpc ShowAcknowledgeReview (ShowAcknowledgeReviewReq) returns (ShowAcknowledgeReviewResp);
+
+    //erp获取用户评论列表
+    rpc ShowAcknowledgeERP (ShowAcknowledgeERPReq) returns (ShowAcknowledgeERPResp);
+
+    //erp保存客服回复
+    rpc SaveEzbuyReply (SaveEzbuyReplyReq) returns (SaveEzbuyReplyResp);
+
+    //erp添加用户评论分类
+    rpc SaveCommentCategory (SaveCommentCategoryReq) returns (appcommon.ResultResp);
+
+    //erp删除用户评论分类
+    rpc DelCommentCategory (DelCommentCategoryReq) returns (appcommon.ResultResp);
+
+    //erp页面显示用户评论分类以及各分类下不满意用户数量
+    rpc ShowCommentCategoryAndTerribleCount (ShowCommentCategoryAndTerribleCountReq) returns (ShowCommentCategoryAndTerribleCountResp);
+
+    // 默认好评
+    rpc DefaultComment (DefaultCommentReq) returns (DefaultCommentResp);
+
+    // 导出评论
+    rpc ErpExportComment (ShowAcknowledgeERPReq) returns (ErpExportCommentResp);
+
+    // 获取标签
+    rpc GetTag (GetTagReq) returns (GetTagResp);
+
+    // 配置标签
+    rpc ErpSaveTag (ErpSaveTagReq) returns (appcommon.ResultResp);
+
+    // 获取当前用户所有评论
+    rpc UserAcknowledge (UserAcknowledgeReq) returns (UserAcknowledgeResp);
+}
+
+message SaveAcknowledgeReq{
+    SaveAcknowledgeItem saveAcknowledgeReq = 1;
+}
+
+message SaveAcknowledgeItem {
+    repeated string parcelNumber = 1;
+    //用户评价等级 0-GOOD 1-NEUTRAL 2-TERRIBLE
+    int32 rating = 2;
+    string comment = 3;
+    repeated string imageUrl = 4;
+    //评论标签ID
+    repeated int32 tagIds = 5;
+}
+
+message ShowAcknowledgeReviewReq{
+    int32 offset = 1;
+    int32 limit = 2;
+}
+
+message ShowAcknowledgeReviewResp{
+    bool result = 1;
+    string msg = 2;
+    int64 total = 3;
+    repeated AcknowledgeReviewItem ShowAcknowledgeReviewLists = 4;
+}
+
+message AcknowledgeReviewItem {
+    //用户评价等级 0-GOOD 1-NEUTRAL 2-TERRIBLE
+    int32 rating = 1;
+    string userName = 2;
+    int32 ackDate = 3;
+    string comment = 4;
+    string ezbuyReply = 5;
+    repeated string tagValue = 6;
+}
+
+message ShowAcknowledgeERPReq{
+    int32 offset = 1;
+    int32 limit = 2;
+    string userName = 3;
+    string commentId = 4;
+    bool commentStatus = 5;
+    int32 ackDateStart = 6;
+    int32 ackDateEnd = 7;
+    COMMONCHOISE replyStatus = 8;
+    RATING rating = 9;
+    COMMONCHOISE categoryStatus = 10;
+}
+
+enum COMMONCHOISE{
+    ALL = 0;
+    NONE = 1;
+    ALREADY = 2;
+}
+
+enum RATING{
+    ALLRATING = 0;
+    GOOD = 1;
+    NEUTRAL = 2;
+    TERRIBLE = 3;
+}
+
+message ShowAcknowledgeERPResp{
+    int64 total = 1;
+    repeated AckReviewERPItem ShowAcknowledgeERPLists = 2;
+}
+
+message AckReviewERPItem{
+    string commentId = 1;
+    repeated string parcelNumber = 2;
+    RATING rating = 3;
+    string comment = 4;
+    repeated string imageUrl = 5;
+    int32 customerId = 6;
+    string userName = 7;
+    int32 ackDate = 8;
+    bool isReplied = 9;
+    string replyComment = 10;
+    int32 replyDate = 11;
+    bool isActive = 12;
+    string parentCategory = 13;
+    string subCategory = 14;
+    repeated string tagValue = 15;
+}
+
+message SaveEzbuyReplyReq{
+    repeated SaveEzbuyReplyItem ezbuyReplyItem = 1;
+}
+
+message SaveEzbuyReplyItem{
+    string commentId = 1;
+    string replyComment = 2;
+    bool isActive = 3;
+    string parentCategory = 4;
+    string subCategory = 5;
+}
+
+message SaveEzbuyReplyResp{
+    repeated SaveEzbuyReplyRespItem saveEzbuyReply = 1;
+}
+
+message SaveEzbuyReplyRespItem{
+    string errCommentId = 1;
+    string errMsg = 2;
+}
+
+message SaveCommentCategoryReq{
+    string parentCategory = 1;
+    string subCategory = 2;
+}
+
+message ShowCommentCategoryAndTerribleCountReq{
+
+}
+
+message DelCommentCategoryReq{
+    string parentCategory = 1;
+    string subCategory = 2;
+}
+
+message ShowCommentCategoryAndTerribleCountResp{
+    repeated CategoryTreeItem category = 1;
+}
+
+message CategoryTreeItem{
+    CategoryItem parentCategory = 1;
+    repeated CategoryItem subCategory = 2;
+}
+
+message CategoryItem{
+    string category = 1;
+    int32 total = 2;
+}
+
+message DefaultCommentReq {
+    repeated DefaultCommentItem defaultComment = 1;
+}
+
+message DefaultCommentItem {
+    repeated string parcelNumber = 1;
+    int64 customerId = 2;
+}
+
+message DefaultCommentResp {
+    repeated DefaultCommentRespItem result = 1;
+}
+
+
+message DefaultCommentRespItem {
+    DefaultCommentItem defaultComment = 1;
+    bool success = 2;
+    string msg = 3;
+}
+
+message ErpExportCommentResp {
+    string fileUrl = 1;
+}
+
+message GetTagReq {
+    string tagValue = 1;
+    string createBy = 2;
+    RATING rating = 3;
+}
+
+message GetTagResp {
+    repeated Tag lists = 1;
+}
+
+message Tag {
+    int32 tagId = 1;
+    string tagValue = 2;
+    string createBy = 3;
+    int64 createDate = 4;
+}
+
+message ErpSaveTagReq {
+    string tagValue = 1;
+    int32 rating = 2;
+}
+
+message UserAcknowledgeReq {
+    int32 offset = 1;
+    int32 limit = 2;
+    UserAcknowledgeFilter filter = 3;
+}
+
+message UserAcknowledgeFilter {
+    repeated string parcelNumber = 1;
+}
+
+message UserAcknowledgeResp {
+    bool result = 1;
+    string msg = 2;
+    int64 total = 3;
+    repeated UserAcknowledgeReviewItem UserAcknowledgeLists = 4;
+}
+
+message UserAcknowledgeReviewItem {
+    int32 rating = 1;
+    string userName = 2;
+    int32 ackDate = 3;
+    string comment = 4;
+    string ezbuyReply = 5;
+    repeated string tagValue = 6;
+    int64 orderCount = 7;
+    int64 eta = 8;
+    string serviceType = 9;
+    repeated string orderImages = 10;
+    int64 pkgId = 11;
+}

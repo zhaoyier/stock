@@ -1,0 +1,106 @@
+syntax = "proto3";
+package gospm;
+
+import "common/ezbuy.proto";
+import "common/empty.proto";
+
+service Event {
+    option (common.service).webapi = true;
+
+	//-------------------------- UserLog ---------------------------------------------
+	// 记录用户在app内打开ezbuyapp://web的协议行为
+	rpc BrowseWeb(EventBrowseWeb) returns (common.Empty);
+
+	// 记录用户浏览商品详情页的行为
+	rpc BrowseProductDetail(EventBrowseProductDetail) returns (common.Empty);
+
+	// 记录用户浏览了选择sku界面的行为
+	rpc BrowseSelectSku(EventBrowseSelectSku) returns (common.Empty);
+
+	// 记录用户进行checkout的行为-> 进入Summary界面
+	rpc Checkout(EventCheckout) returns (common.Empty);
+
+	// 记录用户在Summary界面点pay的行为, 传入transactionId进行关联
+	rpc Purchase(EventPurchase) returns (common.Empty);
+
+	// 记录用户分享商品的行为
+	rpc Shared(EventShared) returns (common.Empty);
+
+	// 记录用户搜索商品的行为
+	rpc Search(EventSearch) returns (common.Empty);
+
+	// 记录类目
+	rpc Category (EventCategory) returns (common.Empty);
+}
+
+message EventBrowseWebCond {
+	string ezspm = 1;
+}
+
+message EventBrowseWeb {
+	EventBrowseWebCond eventArgs = 1;
+}
+
+message EventBrowseProductDetailCond {
+	string ezspm = 1;
+	int64 gpid = 2;
+}
+
+message EventBrowseProductDetail {
+	EventBrowseProductDetailCond eventArgs = 1;
+}
+
+message EventBrowseSelectSkuCond {
+	string ezspm = 1;
+	int64 gpid = 2;
+}
+
+message EventBrowseSelectSku {
+	EventBrowseSelectSkuCond eventArgs = 1;
+}
+
+message EventCheckoutCond {
+	string ezspm = 1;
+	repeated int64 gpids = 2;
+}
+
+message EventCheckout {
+	EventCheckoutCond eventArgs = 1;
+}
+
+message EventPurchaseCond {
+	string ezspm = 1;
+	repeated int64 gpids = 2;
+	string transactionId = 3;
+}
+
+message EventPurchase {
+	EventPurchaseCond eventArgs = 1;
+}
+
+message EventSharedCond {
+	string ezspm = 1;
+	int64 gpid = 2;
+}
+
+message EventShared {
+	EventSharedCond eventArgs = 1;
+}
+
+message EventSearchCond {
+	string ezspm = 1;
+	string keyword = 2;
+}
+
+message EventSearch {
+	EventSearchCond eventArgs = 1;
+}
+
+message EventCategoryCond {
+	string ezspm = 1;
+	int64 categoryId = 2;
+}
+
+message EventCategory {
+	EventCategoryCond eventArgs = 1;
+}

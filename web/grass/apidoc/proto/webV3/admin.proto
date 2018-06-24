@@ -1,0 +1,33 @@
+syntax  = "proto3";
+package web;
+
+import "common/ezbuy.proto";
+import "common/file.proto";
+
+service Admin {
+    option (common.service).webapi = true;
+    // 导入商品
+    rpc ImportPoolExcel(ImportPoolReq) returns (Result){
+        option (common.webapi).upload = true;
+    };
+}
+
+message ImportPoolReq {
+    common.File file = 1;
+    // 展示类目   废弃
+    int32 dcid = 2;
+    string catalog = 3;
+    string channelLink = 4;
+}
+
+message Result {
+	ErrorCode code = 1;
+	string msg = 2;
+}
+
+enum ErrorCode {
+	OK = 0;
+	NotFound = 1;
+	Unkonwn = 2;
+}
+

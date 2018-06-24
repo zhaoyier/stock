@@ -1,0 +1,68 @@
+syntax = "proto3";
+package wautic;
+
+import "common/ezbuy.proto";
+
+service Wautic {
+    rpc SendEmail (SendEmailReq) returns (SendEmailResp);
+
+    // 全部参数验证通过后，才会执行发送
+    rpc BatchSendEmail (BatchSendEmailReq) returns (BatchSendEmailResp);
+}
+
+// --------------------
+message SendEmailReq {
+    string subject = 1;
+
+    // 二者不能同时为空
+    string bodyText = 2; // 不低于20字符
+    string bodyHtml = 3; // 不低于10字符
+
+    repeated EmailAddress toAddrs = 4;
+    repeated EmailAddress ccAddrs = 5; // optional
+
+    // 必须是经过SES认证的邮箱或域名，目前：
+    // 域名：ezbuy.com
+    // 邮箱：noreply@ezbuy.com | newsletter@ezbuy.com | info@ezbuy.com
+    EmailAddress sender = 6;
+    repeated EmailAddress replyToAddrs = 7; // optional
+    EmailPriority priority = 8;
+}
+
+message SendEmailResp {
+    Ret ret = 1;
+}
+
+message EmailAddress { // RFC 5322 address, e.g. "Barry Gibbs <bg@example.com>"
+    string name = 1; // optional
+    string addr = 2;
+}
+
+// 发送优先级，值越高，优先级越高，越早被发送
+// 自觉使用喔 :-)
+enum EmailPriority {
+    EmailPriorityDefault = 0;
+    EmailPriorityMiddle = 1;
+    EmailPriorityHigh = 2;
+    EmailPriorityExtremeHigh = 3;
+}
+
+// --------------------
+message BatchSendEmailReq {
+    repeated SendEmailReq emails = 1;
+}
+
+message BatchSendEmailResp {
+    Ret ret = 1;
+}
+
+// --------------------
+message Ret {
+    RetCode code = 1;
+    string errMsg = 2;
+}
+
+enum RetCode {
+    Ok = 0;
+    Error = 1;
+}

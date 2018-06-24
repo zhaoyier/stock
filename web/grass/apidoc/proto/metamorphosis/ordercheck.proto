@@ -1,0 +1,47 @@
+syntax = "proto3";
+package metamorphosis;
+
+import "common/empty.proto";
+import "common/ezbuy.proto";
+
+// 用户老库数据检查的服务
+service OrderCheck {
+	// 测试
+	rpc Test(common.Empty) returns (common.Empty);
+
+	// 检查订单是否没有更新支付状态
+    rpc CheckOrderPaid(CheckOrderPaidReq) returns (CheckOrderPaidResp);
+
+	// 处理那些还没有被重构的老账单支付, 处理cartorder中不处理的那些
+	rpc CheckPayOldPayments(CheckPayOldPaymentsReq) returns (CheckPayOldPaymentsResp) {
+		option (common.timeout) = "60s";
+	}
+}
+
+// ----------------------------------------------------------------
+
+message CheckPayOldPaymentsReq {
+	int64 CustomerId = 1;
+	repeated int32 PaymentBillIds = 2;
+}
+
+message CheckPayOldPaymentsResp {
+	Result_Check Result = 1;
+}
+
+message CheckOrderPaidReq {
+    int64 begin = 1; // 可选，默认当天开始
+    int64 end = 2; // 可选，默认当天结束
+    bool isCheckOnly = 3; // 进检查，不做处理
+}
+
+message CheckOrderPaidResp {
+    Result_Check result = 1;
+    repeated string msgs = 2;
+    int32 count = 3;
+}
+
+message Result_Check {
+	int64 code = 1;
+	string message = 2;
+}

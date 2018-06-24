@@ -1,0 +1,21 @@
+syntax = "proto3";
+package ezOrder;
+
+import "common/empty.proto";
+import "ezOrder/order.proto";
+import "ezOrder/orderUtil.proto";
+
+service OrderNearline {
+	//测试
+	rpc Test(common.Empty) returns (common.Empty);
+	// 获取订单item原始总价
+	rpc RpcGetOrderItemsOriginTotalAmount(RpcGetOrderItemsOriginTotalAmountReq) returns (RpcGetOrderItemsOriginTotalAmountResp) {};
+	//根据订单id查询订单sku详情
+    rpc RpcGetOrderSkuDetailByOrderIdItemId(RpcGetOrderSkuDetailByOrderIdItemIdReq) returns (RpcGetOrderSkuDetailByOrderIdItemIdResp);
+}
+
+
+
+
+
+

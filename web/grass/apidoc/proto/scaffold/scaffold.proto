@@ -1,0 +1,73 @@
+syntax  = "proto3";
+package scaffold;
+
+import "tong/wallet.proto";
+import "common/ezbuy.proto";
+
+service Scaffold {
+    rpc TopUp(tong.WalletTopUp) returns (tong.WalletTopUpResp);
+    rpc ConfirmTopUp(tong.WalletInstruct) returns (tong.WalletInstructResp);
+    rpc Deduct2(tong.WalletDeduct) returns (tong.AccountBalanceAndResp){
+        option (common.timeout) = "60s";
+    }
+
+    rpc InsertTrace (Trace) returns (TraceResp);
+
+    rpc Refund(tong.WalletRefund) returns (tong.AccountBalanceAndResp);
+    // 查询钱包帐户余额
+    rpc GetBalance(tong.WalletGetBalance) returns (tong.WalletGetBalanceResp);
+
+    // 查询prepayment
+    rpc GetPrepayment(GetPrepaymentReq) returns (GetPrepaymentResp);
+
+    // 查看账单号是否存在付款记录
+    rpc GetPrePaymentID(GetPrePaymentIDReq) returns (GetPrePaymentIDResp);
+}
+
+message GetPrepaymentReq {
+    int64 CustomerId = 1;
+    string OrderNumber = 2;
+    string PackageNumber = 3;
+}
+
+message GetPrepaymentResp {
+    tong.Result Result = 1;
+    repeated Prepayment Prepayments = 2;
+}
+
+message Prepayment {
+    int64 Total = 1;
+    string Notes = 2;
+    string Operator = 3;
+    string OperTime = 4;
+}
+
+message Trace {
+    string Information    = 1;
+    string TopUpNumber    = 4;
+    string PaymentNumbers = 5;
+    string CurrencyCode   = 6;
+    int32  Total          = 7;
+    int32  PayFee         = 8;
+    int32  CustomerId     = 9;
+    string TraceType      = 11;
+    string PayStatus      = 12;
+    string PaymentGateway = 14;
+    string NotifyId       = 15;
+    int32  PlatformId     = 16;
+
+    string Token          = 18;
+}
+
+message TraceResp{}
+
+message GetPrePaymentIDReq {
+    string BillID       = 1;
+    int64 CustomerID    = 2;
+    int64 Amount        = 3;
+}
+
+message GetPrePaymentIDResp {
+    int64 PrePaymentID  = 1; //  非0 的PrePaymentID代表已经存在这笔账单的预付款记录
+}
+
