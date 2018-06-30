@@ -1,4 +1,5 @@
 syntax="proto3";
+package account;
 
 message Result {
     // 状态码
@@ -19,4 +20,8 @@ message AccountLoginReq {
 message AccountLoginResp {
     // 结果
     Result result = 1;
+}
+
+service GAccount {
+    rpc GAccountSigin(AccountLoginReq) returns (AccountLoginResp);
 }

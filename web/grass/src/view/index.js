@@ -12,9 +12,7 @@ function render(rootRoutes){
 	const target = document.getElementById('container')
 	ReactDOM.unmountComponentAtNode(target)
   ReactDOM.render(
-    <Provider store={store}>
-      <Router routes={rootRoutes} history={hashHistory} />
-    </Provider>,
+    <Router routes={rootRoutes} history={hashHistory} />,
     target
   )
 }

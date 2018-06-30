@@ -5,7 +5,7 @@ SHELL := /bin/bash
 # 多个 service 文件以空格隔开
 
 thriftServices =
-protobufServices = apidoc/proto/ezseller/product.proto
+protobufServices = apidoc/proto/account/account.proto
 
 
 genservices:
