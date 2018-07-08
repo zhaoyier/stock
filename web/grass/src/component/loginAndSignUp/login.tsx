@@ -1,10 +1,11 @@
 import * as React from "react";
 import { Form, Input, Icon, Button } from "antd";
-
+import * as Cookies from "js-cookie";
 import * as Fetch from "fetch.io";
 import { FormComponentProps } from "antd/lib/form/Form";
 
 import { GAccountSigin } from "services/account/account";
+import { Post } from "services/api";
 
 const FormItem = Form.Item;
 
@@ -33,37 +34,13 @@ class SigninPage extends React.Component<CreateProps & FormComponentProps, Creat
 			if (!err) {
 				console.log("Received values of form: ", values);
 			}
-			// GAccountSigin(values).then( res => {
-			// 	console.log("=====>>>sigin:", res);
-			// }).catch(res => {
-			// 	console.log("===>>>sigin catch:", res);
-			// })
-
-			// Fetch("http://localhost:12101/account/login", {
-			// 	method: "POST",
-			// 	headers: { "Accept": "application/json", "Content-Type": "application/json", },
-			// 	body: JSON.stringify(values)
-			// })
-			// .then(response => response.json())
-			// .then(res => {
-			// 	console.log("=====>>then:", res);
-			// })
-			// .catch(res => {
-			// 	console.log("=====>>catch:", res);
-			// });
-			const fetchOption = {
-				method: "POST",
-				headers: { Accept: "application/json", "Content-Type": "application/json" },
-				body: JSON.stringify({ username: "hello", password: "world", captcha: "00101" })
-			};
-			fetch("http://localhost:12101/account/login", fetchOption)
-				.then(response => response.json())
-				.then(responseJson => {
-					console.log("==>>then:", responseJson);
-				})
-				.catch(function(e) {
-					console.log("===>>catch:", "Oops, error");
-				});
+			Post("/account/login", values).then(res => {
+				console.log("===res:", res);
+				const expireDate = new Date();
+				expireDate.setDate(expireDate.getDate() + 1);
+				Cookies.set("data", res, { expires: expireDate });
+				window.location.href = "/index.html";
+			});
 		});
 	};
 

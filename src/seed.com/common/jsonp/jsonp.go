@@ -15,7 +15,6 @@ func Jsonp() gin.HandlerFunc {
 			c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 			c.Writer.Header().Add("Access-Control-Allow-Headers", "Content-Type")
 			c.Writer.Header().Set("content-type", "application/json")
-
 		}
 
 		//放行所有OPTIONS方法

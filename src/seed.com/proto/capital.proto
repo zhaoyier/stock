@@ -1,0 +1,39 @@
+syntax="proto3";
+package capital;
+
+enum DateSpan {
+    OneDay = 0;
+    TwoDay = 1;
+    ThreeDay = 2;
+    FourDay = 3;
+    OneWk = 4;   // 一周
+    TwoWk = 5;
+    ThreeWk = 6;
+    FourWk = 7;
+}
+
+message Pagination {
+    int32 page = 1;
+    int32 size = 2;
+    bool next = 3;
+}
+
+
+// 查询条件
+message CapitalFlowReq {
+    string code = 1; // 代码
+    DateSpan span = 2;  //跨度
+    Pagination page = 3;    //分页
+}
+
+message CapitalFlowResp {
+    string code = 1;
+    string name = 2;
+    int64 mainIn = 3;//主力流入
+    int64 mainOut = 4;//主力流出
+    int64 retailIn = 5;//散户流入
+    int64 retailOut = 6;//散户流出
+    int64 balance = 7;//流入流出差
+    DateSpan span = 8;  //跨度
+    Pagination page = 9;
+}

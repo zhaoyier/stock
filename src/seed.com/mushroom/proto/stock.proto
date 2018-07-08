@@ -157,16 +157,24 @@ message Funds {
 message FundsData {
     //流入
     float mainInflow = 1;
+    //流出
+    float mainOutflow = 2;
+    // 差值
+    float mainNet = 3;
+    // 百分比
+    int32 mainPCT = 4;
     //流入
-    float retailInflow = 2;
+    float retailInflow = 5;
     //流出
-    float mainOutflow = 3;
-    //流出
-    float retailOutflow = 4;
+    float retailOutflow = 6;
+    //散户净值
+    float retailNet = 7;
+    //百分比
+    int32 retailPCT = 8;
     // 日期
-    string date = 5;
+    string date = 9;
     //主力信息
-    repeated MainInfo mainInfo = 6;
+    repeated MainInfo mainInfo = 10;
 }
 
 //信息

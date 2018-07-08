@@ -183,6 +183,9 @@ func _baiduFunds(code, exc string) error {
 			_, err := fmt.Printf("Code: %s|Exchange: %s 解析失败!", code, exc)
 			return err
 		}
+
+		funds.FundsData.MainNet = funds.GetFundsData().GetMainInflow() - funds.GetFundsData().GetMainOutflow()
+		funds.FundsData.RetailNet = funds.GetFundsData().GetRetailInflow() - funds.GetFundsData().GetRetailOutflow()
 		if err := dao.SaveFundsData(code, exc, Origin, funds.GetFundsData()); err != nil {
 			log.Errorf("[_getHTTPJSON] 记录数据失败:%s", err.Error())
 			return err
