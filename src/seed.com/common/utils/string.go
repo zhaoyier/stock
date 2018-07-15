@@ -30,7 +30,7 @@ func FormatInt(val int) string {
 }
 
 //ParseFloat32 字符串转32浮点数
-func ParseFloat32(str string) float32 {
+func ParseF32(str string) float32 {
 	val, err := strconv.ParseFloat(str, 64)
 	if err != nil {
 
@@ -39,7 +39,7 @@ func ParseFloat32(str string) float32 {
 }
 
 //ParseFloat64 字符串转64位浮点数
-func ParseFloat64(str string) float64 {
+func ParseF64(str string) float64 {
 	val, err := strconv.ParseFloat(str, 64)
 	if err != nil {
 
@@ -106,5 +106,10 @@ func CheckExchange(code string) string {
 func Atoi(str string) int {
 	val, _ := strconv.Atoi(str)
 	return val
+}
+
+func Atoi64(str string) int64 {
+	val, _ := strconv.Atoi(str)
+	return int64(val)
 }
 

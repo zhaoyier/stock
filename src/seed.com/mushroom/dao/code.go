@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	"seed.com/mushroom/proto/stock"
+	"seed.com/proto/stock"
 	"seed.com/utils"
 )
 
@@ -62,7 +62,7 @@ func GetCodeByOffset(offset, size int) ([]*stock.CodeByOffsetData, error) {
 			Name:     v["name"],
 			Exchange: v["exchange"],
 		}
-		fmt.Println("====>>code:", data)
+		// fmt.Println("====>>code:", data)
 		list = append(list, data)
 	}
 	return list, nil

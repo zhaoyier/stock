@@ -3,7 +3,7 @@ syntax="proto3";
 package stock;
 
 message EastMoneyPage {
-    
+
 }
 
 message EastMoneyData {
@@ -156,25 +156,27 @@ message Funds {
 //资金数据
 message FundsData {
     //流入
-    float mainInflow = 1;
+    double mainInflow = 1;
     //流出
-    float mainOutflow = 2;
+    double mainOutflow = 2;
     // 差值
-    float mainNet = 3;
+    double mainNet = 3;
     // 百分比
     int32 mainPCT = 4;
     //流入
-    float retailInflow = 5;
+    double retailInflow = 5;
     //流出
-    float retailOutflow = 6;
+    double retailOutflow = 6;
     //散户净值
-    float retailNet = 7;
+    double retailNet = 7;
     //百分比
     int32 retailPCT = 8;
+    //净流出
+    double outflow = 9;
     // 日期
-    string date = 9;
+    string date = 10;
     //主力信息
-    repeated MainInfo mainInfo = 10;
+    repeated MainInfo mainInfo = 11;
 }
 
 //信息
@@ -234,14 +236,14 @@ message StockCodePage {
 
 //翻页查询股票数据列表
 message GetCodeByOffsetDataList {
-  repeated CodeByOffsetData list = 1;
+    repeated CodeByOffsetData list = 1;
 }
-//翻页查询股票数据 
+//翻页查询股票数据
 message CodeByOffsetData {
-  //代码ID
-  string id=1;
-  //名称
-  string name=2;
-  //交易所
-  string exchange=3;
+    //代码ID
+    string id=1;
+    //名称
+    string name=2;
+    //交易所
+    string exchange=3;
 }

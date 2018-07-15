@@ -1,6 +1,6 @@
 package dao
 
-import "seed.com/mushroom/proto/stock"
+import "seed.com/proto/stock"
 
 //DBFunds 资金
 type DBFunds struct {

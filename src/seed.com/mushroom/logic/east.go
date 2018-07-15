@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"seed.com/mushroom/dao"
-	pbStock "seed.com/mushroom/proto/stock"
+	pbStock "seed.com/proto/stock"
 	"seed.com/utils"
 )
 
