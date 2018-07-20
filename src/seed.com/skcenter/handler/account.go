@@ -3,9 +3,11 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"seed.com/proto/account"
-	"fmt"
-	"net/http"
 	"seed.com/skcenter/data"
+
+	"seed.com/common/utils"
+	// "seed.com/skcenter/utils"
+	"fmt"
 )
 
 func Login(c *gin.Context)  {
@@ -24,7 +26,11 @@ func Login(c *gin.Context)  {
 		Code: 0,
 		Message: "succeed",
 	}
-	
 
-	c.JSON(http.StatusOK, resp)
+	fmt.Println("=====>>0001:", resp.String())
+	c.Set(utils.ResponseKey, utils.Resp{
+		Code: utils.Success,
+		Message: "",
+		Data: resp,
+	})
 }
