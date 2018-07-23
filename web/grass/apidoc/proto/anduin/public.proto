@@ -1,7 +1,0 @@
-syntax = "proto3";
-package anduin;
-
-message Result {
-	int32 code = 1;
-	string message = 2;
-}

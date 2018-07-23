@@ -1,7 +1,0 @@
-syntax = "proto3";
-package mqClient;
-
-message BroadcastMsg {
-    string topic = 1; // 广播的topic
-    string msg = 2; // 广播的message
-}

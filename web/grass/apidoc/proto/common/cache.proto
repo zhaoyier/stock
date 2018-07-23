@@ -1,9 +1,0 @@
-syntax = "proto3";
-package common;
-import "common/time.proto";
-option go_package = "gitlab.1dmy.com/ezbuy/base/dist/proto/common";
-
-message AsynccItem {
-	bytes data = 1;
-	common.Time cacheTime = 2;
-}

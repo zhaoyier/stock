@@ -1,9 +1,0 @@
-syntax = "proto3";
-package statusmq;
-
-import "common/empty.proto";
-import "ezStatus/status.proto";
-
-service status {
-    rpc SetOrderItemStatusBatch(.status.NewOrderItemStatusBatch) returns (common.Empty);
-}

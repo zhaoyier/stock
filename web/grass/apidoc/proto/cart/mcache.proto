@@ -1,7 +1,0 @@
-syntax = "proto3";
-package cart;
-
-//！ cache service
-message ValList {
-    repeated string strKey = 1;
-}

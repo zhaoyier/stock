@@ -1,6 +1,0 @@
-{
-	"extends": "tslint-config-ezbuy",
-	"linterOptions": {
-		"exclude": ["src/services/*.tsx"]
-	}
-}
