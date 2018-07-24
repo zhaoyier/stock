@@ -1,10 +1,10 @@
 @import (once) '../../../styles/index';
 
 .Layouts_wrap {
-    width: 100%;
-    height: 100%;
+    display: flex;
+    flex-direction: column;  
     > div {
-        height: 100%;
+        flex: 1;
     }
     .left {
         float: left;
@@ -53,6 +53,54 @@
         .routeWrap{
             height:100%;
             padding:10px 0px 0px 10px;
+        }
+    }
+    .header {
+        height: 46px;
+        display: flex;
+        .center {
+            flex: 0 0 80%!important;
+            padding-left: 0px;
+        }
+        .left{
+            flex: 0 0 10%!important; 
+            margin-left: 0px;
+            float: left;
+        }
+        .right {
+            display: flex; 
+            flex: 0 0 10%!important; 
+            justify-content: center;
+            align-items: center;
+        }
+    }
+    .body {
+        display: flex;
+        .center {
+            display: flex;
+            justify-content: center;   /*水平居中*/
+            align-items: center;     /*垂直居中*/
+            flex: 0 0 80%!important;
+            background: red;
+        }
+        .left,.right{
+            flex: 0 0 10%!important;
+            background: blue;
+        }
+    }
+    .footer {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        background: #F2F2F2;
+        text-align: center;
+        >div {
+            height: 100%;
+            width: 100%;
+            padding: 21px 0 22px;
+            border-top: 1px solid #EAEAEA;
+            background-color: #fff;
         }
     }
 }
